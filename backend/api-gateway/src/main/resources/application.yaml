@@ -1,3 +1,55 @@
+server:
+  port: 8076
+
 spring:
   application:
     name: api-gateway
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+      server:
+        webmvc:
+          routes:
+            - id: patient
+              uri: lb://patient
+              predicates:
+                - Path=/patient/**
+
+            - id: doctor
+              uri: lb://doctor
+              predicates:
+                - Path=/doctor/**
+
+            - id: appointment
+              uri: lb://appointment
+              predicates:
+                - Path=/appointment/**
+
+            - id: diagnostic
+              uri: lb://diagnostic
+              predicates:
+                - Path=/diagnostic/**
+
+            - id: prescription
+              uri: lb://prescription
+              predicates:
+                - Path=/prescription/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
