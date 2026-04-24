@@ -1,0 +1,28 @@
+.login-page {
+  width: 100%;
+}
+
+.login-visual {
+  position: relative;
+  background: url("/hero.png") center/cover no-repeat;
+}
+
+.login-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(5,40,56,.85);
+}
+
+.login-text {
+  position: relative;
+  z-index: 2;
+  color: white;
+  padding: 80px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.12);
+}
