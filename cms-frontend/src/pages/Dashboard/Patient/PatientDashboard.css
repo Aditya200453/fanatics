@@ -1,0 +1,39 @@
+/* ================= DASHBOARD ROOT ================= */
+
+.pd-root {
+  min-height: 100vh;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5, 40, 56, 0.92),
+      rgba(5, 40, 56, 0.85)
+    ),
+   url("../../../../public/hero.png")
+  center / cover no-repeat;
+  padding-top: 80px;
+}
+/* ================= GLASS CARD ================= */
+
+.pd-glass-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  color: #ffffff;
+  box-shadow: 0 20px 45px rgba(0,0,0,0.35);
+}
+/* ================= TEXT TOKENS ================= */
+
+.pd-title {
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.pd-muted {
+  color: rgba(255,255,255,0.75);
+}
+
+.pd-accent {
+  color: #22d3ee;
+}
