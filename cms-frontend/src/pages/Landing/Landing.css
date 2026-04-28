@@ -1,4 +1,4 @@
-/* ROOT */
+/* ================= ROOT ================= */
 .lp {
   background: #ffffff;
 }
@@ -7,86 +7,65 @@
 .lp-navbar {
   background: rgba(8, 35, 46, 0.92);
   backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.lp-navbar .nav-link{
-  color: rgba(255,255,255,.78) !important;
+.lp-navbar .nav-link {
+  color: rgba(255, 255, 255, 0.78) !important;
   padding: 8px 12px;
   border-radius: 10px;
-  transition: background .2s ease, color .2s ease;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
-.lp-navbar .nav-link:hover{
-  background: rgba(255,255,255,.10);
+.lp-navbar .nav-link:hover {
+  background: rgba(255, 255, 255, 0.1);
   color: #fff !important;
 }
 
-.lp-navbar .nav-link.active{
-  background: rgba(34,211,238,.20);
+.lp-navbar .nav-link.active {
+  background: rgba(34, 211, 238, 0.2);
   color: #fff !important;
-}
-
-.lp-pill {
-  border-radius: 999px;
-  padding: 8px 14px;
 }
 
 /* ================= HERO ================= */
 .lp-hero {
   position: relative;
-  min-height: 78vh;
+  min-height: 95vh;
   display: flex;
   align-items: center;
-  padding-top: 72px;
+  padding-top: 88px; /* ✅ FIX for fixed navbar */
   overflow: hidden;
 }
 
-/* ✅ BACKGROUND IMAGE LAYER */
+/* Background image */
 .lp-hero::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url("../../public/group-doctors-are-standing-hospital-corridor_1158271-723.png");
+  background-image: url("../../assets/doctors.png");
   background-size: cover;
   background-position: center;
   z-index: 0;
 }
 
-/* ✅ OVERLAY LAYER */
-.lp-hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(5, 40, 56, 0.88),
-    rgba(5, 40, 56, 0.55)
-  );
-  z-index: 1;
-}
-
-/* ✅ CONTENT LAYER */
-.lp-hero-content {
-  position: relative;
-  z-index: 2;
-  color: white;
-}
-
+/* Overlay */
 .lp-hero-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     90deg,
     rgba(5, 40, 56, 0.88) 0%,
-    rgba(5, 40, 56, 0.70) 45%,
+    rgba(5, 40, 56, 0.7) 45%,
     rgba(5, 40, 56, 0.55) 100%
   );
+  z-index: 1;
 }
 
+/* Hero content */
 .lp-hero-content {
   position: relative;
-  z-index: 1;
-  color: white;
+  z-index: 2;
+  color: #ffffff;
 }
 
 .lp-title {
@@ -103,10 +82,10 @@
   max-width: 680px;
   margin-top: 12px;
   font-size: 16px;
-  color: rgba(255,255,255,0.85);
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.lp-hero .btn{
+.lp-hero .btn {
   border-radius: 12px;
   padding: 10px 16px;
 }
@@ -116,9 +95,9 @@
   display: inline-flex;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.18);
-  color: rgba(255,255,255,0.9);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 12px;
 }
 
@@ -127,24 +106,23 @@
   padding: 56px 0;
 }
 
-.lp-section-soft {
-  background: #f6fbff;
-}
-
-/* ================= FEATURE CARDS ================= */
-.lp-feature-card{
+/* ================= FEATURE & ABOUT CARDS ================= */
+.lp-feature-card,
+.about-card {
   border-radius: 18px;
-  background: rgba(255,255,255,.92);
-  box-shadow: 0 12px 30px rgba(2, 8, 23, 0.10);
-  transition: transform .25s ease, box-shadow .25s ease;
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(2, 8, 23, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.lp-feature-card:hover{
+.lp-feature-card:hover,
+.about-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 18px 45px rgba(2, 8, 23, 0.14);
+  box-shadow: 0 18px 45px rgba(2, 8, 23, 0.15);
 }
 
-.lp-feature-icon{
+/* Icon */
+.lp-feature-icon {
   width: 54px;
   height: 54px;
   border-radius: 14px;
@@ -156,23 +134,10 @@
   font-size: 22px;
 }
 
-/* ================= ROLE CARDS ================= */
-
-.lp-card {
-  border-radius: 18px;
-  padding: 6px;
-  box-shadow: 0 10px 28px rgba(2, 8, 23, 0.08);
-  border: 1px solid #e5e7eb;
-}
-
-.lp-list {
-  margin: 12px 0 0;
-  padding-left: 18px;
-  color: #334155;
-}
-
-.lp-list li{
-  margin-bottom: 8px;
+.lp-feature-card:hover .lp-feature-icon i,
+.about-card:hover .lp-feature-icon i {
+  transform: scale(1.2);
+  transition: transform 0.3s ease;
 }
 
 /* ================= FOOTER ================= */
@@ -180,42 +145,52 @@
   background: #062633;
 }
 
-.lp-footer a{
-  color: rgba(255,255,255,.65);
+.lp-footer a {
+  color: rgba(255, 255, 255, 0.65);
   text-decoration: none;
 }
 
-.lp-footer a:hover{
+.lp-footer a:hover {
   color: #ffffff;
 }
-/* ===== Navbar Login Dropdown (Dark Theme) ===== */
 
+/* ================= DROPDOWN ================= */
 #login-dropdown + .dropdown-menu {
   background: rgba(8, 35, 46, 0.95);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: 8px;
   min-width: 220px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
 }
 
-/* Dropdown items */
 #login-dropdown + .dropdown-menu .dropdown-item {
-  color: rgba(255,255,255,0.85);
+  color: rgba(255, 255, 255, 0.85);
   border-radius: 10px;
   padding: 10px 12px;
   transition: background 0.2s ease, color 0.2s ease;
   font-weight: 500;
 }
 
-/* Hover state */
 #login-dropdown + .dropdown-menu .dropdown-item:hover {
   background: rgba(34, 211, 238, 0.18);
   color: #ffffff;
 }
 
-/* Divider */
-#login-dropdown + .dropdown-menu .dropdown-divider {
-  border-top: 1px solid rgba(255,255,255,0.12);
+/* ================= ANIMATIONS (CARD ONLY) ================= */
+.about-card,
+.lp-feature-card {
+  animation: fadeUp 0.8s ease-in-out both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
