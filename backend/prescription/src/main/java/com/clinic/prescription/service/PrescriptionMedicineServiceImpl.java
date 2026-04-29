@@ -1,6 +1,7 @@
 package com.clinic.prescription.service;
 
 import com.clinic.prescription.entity.PrescriptionMedicine;
+import com.clinic.prescription.exception.PrescriptionConflictException;
 import com.clinic.prescription.exception.PrescriptionNotFoundException;
 import com.clinic.prescription.repository.PrescriptionMedicineRepository;
 import com.clinic.prescription.repository.PrescriptionRepository;
@@ -21,17 +22,15 @@ public class PrescriptionMedicineServiceImpl implements PrescriptionMedicineServ
     }
 
     public PrescriptionMedicine addMedicine(Integer prescriptionId, PrescriptionMedicine medicine) {
-
         if (!prescriptionRepository.existsById(prescriptionId)) {
             throw new PrescriptionNotFoundException("Prescription with Id " + prescriptionId + " not found");
         }
 
-        medicine.setPrescriptionId(prescriptionId);
-
         if (medicine.getMedicineName() == null || medicine.getMedicineName().trim().isEmpty()) {
-            throw new PrescriptionNotFoundException("medicineName is required");
+            throw new PrescriptionConflictException("medicineName is required");
         }
 
+        medicine.setPrescriptionId(prescriptionId);
         return medicineRepository.save(medicine);
     }
 

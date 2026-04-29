@@ -3,6 +3,7 @@ package com.clinic.patient.controller;
 import com.clinic.patient.entity.Patient;
 import com.clinic.patient.service.PatientService;
 import com.clinic.patient.util.ResponseMessage;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +14,7 @@ import java.util.List;
 @RequestMapping("/patient")
 public class PatientController {
 
-    private PatientService patientService;
+    private final PatientService patientService;
 
     public PatientController(PatientService patientService) {
         this.patientService = patientService;
@@ -35,7 +36,7 @@ public class PatientController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Patient> storePatient(@RequestBody Patient patient) {
-        return ResponseEntity.ok(patientService.save(patient));
+        return ResponseEntity.status(HttpStatus.CREATED).body(patientService.save(patient));
     }
 
     @PutMapping(
@@ -50,7 +51,6 @@ public class PatientController {
     @DeleteMapping(path = "/")
     public ResponseEntity<ResponseMessage> removePatient(
             @RequestParam(name = "patientId", required = true) Integer id) {
-
         patientService.delete(id);
         return ResponseEntity.ok(new ResponseMessage("Patient deleted"));
     }
@@ -63,7 +63,6 @@ public class PatientController {
     public ResponseEntity<Patient> updatePatientPartially(
             @PathVariable Integer id,
             @RequestBody Patient patient) {
-
         return ResponseEntity.ok(patientService.partialUpdate(id, patient));
     }
 }

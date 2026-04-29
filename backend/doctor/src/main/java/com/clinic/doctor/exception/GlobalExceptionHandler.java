@@ -23,4 +23,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResponseMessage> handleGeneric(Exception ex) {
         return new ResponseEntity<>(new ResponseMessage("Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(DoctorExsistsException.class)
+    public ResponseEntity<ResponseMessage> handleDoctorExists(DoctorExsistsException ex) {
+        return new ResponseEntity<>(
+                new ResponseMessage(ex.getMessage()),
+                HttpStatus.CONFLICT
+        );
+    }
 }

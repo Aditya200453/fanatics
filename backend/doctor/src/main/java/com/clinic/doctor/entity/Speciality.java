@@ -1,9 +1,15 @@
 package com.clinic.doctor.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "speciality")
+@Table(
+        name = "speciality",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "name")
+        }
+)
 public class Speciality {
 
     @Id
@@ -11,10 +17,23 @@ public class Speciality {
     @Column(name = "speciality_id")
     private Integer specialityId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 100)
     private String name;
 
+    @Column(length = 255)
+    private String description;
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
     public Speciality() {}
+
+    // getters & setters
 
     public Integer getSpecialityId() {
         return specialityId;
@@ -30,5 +49,21 @@ public class Speciality {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

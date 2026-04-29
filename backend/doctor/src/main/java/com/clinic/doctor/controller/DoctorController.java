@@ -2,6 +2,7 @@ package com.clinic.doctor.controller;
 
 import com.clinic.doctor.entity.Doctor;
 import com.clinic.doctor.service.DoctorService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +30,8 @@ public class DoctorController {
 
     @PostMapping("/")
     public ResponseEntity<Doctor> add(@RequestBody Doctor doctor) {
-        return ResponseEntity.ok(doctorService.saveDoctor(doctor));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(doctorService.saveDoctor(doctor));
     }
 
     @PutMapping("/")
