@@ -11,6 +11,10 @@ const COUNTRIES = {
 export default function RegisterPage() {
   const [form, setForm] = useState({
     name: "",
+    email: "",
+    dob: "",
+    gender: "",
+    city: "",
     countryCode: "+91",
     phone: "",
     password: "",
@@ -32,6 +36,18 @@ export default function RegisterPage() {
     const requiredLength = COUNTRIES[form.countryCode].length;
 
     if (!form.name.trim()) newErrors.name = "Name is required";
+
+    if (!form.email) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      newErrors.email = "Invalid email format";
+    }
+
+    if (!form.dob) newErrors.dob = "Date of birth is required";
+
+    if (!form.gender) newErrors.gender = "Please select gender";
+
+    if (!form.city.trim()) newErrors.city = "City is required";
 
     if (!form.phone) {
       newErrors.phone = "Phone number is required";
@@ -55,6 +71,12 @@ export default function RegisterPage() {
 
     const payload = {
       name: form.name,
+      email: form.email,
+      dob: form.dob,
+      gender: form.gender,
+      address: {
+        city: form.city,
+      },
       phone: `${form.countryCode}${form.phone}`,
       password: form.password,
       role: form.role,
@@ -75,6 +97,7 @@ export default function RegisterPage() {
                 <h3 className="fw-bold text-center mb-3">Create Account</h3>
 
                 <Form onSubmit={handleSubmit}>
+                  {/* Name */}
                   <Form.Group className="mb-3">
                     <Form.Label>Full Name</Form.Label>
                     <Form.Control
@@ -88,9 +111,73 @@ export default function RegisterPage() {
                     </Form.Control.Feedback>
                   </Form.Group>
 
+                  {/* Email */}
+                  <Form.Group className="mb-3">
+                    <Form.Label>Email</Form.Label>
+                    <Form.Control
+                      type="email"
+                      name="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      isInvalid={!!errors.email}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.email}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  {/* DOB */}
+                  <Form.Group className="mb-3">
+                    <Form.Label>Date of Birth</Form.Label>
+                    <Form.Control
+                      type="date"
+                      name="dob"
+                      value={form.dob}
+                      onChange={handleChange}
+                      isInvalid={!!errors.dob}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.dob}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  {/* Gender */}
+                  <Form.Group className="mb-3">
+                    <Form.Label>Gender</Form.Label>
+                    <Form.Select
+                      name="gender"
+                      value={form.gender}
+                      onChange={handleChange}
+                      isInvalid={!!errors.gender}
+                    >
+                      <option value="">Select gender</option>
+                      <option value="MALE">Male</option>
+                      <option value="FEMALE">Female</option>
+                      <option value="OTHER">Other</option>
+                    </Form.Select>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.gender}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  {/* City */}
+                  <Form.Group className="mb-3">
+                    <Form.Label>City</Form.Label>
+                    <Form.Control
+                      name="city"
+                      value={form.city}
+                      onChange={handleChange}
+                      isInvalid={!!errors.city}
+                      placeholder="City"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.city}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  {/* Phone */}
                   <Form.Group className="mb-3">
                     <Form.Label>Phone Number</Form.Label>
-
                     <div className="d-flex gap-2">
                       <Form.Select
                         name="countryCode"
@@ -113,12 +200,12 @@ export default function RegisterPage() {
                         placeholder="Phone number"
                       />
                     </div>
-
                     <Form.Control.Feedback type="invalid">
                       {errors.phone}
                     </Form.Control.Feedback>
                   </Form.Group>
 
+                  {/* Password */}
                   <Form.Group className="mb-3">
                     <Form.Label>Password</Form.Label>
                     <Form.Control
@@ -133,6 +220,7 @@ export default function RegisterPage() {
                     </Form.Control.Feedback>
                   </Form.Group>
 
+                  {/* Role */}
                   <Form.Group className="mb-4">
                     <Form.Label>Register As</Form.Label>
                     <Form.Select
