@@ -22,6 +22,9 @@
 		<java.version>21</java.version>
 		<!-- Use a Spring Cloud BOM compatible with Spring Boot 3.5.x (matches your working template) -->
 		<spring-cloud.version>2025.0.1</spring-cloud.version>
+
+		<!-- ✅ ADD THIS -->
+		<jjwt.version>0.13.0</jjwt.version>
 	</properties>
 
 	<dependencyManagement>
@@ -38,48 +41,51 @@
 
 	<dependencies>
 
-		<!-- ✅ WebMVC Gateway (use this because your YAML uses spring.cloud.gateway.server.webmvc.*) -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-gateway-server-webmvc</artifactId>
-		</dependency>
+			<!-- ✅ SPRING CLOUD GATEWAY (REACTIVE) -->
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-starter-gateway</artifactId>
+			</dependency>
 
-		<!-- ✅ Eureka Client (service discovery) -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-		</dependency>
+			<!-- ✅ EUREKA CLIENT -->
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+			</dependency>
 
-		<!-- ✅ Load balancer support for lb://serviceName -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-loadbalancer</artifactId>
-		</dependency>
+			<!-- ✅ ACTUATOR (OPTIONAL BUT GOOD) -->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-actuator</artifactId>
+			</dependency>
 
-		<!-- ✅ Actuator (optional but recommended) -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
+			<!-- ✅ JWT VALIDATION -->
+			<dependency>
+				<groupId>io.jsonwebtoken</groupId>
+				<artifactId>jjwt-api</artifactId>
+				<version>${jjwt.version}</version>
+			</dependency>
 
-		<!-- ✅ Optional: Circuit breaker (keep only if you will configure it) -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
-		</dependency>
+			<dependency>
+				<groupId>io.jsonwebtoken</groupId>
+				<artifactId>jjwt-impl</artifactId>
+				<version>${jjwt.version}</version>
+				<scope>runtime</scope>
+			</dependency>
 
-		<!-- ✅ Optional: AOP (only needed if you actually use aspects) -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-aop</artifactId>
-		</dependency>
+			<dependency>
+				<groupId>io.jsonwebtoken</groupId>
+				<artifactId>jjwt-jackson</artifactId>
+				<version>${jjwt.version}</version>
+				<scope>runtime</scope>
+			</dependency>
 
-		<!-- Tests -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+			<!-- ✅ TEST DEPENDENCIES -->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-test</artifactId>
+				<scope>test</scope>
+			</dependency>
 
 	</dependencies>
 

@@ -126,4 +126,12 @@ public class PatientServiceImpl implements PatientService {
 
         return patientRepository.save(targetPatient);
     }
+
+    @Override
+    public Patient getLoggedInPatient(String email) {
+        return patientRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new PatientNotFoundException("Patient not found for email: " + email)
+                );
+    }
 }

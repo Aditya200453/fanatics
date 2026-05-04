@@ -2,43 +2,56 @@ server:
   port: 8076
 
 spring:
+  main:
+    web-application-type: reactive   # ✅ IMPORTANT
+
   application:
     name: api-gateway
 
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
-
       server:
-        webmvc:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+
           routes:
-            - id: patient
-              uri: lb://patient
+            # ✅ AUTH SERVICE (PUBLIC)
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/auth/**
+
+            # ✅ PROTECTED SERVICES
+            - id: patient-service
+              uri: lb://patient-service
               predicates:
                 - Path=/patient/**
 
-            - id: doctor
-              uri: lb://doctor
+            - id: doctor-service
+              uri: lb://doctor-service
               predicates:
                 - Path=/doctor/**
 
-            - id: appointment
-              uri: lb://appointment
+            - id: appointment-service
+              uri: lb://appointment-service
               predicates:
                 - Path=/appointment/**
 
-            - id: diagnostic
-              uri: lb://diagnostic
+            - id: diagnostic-service
+              uri: lb://diagnostic-service
               predicates:
                 - Path=/diagnostic/**
 
-            - id: prescription
-              uri: lb://prescription
+            - id: prescription-service
+              uri: lb://prescription-service
               predicates:
                 - Path=/prescription/**
+
+jwt:
+  secret: clinic-auth-secret-key-please-make-this-very-long-32chars
 
 eureka:
   client:
@@ -50,6 +63,7 @@ management:
     web:
       exposure:
         include: "*"
+
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
