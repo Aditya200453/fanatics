@@ -1,38 +1,31 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
-// Pages
 import LandingPage from "./pages/Landing/LandingPage";
 import RegisterPage from "./pages/Register/RegisterPage";
 
-// Login Pages
 import AdminLogin from "./pages/Login/AdminLogin";
 import DoctorLogin from "./pages/Login/DoctorLogin";
 import PatientLogin from "./pages/Login/PatientLogin";
 
-// Dashboards (✅ ACTUAL IMPLEMENTATIONS)
 import PatientDashboard from "./pages/Dashboard/Patient/PatientDashboard";
 import DoctorDashboard from "./pages/Dashboard/Doctor/DoctorDashboard";
 import AdminDashboard from "./pages/Dashboard/Admin/AdminDashboard";
 
-// Protected Route
+import BookAppointment from "./pages/Dashboard/Patient/BookAppointment";
+import MyAppointments from "./pages/Dashboard/Patient/MyAppointments";
+
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 export default function App() {
   return (
     <Routes>
-
-      {/* ✅ Landing Page */}
       <Route path="/" element={<LandingPage />} />
-
-      {/* ✅ Register Page */}
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* ✅ Login Routes */}
       <Route path="/login/admin" element={<AdminLogin />} />
       <Route path="/login/doctor" element={<DoctorLogin />} />
       <Route path="/login/patient" element={<PatientLogin />} />
 
-      {/* ✅ PATIENT DASHBOARD */}
       <Route
         path="/dashboard/patient"
         element={
@@ -42,16 +35,14 @@ export default function App() {
         }
       />
 
-      {/* ✅ DOCTOR DASHBOARD */}
       <Route
-        path="/dashboard/doctor"
+        path="/dashboard/patient/book"
         element={
-          <ProtectedRoute allowedRoles={["DOCTOR"]}>
-            <DoctorDashboard />
+          <ProtectedRoute allowedRoles={["PATIENT"]}>
+            <BookAppointment />
           </ProtectedRoute>
         }
       />
-
       <Route
   path="/dashboard/admin"
   element={
@@ -62,9 +53,34 @@ export default function App() {
 />
 
 
-      {/* ✅ Fallback Route */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route
+        path="/dashboard/patient/appointments"
+        element={
+          <ProtectedRoute allowedRoles={["PATIENT"]}>
+            <MyAppointments />
+          </ProtectedRoute>
+        }
+      />
 
+      <Route
+        path="/dashboard/doctor"
+        element={
+          <ProtectedRoute allowedRoles={["DOCTOR"]}>
+            <DoctorDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/dashboard/admin"
+        element={
+          <ProtectedRoute allowedRoles={["ADMIN"]}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

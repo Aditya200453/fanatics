@@ -35,13 +35,17 @@ export default function RegisterPage() {
     if (!form.email) return "Email required";
     if (!form.phone) return "Phone required";
 
+    // ✅ PATIENT PASSWORD
     if (form.role === "PATIENT") {
       if (!form.password || form.password.length < 6)
         return "Password min 6 chars";
       if (!form.age) return "Age required";
     }
 
+    // ✅ ✅ DOCTOR PASSWORD VALIDATION (NEW)
     if (form.role === "DOCTOR") {
+      if (!form.password || form.password.length < 6)
+        return "Password min 6 chars";   // ✅ ADDED
       if (!form.experience || isNaN(form.experience))
         return "Valid experience required (number)";
     }
@@ -80,14 +84,16 @@ export default function RegisterPage() {
         setTimeout(() => navigate("/login/patient"), 1500);
       }
 
-      // ✅ DOCTOR API (FIXED)
+      // ✅ ✅ DOCTOR API (FIXED)
       else if (form.role === "DOCTOR") {
         const payload = {
           name: form.name,
           email: form.email,
           phone: form.phone,
-          experience: parseInt(form.experience, 10), // ✅ FIXED
+          experience: parseInt(form.experience, 10),
           qualification: form.qualification,
+
+          password: form.password,   // ✅ ✅ VERY IMPORTANT FIX
         };
 
         res = await http.post("/doctor/signup", payload);
@@ -119,6 +125,7 @@ export default function RegisterPage() {
       {success && <Alert variant="success">{success}</Alert>}
 
       <Form onSubmit={handleSubmit}>
+
         <Form.Select name="role" onChange={handleChange}>
           <option value="">Select role</option>
           <option value="PATIENT">Patient</option>
@@ -129,10 +136,20 @@ export default function RegisterPage() {
         <Form.Control className="mt-2" name="email" placeholder="Email" onChange={handleChange} />
         <Form.Control className="mt-2" name="phone" placeholder="Phone" onChange={handleChange} />
 
+        {/* ✅ COMMON PASSWORD FOR BOTH */}
+        {(form.role === "PATIENT" || form.role === "DOCTOR") && (
+          <Form.Control
+            className="mt-2"
+            type="password"
+            name="password"
+            placeholder="Password"
+            onChange={handleChange}
+          />
+        )}
+
         {/* ✅ PATIENT */}
         {form.role === "PATIENT" && (
           <>
-            <Form.Control className="mt-2" type="password" name="password" placeholder="Password" onChange={handleChange} />
             <Form.Control className="mt-2" name="age" placeholder="Age" onChange={handleChange} />
             <Form.Control className="mt-2" type="date" name="dob" onChange={handleChange} />
 
@@ -146,17 +163,22 @@ export default function RegisterPage() {
           </>
         )}
 
-        {/* ✅ DOCTOR (FIXED INPUT) */}
+        {/* ✅ DOCTOR */}
         {form.role === "DOCTOR" && (
           <>
             <Form.Control
               className="mt-2"
-              type="number"                 // ✅ CRITICAL FIX
+              type="number"
               name="experience"
               placeholder="Experience (years)"
               onChange={handleChange}
             />
-            <Form.Control className="mt-2" name="qualification" placeholder="Qualification" onChange={handleChange} />
+            <Form.Control
+              className="mt-2"
+              name="qualification"
+              placeholder="Qualification"
+              onChange={handleChange}
+            />
           </>
         )}
 

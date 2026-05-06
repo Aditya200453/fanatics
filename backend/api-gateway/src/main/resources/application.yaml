@@ -45,6 +45,16 @@ spring:
               predicates:
                 - Path=/doctor/**
 
+            - id: appointment
+              uri: lb://appointment
+              predicates:
+                - Path=/appointment/**
+
+            - id: speciality-api
+              uri: lb://doctor
+              predicates:
+                - Path=/speciality/**
+
 # ✅ ✅ THIS IS THE FIX FOR YOUR ERROR
 jwt:
   secret: "MDEyMzQ1Njc4OWFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHg="

@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "appointment")
@@ -29,7 +29,7 @@ public class Appointment {
     private LocalTime appointmentTime;
 
     @Column(name = "status", length = 20)
-    private String status = "BOOKED";
+    private String status = "BOOKED"; // BOOKED / COMPLETED / CANCELLED
 
     @Column(name = "symptoms", length = 255)
     private String symptoms;
@@ -39,10 +39,9 @@ public class Appointment {
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
-    public Appointment() {}
-
+    // getters/setters
     public Integer getAppointmentId() { return appointmentId; }
     public void setAppointmentId(Integer appointmentId) { this.appointmentId = appointmentId; }
 
@@ -67,6 +66,5 @@ public class Appointment {
     public String getRemarks() { return remarks; }
     public void setRemarks(String remarks) { this.remarks = remarks; }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public Instant getCreatedAt() { return createdAt; }
 }

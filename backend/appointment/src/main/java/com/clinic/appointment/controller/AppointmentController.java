@@ -1,65 +1,46 @@
 package com.clinic.appointment.controller;
 
+import com.clinic.appointment.dto.BookAppointmentRequest;
 import com.clinic.appointment.entity.Appointment;
 import com.clinic.appointment.service.AppointmentService;
-import com.clinic.appointment.util.ResponseMessage;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("")
+@RequestMapping("/appointment")
 public class AppointmentController {
 
-    private final AppointmentService appointmentService;
+    private final AppointmentService service;
 
-    public AppointmentController(AppointmentService appointmentService) {
-        this.appointmentService = appointmentService;
+    public AppointmentController(AppointmentService service) {
+        this.service = service;
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<Appointment>> getAll() {
-        return ResponseEntity.ok(appointmentService.getAllAppointments());
+    // ✅ Book appointment
+    @PostMapping("/book")
+    public ResponseEntity<Appointment> book(
+            @RequestHeader("X-User-Email") String email,
+            @RequestBody BookAppointmentRequest req) {
+
+        return ResponseEntity.ok(service.bookForLoggedInPatient(email, req));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Appointment> getOne(@PathVariable Integer id) {
-        return ResponseEntity.ok(appointmentService.getAppointment(id));
+    // ✅ Patient appointments
+    @GetMapping("/my")
+    public ResponseEntity<List<Appointment>> my(
+            @RequestHeader("X-User-Email") String email) {
+
+        return ResponseEntity.ok(service.myAppointments(email));
     }
 
-    @PostMapping("/")
-    public ResponseEntity<Appointment> book(@RequestBody Appointment appointment) {
-        return ResponseEntity.ok(appointmentService.bookAppointment(appointment));
+    // ✅ Doctor appointments (optional)
+    @GetMapping("/doctor/my")
+    public ResponseEntity<List<Appointment>> doctorMy(
+            @RequestHeader("X-User-Email") String email) {
+
+        return ResponseEntity.ok(service.doctorAppointments(email));
     }
 
-    @PutMapping("/")
-    public ResponseEntity<Appointment> update(@RequestBody Appointment appointment) {
-        return ResponseEntity.ok(appointmentService.updateAppointment(appointment));
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<Appointment> patch(@PathVariable Integer id, @RequestBody Appointment patch) {
-        return ResponseEntity.ok(appointmentService.patchAppointment(id, patch));
-    }
-
-    @DeleteMapping("/")
-    public ResponseEntity<ResponseMessage> delete(@RequestParam Integer id) {
-        appointmentService.deleteAppointment(id);
-        return ResponseEntity.ok(new ResponseMessage("Appointment deleted"));
-    }
-
-    @GetMapping("/patient/{patientId}")
-    public ResponseEntity<List<Appointment>> getByPatient(@PathVariable Integer patientId) {
-        return ResponseEntity.ok(appointmentService.getAppointmentsByPatient(patientId));
-    }
-
-    @GetMapping("/doctor/{doctorId}")
-    public ResponseEntity<List<Appointment>> getByDoctorAndDate(
-            @PathVariable Integer doctorId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ResponseEntity.ok(appointmentService.getAppointmentsByDoctorAndDate(doctorId, date));
-    }
 }

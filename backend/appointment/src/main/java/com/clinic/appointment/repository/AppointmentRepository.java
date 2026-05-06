@@ -9,12 +9,16 @@ import java.util.List;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Integer> {
 
-    List<Appointment> findByPatientId(Integer patientId);
-    List<Appointment> findByDoctorIdAndAppointmentDate(Integer doctorId, LocalDate appointmentDate);
+    boolean existsByDoctorIdAndAppointmentDateAndAppointmentTimeAndStatusIn(
+            Integer doctorId, LocalDate date, LocalTime time, List<String> statuses);
 
-    boolean existsByDoctorIdAndAppointmentDateAndAppointmentTime(Integer doctorId, LocalDate appointmentDate, LocalTime appointmentTime);
-    boolean existsByPatientIdAndAppointmentDateAndAppointmentTime(Integer patientId, LocalDate appointmentDate, LocalTime appointmentTime);
+    List<Appointment> findByPatientIdOrderByAppointmentDateDescAppointmentTimeDesc(Integer patientId);
 
-    boolean existsByDoctorIdAndAppointmentDateAndAppointmentTimeAndAppointmentIdNot(Integer doctorId, LocalDate appointmentDate, LocalTime appointmentTime, Integer appointmentId);
-    boolean existsByPatientIdAndAppointmentDateAndAppointmentTimeAndAppointmentIdNot(Integer patientId, LocalDate appointmentDate, LocalTime appointmentTime, Integer appointmentId);
+    List<Appointment> findByDoctorIdOrderByAppointmentDateDescAppointmentTimeDesc(Integer doctorId);
+
+    List<Appointment> findByDoctorIdOrderByAppointmentDateDesc(Integer patientId);
+
+    List<Appointment> findByPatientIdOrderByAppointmentDateDesc(Integer patientId);
+
+
 }
