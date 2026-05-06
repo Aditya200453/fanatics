@@ -12,7 +12,7 @@ import java.util.List;
 @RequestMapping("/prescription")
 public class PrescriptionController {
 
-    private PrescriptionService prescriptionService;
+    private final PrescriptionService prescriptionService;
 
     public PrescriptionController(PrescriptionService prescriptionService) {
         this.prescriptionService = prescriptionService;
@@ -36,6 +36,11 @@ public class PrescriptionController {
     @PutMapping("/")
     public ResponseEntity<Prescription> update(@RequestBody Prescription prescription) {
         return ResponseEntity.ok(prescriptionService.updatePrescription(prescription));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Prescription> patch(@PathVariable Integer id, @RequestBody Prescription updates) {
+        return ResponseEntity.ok(prescriptionService.patchPrescription(id, updates));
     }
 
     @DeleteMapping("/")

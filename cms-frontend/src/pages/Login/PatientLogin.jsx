@@ -5,6 +5,7 @@ export default function PatientLogin() {
     <BaseLogin
       title="Patient Login"
       subtitle="View records and book appointments easily"
+      expectedRole="PATIENT"
     />
   );
 }

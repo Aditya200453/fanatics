@@ -34,10 +34,21 @@ public class DiagnosticTestServiceImpl implements DiagnosticTestService {
     }
 
     public DiagnosticTest updateTest(DiagnosticTest test) {
-        if (!testRepository.existsById(test.getTestId())) {
-            throw new DiagnosticTestNotFoundException("Test with Id " + test.getTestId() + " not found");
-        }
-        return testRepository.save(test);
+
+        DiagnosticTest existing = testRepository.findById(test.getTestId())
+                .orElseThrow(() -> new DiagnosticTestNotFoundException("Test not found"));
+
+        testRepository.findByTestName(test.getTestName())
+                .filter(t -> !t.getTestId().equals(test.getTestId()))
+                .ifPresent(t -> {
+                    throw new DiagnosticTestExistsException("Test name already exists");
+                });
+
+        existing.setTestName(test.getTestName());
+        existing.setDescription(test.getDescription());
+        existing.setCost(test.getCost());
+
+        return testRepository.save(existing);
     }
 
     public void deleteTest(Integer id) {

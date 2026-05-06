@@ -11,6 +11,8 @@ public class SpecialityDoctorMapId implements Serializable {
     public SpecialityDoctorMapId() {}
 
     public SpecialityDoctorMapId(Integer specialityId, Integer doctorId) {
+        this.specialityId = specialityId;
+        this.doctorId = doctorId;
     }
 
     @Override
@@ -18,8 +20,8 @@ public class SpecialityDoctorMapId implements Serializable {
         if (this == o) return true;
         if (!(o instanceof SpecialityDoctorMapId)) return false;
         SpecialityDoctorMapId that = (SpecialityDoctorMapId) o;
-        return Objects.equals(specialityId, that.specialityId) &&
-                Objects.equals(doctorId, that.doctorId);
+        return Objects.equals(specialityId, that.specialityId)
+                && Objects.equals(doctorId, that.doctorId);
     }
 
     @Override

@@ -20,11 +20,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new ResponseMessage(ex.getMessage()), HttpStatus.CONFLICT);
     }
 
-    // If unique constraints / FK constraints fail at DB level
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ResponseMessage> handleDbConstraint(DataIntegrityViolationException ex) {
-        return new ResponseEntity<>(new ResponseMessage("DB constraint error (check patientId/doctorId/date/time)"),
-                HttpStatus.BAD_REQUEST);
+        // Likely FK constraint fail: patient_id or doctor_id not found
+        return new ResponseEntity<>(
+                new ResponseMessage("DB constraint error: invalid patientId/doctorId OR slot constraint violation"),
+                HttpStatus.BAD_REQUEST
+        );
     }
 
     @ExceptionHandler(Exception.class)

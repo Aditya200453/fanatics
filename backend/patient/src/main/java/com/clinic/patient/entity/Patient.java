@@ -1,14 +1,20 @@
 package com.clinic.patient.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "patient")
+@Table(
+        name = "patient",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_patient_phone", columnNames = "phone"),
+                @UniqueConstraint(name = "uk_patient_email", columnNames = "email")
+        }
+)
 public class Patient {
 
     @Id
@@ -16,78 +22,81 @@ public class Patient {
     @Column(name = "patient_id")
     private Integer patientId;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
     @Column(name = "age", nullable = false)
     private Integer age;
 
-    @Column(name = "gender")
+    @Column(name = "dob")
+    private LocalDate dob;
+
+    @Column(name = "gender", length = 10)
     private String gender;
 
-    @Column(name = "phone", nullable = false, unique = true)
+    @Column(name = "phone", nullable = false, unique = true, length = 15)
     private String phone;
 
-    @Column(name = "address")
+    @Column(name = "email", nullable = false, unique = true, length = 100)
+    private String email;
+
+    @Column(name = "address", length = 255)
     private String address;
 
-    public Patient() {
-    }
+    @Column(name = "status", length = 20)
+    private String status = "ACTIVE";
 
-    public Patient(Integer patientId, String name, Integer age, String gender, String phone, String address) {
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private Instant updatedAt;
+
+    public Patient() {}
+
+    // (Optional) keep constructor minimal; prefer setters/DTOs in production
+    public Patient(Integer patientId, String name, Integer age, LocalDate dob, String gender,
+                   String phone, String email, String address, String status) {
         this.patientId = patientId;
         this.name = name;
         this.age = age;
+        this.dob = dob;
         this.gender = gender;
         this.phone = phone;
+        this.email = email;
         this.address = address;
+        this.status = status;
     }
 
-    public Integer getPatientId() {
-        return patientId;
-    }
+    public Integer getPatientId() { return patientId; }
+    public void setPatientId(Integer patientId) { this.patientId = patientId; }
 
-    public void setPatientId(Integer patientId) {
-        this.patientId = patientId;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getName() {
-        return name;
-    }
+    public Integer getAge() { return age; }
+    public void setAge(Integer age) { this.age = age; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public LocalDate getDob() { return dob; }
+    public void setDob(LocalDate dob) { this.dob = dob; }
 
-    public Integer getAge() {
-        return age;
-    }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
 
-    public void setAge(Integer age) {
-        this.age = age;
-    }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public String getGender() {
-        return gender;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
-    public String getPhone() {
-        return phone;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
+    public Instant getCreatedAt() { return createdAt; }
+    public Instant getUpdatedAt() { return updatedAt; }
 }

@@ -17,4 +17,6 @@ public interface PatientService {
     void delete(Integer id);
 
     Patient partialUpdate(Integer id, Patient patient);
+
+    Patient getLoggedInPatient(String email);
 }

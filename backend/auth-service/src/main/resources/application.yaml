@@ -6,7 +6,7 @@ spring:
     name: auth-service
 
   datasource:
-    url: jdbc:mariadb://localhost:3307/clinic_auth
+    url: jdbc:mariadb://localhost:3307/auth_db
     username: root
     password: root
     driver-class-name: org.mariadb.jdbc.Driver
@@ -15,6 +15,19 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+jwt:
+  # ✅ MUST be Base64 encoded and >= 32 bytes after decoding
+  # (Important fix for your JwtUtil)
+  secret: "MDEyMzQ1Njc4OWFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHg="
+  expiry-ms: 3600000  # 1 hour
+
+app:
+  # ✅ Used in AuthService for internal API security
+  internal-key: "CLINIC_INTERNAL_SECRET"
+

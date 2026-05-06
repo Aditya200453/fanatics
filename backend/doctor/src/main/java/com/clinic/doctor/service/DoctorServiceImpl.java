@@ -1,6 +1,7 @@
 package com.clinic.doctor.service;
 
 import com.clinic.doctor.entity.Doctor;
+import com.clinic.doctor.exception.DoctorExsistsException;
 import com.clinic.doctor.exception.DoctorNotFoundException;
 import com.clinic.doctor.repository.DoctorRepository;
 import org.springframework.stereotype.Service;
@@ -26,15 +27,28 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     public Doctor saveDoctor(Doctor doctor) {
+        if (doctorRepository.existsByEmail(doctor.getEmail())) {
+            throw new DoctorExsistsException(
+                    "Doctor with email " + doctor.getEmail() + " already exists"
+            );
+        }
         return doctorRepository.save(doctor);
     }
 
     public Doctor updateDoctor(Doctor doctor) {
-        if (!doctorRepository.existsById(doctor.getDoctorId())) {
-            throw new DoctorNotFoundException("Doctor with Id " + doctor.getDoctorId() + " not found");
-        }
-        return doctorRepository.save(doctor);
+        Doctor existing = doctorRepository.findById(doctor.getDoctorId())
+                .orElseThrow(() -> new DoctorNotFoundException(
+                        "Doctor with Id " + doctor.getDoctorId() + " not found"));
+
+        existing.setName(doctor.getName());
+        existing.setExperience(doctor.getExperience());
+        existing.setQualification(doctor.getQualification());
+        existing.setPhone(doctor.getPhone());
+        existing.setStatus(doctor.getStatus());
+
+        return doctorRepository.save(existing);
     }
+
 
     public void deleteDoctor(Integer id) {
         if (!doctorRepository.existsById(id)) {

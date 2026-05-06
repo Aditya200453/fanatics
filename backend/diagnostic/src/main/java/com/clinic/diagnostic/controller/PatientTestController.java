@@ -7,6 +7,7 @@ import com.clinic.diagnostic.util.ResponseMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -21,10 +22,34 @@ public class PatientTestController {
 
     // Assign a test to a patient
     @PostMapping("/patients/{patientId}/tests/{testId}")
-    public ResponseEntity<PatientTest> assign(@PathVariable Integer patientId,
-                                              @PathVariable Integer testId) {
-        return ResponseEntity.ok(patientTestService.assignTestToPatient(patientId, testId));
+    public ResponseEntity<PatientTest> assign(
+            @PathVariable Integer patientId,
+            @PathVariable Integer testId,
+            @RequestParam String testDate) {
+
+        return ResponseEntity.ok(
+                patientTestService.assignTestToPatient(
+                        patientId,
+                        testId,
+                        LocalDate.parse(testDate)
+                )
+        );
     }
+
+
+    @PatchMapping("/patients/{patientId}/tests/{testId}")
+    public ResponseEntity<PatientTest> updateResult(
+            @PathVariable Integer patientId,
+            @PathVariable Integer testId,
+            @RequestParam(required = false) String result,
+            @RequestParam(required = false) String status) {
+
+        return ResponseEntity.ok(
+                patientTestService.updateResult(patientId, testId, result, status)
+        );
+    }
+
+
 
     // Remove test from patient
     @DeleteMapping("/patients/{patientId}/tests/{testId}")
@@ -36,7 +61,12 @@ public class PatientTestController {
 
     // List tests assigned to patient
     @GetMapping("/patients/{patientId}/tests")
-    public ResponseEntity<List<DiagnosticTest>> getTests(@PathVariable Integer patientId) {
-        return ResponseEntity.ok(patientTestService.getTestsForPatient(patientId));
+    public ResponseEntity<List<PatientTest>> getTests(
+            @PathVariable Integer patientId) {
+
+        return ResponseEntity.ok(
+                patientTestService.getTestsForPatient(patientId)
+        );
     }
+
 }

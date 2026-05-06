@@ -1,165 +1,169 @@
 import { useState } from "react";
-import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
-import "./Register.css";
-
-const COUNTRIES = {
-  "+91": { flag: "🇮🇳", length: 10 },
-  "+1": { flag: "🇺🇸", length: 10 },
-  "+44": { flag: "🇬🇧", length: 10 },
-};
+import { Card, Button, Form, Alert } from "react-bootstrap";
+import http from "../../api/http";
+import { useNavigate } from "react-router-dom";
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
+    role: "",
     name: "",
-    countryCode: "+91",
+    email: "",
     phone: "",
     password: "",
-    role: "",
+    age: "",
+    dob: "",
+    gender: "",
+    address: "",
+    experience: "",
+    qualification: "",
   });
 
-  const [errors, setErrors] = useState({});
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    if (name === "phone" && !/^\d*$/.test(value)) return;
-
-    setForm({ ...form, [name]: value });
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setError("");
+    setSuccess("");
   };
 
   const validate = () => {
-    const newErrors = {};
-    const requiredLength = COUNTRIES[form.countryCode].length;
+    if (!form.role) return "Select role";
+    if (!form.name) return "Name required";
+    if (!form.email) return "Email required";
+    if (!form.phone) return "Phone required";
 
-    if (!form.name.trim()) newErrors.name = "Name is required";
-
-    if (!form.phone) {
-      newErrors.phone = "Phone number is required";
-    } else if (form.phone.length !== requiredLength) {
-      newErrors.phone = `Phone number must be ${requiredLength} digits`;
+    if (form.role === "PATIENT") {
+      if (!form.password || form.password.length < 6)
+        return "Password min 6 chars";
+      if (!form.age) return "Age required";
     }
 
-    if (!form.password || form.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+    if (form.role === "DOCTOR") {
+      if (!form.experience || isNaN(form.experience))
+        return "Valid experience required (number)";
     }
 
-    if (!form.role) newErrors.role = "Please select a role";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return "";
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validate()) return;
 
-    const payload = {
-      name: form.name,
-      phone: `${form.countryCode}${form.phone}`,
-      password: form.password,
-      role: form.role,
-    };
+    const v = validate();
+    if (v) {
+      setError(v);
+      return;
+    }
 
-    console.log("REGISTER PAYLOAD →", payload);
+    try {
+      let res;
 
-    // 🔴 send payload to backend here
+      // ✅ PATIENT API
+      if (form.role === "PATIENT") {
+        const payload = {
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          password: form.password,
+          age: Number(form.age),
+          dob: form.dob,
+          gender: form.gender,
+          address: form.address,
+        };
+
+        res = await http.post("/patient/signup", payload);
+
+        setSuccess("Patient Registered ✅");
+        setTimeout(() => navigate("/login/patient"), 1500);
+      }
+
+      // ✅ DOCTOR API (FIXED)
+      else if (form.role === "DOCTOR") {
+        const payload = {
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          experience: parseInt(form.experience, 10), // ✅ FIXED
+          qualification: form.qualification,
+        };
+
+        res = await http.post("/doctor/signup", payload);
+
+        setSuccess("Doctor Application Submitted ✅ (Wait for approval)");
+        setTimeout(() => navigate("/login/doctor"), 1500);
+      }
+
+    } catch (err) {
+      console.error("🔴 REGISTER ERROR:", err);
+
+      const data = err?.response?.data;
+
+      const msg =
+        data?.message ||
+        (typeof data === "string" ? data : JSON.stringify(data)) ||
+        err?.message ||
+        "Registration failed";
+
+      setError(msg);
+    }
   };
 
   return (
-    <div className="register-page">
-      <Container>
-        <Row className="vh-100 align-items-center justify-content-center">
-          <Col md={7} lg={5}>
-            <Card className="register-card">
-              <Card.Body className="p-4">
-                <h3 className="fw-bold text-center mb-3">Create Account</h3>
+    <Card className="p-4">
+      <h4>Create Account</h4>
 
-                <Form onSubmit={handleSubmit}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Full Name</Form.Label>
-                    <Form.Control
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      isInvalid={!!errors.name}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {errors.name}
-                    </Form.Control.Feedback>
-                  </Form.Group>
+      {error && <Alert variant="danger">{error}</Alert>}
+      {success && <Alert variant="success">{success}</Alert>}
 
-                  <Form.Group className="mb-3">
-                    <Form.Label>Phone Number</Form.Label>
+      <Form onSubmit={handleSubmit}>
+        <Form.Select name="role" onChange={handleChange}>
+          <option value="">Select role</option>
+          <option value="PATIENT">Patient</option>
+          <option value="DOCTOR">Doctor</option>
+        </Form.Select>
 
-                    <div className="d-flex gap-2">
-                      <Form.Select
-                        name="countryCode"
-                        value={form.countryCode}
-                        onChange={handleChange}
-                        style={{ maxWidth: "120px" }}
-                      >
-                        {Object.entries(COUNTRIES).map(([code, c]) => (
-                          <option key={code} value={code}>
-                            {code} {c.flag}
-                          </option>
-                        ))}
-                      </Form.Select>
+        <Form.Control className="mt-2" name="name" placeholder="Name" onChange={handleChange} />
+        <Form.Control className="mt-2" name="email" placeholder="Email" onChange={handleChange} />
+        <Form.Control className="mt-2" name="phone" placeholder="Phone" onChange={handleChange} />
 
-                      <Form.Control
-                        name="phone"
-                        value={form.phone}
-                        onChange={handleChange}
-                        isInvalid={!!errors.phone}
-                        placeholder="Phone number"
-                      />
-                    </div>
+        {/* ✅ PATIENT */}
+        {form.role === "PATIENT" && (
+          <>
+            <Form.Control className="mt-2" type="password" name="password" placeholder="Password" onChange={handleChange} />
+            <Form.Control className="mt-2" name="age" placeholder="Age" onChange={handleChange} />
+            <Form.Control className="mt-2" type="date" name="dob" onChange={handleChange} />
 
-                    <Form.Control.Feedback type="invalid">
-                      {errors.phone}
-                    </Form.Control.Feedback>
-                  </Form.Group>
+            <Form.Select className="mt-2" name="gender" onChange={handleChange}>
+              <option value="">Gender</option>
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+            </Form.Select>
 
-                  <Form.Group className="mb-3">
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control
-                      type="password"
-                      name="password"
-                      value={form.password}
-                      onChange={handleChange}
-                      isInvalid={!!errors.password}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {errors.password}
-                    </Form.Control.Feedback>
-                  </Form.Group>
+            <Form.Control className="mt-2" name="address" placeholder="Address" onChange={handleChange} />
+          </>
+        )}
 
-                  <Form.Group className="mb-4">
-                    <Form.Label>Register As</Form.Label>
-                    <Form.Select
-                      name="role"
-                      value={form.role}
-                      onChange={handleChange}
-                      isInvalid={!!errors.role}
-                    >
-                      <option value="">Select role</option>
-                      <option value="PATIENT">Patient</option>
-                      <option value="DOCTOR">Doctor</option>
-                    </Form.Select>
-                    <Form.Control.Feedback type="invalid">
-                      {errors.role}
-                    </Form.Control.Feedback>
-                  </Form.Group>
+        {/* ✅ DOCTOR (FIXED INPUT) */}
+        {form.role === "DOCTOR" && (
+          <>
+            <Form.Control
+              className="mt-2"
+              type="number"                 // ✅ CRITICAL FIX
+              name="experience"
+              placeholder="Experience (years)"
+              onChange={handleChange}
+            />
+            <Form.Control className="mt-2" name="qualification" placeholder="Qualification" onChange={handleChange} />
+          </>
+        )}
 
-                  <Button type="submit" variant="info" className="w-100">
-                    Register
-                  </Button>
-                </Form>
-
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
-    </div>
+        <Button className="mt-3 w-100" type="submit">
+          Register
+        </Button>
+      </Form>
+    </Card>
   );
 }

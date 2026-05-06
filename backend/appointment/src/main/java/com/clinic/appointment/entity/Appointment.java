@@ -1,18 +1,14 @@
 package com.clinic.appointment.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
-@Table(
-        name = "appointment",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uq_doctor_slot", columnNames = {"doctor_id", "appointment_date", "appointment_time"}),
-                @UniqueConstraint(name = "uq_patient_slot", columnNames = {"patient_id", "appointment_date", "appointment_time"})
-        }
-)
+@Table(name = "appointment")
 public class Appointment {
 
     @Id
@@ -32,6 +28,19 @@ public class Appointment {
     @Column(name = "appointment_time", nullable = false)
     private LocalTime appointmentTime;
 
+    @Column(name = "status", length = 20)
+    private String status = "BOOKED";
+
+    @Column(name = "symptoms", length = 255)
+    private String symptoms;
+
+    @Column(name = "remarks", length = 255)
+    private String remarks;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
     public Appointment() {}
 
     public Integer getAppointmentId() { return appointmentId; }
@@ -48,4 +57,16 @@ public class Appointment {
 
     public LocalTime getAppointmentTime() { return appointmentTime; }
     public void setAppointmentTime(LocalTime appointmentTime) { this.appointmentTime = appointmentTime; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public String getSymptoms() { return symptoms; }
+    public void setSymptoms(String symptoms) { this.symptoms = symptoms; }
+
+    public String getRemarks() { return remarks; }
+    public void setRemarks(String remarks) { this.remarks = remarks; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }
