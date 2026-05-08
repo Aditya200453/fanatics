@@ -1,7 +1,16 @@
 import { useState } from "react";
-import { Card, Button, Form, Alert } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Form,
+  Alert
+} from "react-bootstrap";
 import http from "../../api/http";
 import { useNavigate } from "react-router-dom";
+import "../Login/Login.css"; // ✅ VERY IMPORTANT
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -35,15 +44,16 @@ export default function RegisterPage() {
     if (!form.email) return "Email required";
     if (!form.phone) return "Phone required";
 
+    if (!form.password || form.password.length < 6)
+      return "Password min 6 chars";
+
     if (form.role === "PATIENT") {
-      if (!form.password || form.password.length < 6)
-        return "Password min 6 chars";
       if (!form.age) return "Age required";
     }
 
     if (form.role === "DOCTOR") {
       if (!form.experience || isNaN(form.experience))
-        return "Valid experience required (number)";
+        return "Valid experience required";
     }
 
     return "";
@@ -51,19 +61,12 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const v = validate();
-    if (v) {
-      setError(v);
-      return;
-    }
+    if (v) return setError(v);
 
     try {
-      let res;
-
-      // ✅ PATIENT API
       if (form.role === "PATIENT") {
-        const payload = {
+        await http.post("/patient/signup", {
           name: form.name,
           email: form.email,
           phone: form.phone,
@@ -72,98 +75,90 @@ export default function RegisterPage() {
           dob: form.dob,
           gender: form.gender,
           address: form.address,
-        };
-
-        res = await http.post("/patient/signup", payload);
+        });
 
         setSuccess("Patient Registered ✅");
         setTimeout(() => navigate("/login/patient"), 1500);
       }
 
-      // ✅ DOCTOR API (FIXED)
-      else if (form.role === "DOCTOR") {
-        const payload = {
+      if (form.role === "DOCTOR") {
+        await http.post("/doctor/signup", {
           name: form.name,
           email: form.email,
           phone: form.phone,
-          experience: parseInt(form.experience, 10), // ✅ FIXED
+          password: form.password,
+          experience: Number(form.experience),
           qualification: form.qualification,
-        };
+        });
 
-        res = await http.post("/doctor/signup", payload);
-
-        setSuccess("Doctor Application Submitted ✅ (Wait for approval)");
+        setSuccess("Doctor Application Submitted ✅");
         setTimeout(() => navigate("/login/doctor"), 1500);
       }
-
     } catch (err) {
-      console.error("🔴 REGISTER ERROR:", err);
-
-      const data = err?.response?.data;
-
-      const msg =
-        data?.message ||
-        (typeof data === "string" ? data : JSON.stringify(data)) ||
-        err?.message ||
-        "Registration failed";
-
-      setError(msg);
+      setError(err?.response?.data?.message || "Registration failed");
     }
   };
 
   return (
-    <Card className="p-4">
-      <h4>Create Account</h4>
+    <Container fluid className="login-page">
+      <Row className="min-vh-100">
 
-      {error && <Alert variant="danger">{error}</Alert>}
-      {success && <Alert variant="success">{success}</Alert>}
+        {/* ✅ LEFT BACKGROUND (same as login) */}
+        <Col md={7} className="login-visual d-none d-md-block">
+          <div className="login-overlay" />
+          <div className="login-text">
+            <h2>ClinicCare</h2>
+            <p>Secure clinic access & role‑based registration</p>
+          </div>
+        </Col>
 
-      <Form onSubmit={handleSubmit}>
-        <Form.Select name="role" onChange={handleChange}>
-          <option value="">Select role</option>
-          <option value="PATIENT">Patient</option>
-          <option value="DOCTOR">Doctor</option>
-        </Form.Select>
+        {/* ✅ RIGHT FORM */}
+        <Col md={5} className="d-flex align-items-center justify-content-center">
+          <Card className="login-card p-4">
+            <h4 className="mb-3">Create Account</h4>
 
-        <Form.Control className="mt-2" name="name" placeholder="Name" onChange={handleChange} />
-        <Form.Control className="mt-2" name="email" placeholder="Email" onChange={handleChange} />
-        <Form.Control className="mt-2" name="phone" placeholder="Phone" onChange={handleChange} />
+            {error && <Alert variant="danger">{error}</Alert>}
+            {success && <Alert variant="success">{success}</Alert>}
 
-        {/* ✅ PATIENT */}
-        {form.role === "PATIENT" && (
-          <>
-            <Form.Control className="mt-2" type="password" name="password" placeholder="Password" onChange={handleChange} />
-            <Form.Control className="mt-2" name="age" placeholder="Age" onChange={handleChange} />
-            <Form.Control className="mt-2" type="date" name="dob" onChange={handleChange} />
+            <Form onSubmit={handleSubmit}>
+              <Form.Select className="mb-3" name="role" onChange={handleChange}>
+                <option value="">Select role</option>
+                <option value="PATIENT">Patient</option>
+                <option value="DOCTOR">Doctor</option>
+              </Form.Select>
 
-            <Form.Select className="mt-2" name="gender" onChange={handleChange}>
-              <option value="">Gender</option>
-              <option value="MALE">Male</option>
-              <option value="FEMALE">Female</option>
-            </Form.Select>
+              <Form.Control className="mb-3" name="name" placeholder="Name" onChange={handleChange} />
+              <Form.Control className="mb-3" name="email" placeholder="Email" onChange={handleChange} />
+              <Form.Control className="mb-3" name="phone" placeholder="Phone" onChange={handleChange} />
+              <Form.Control className="mb-3" type="password" name="password" placeholder="Password" onChange={handleChange} />
 
-            <Form.Control className="mt-2" name="address" placeholder="Address" onChange={handleChange} />
-          </>
-        )}
+              {form.role === "PATIENT" && (
+                <>
+                  <Form.Control className="mb-3" name="age" placeholder="Age" onChange={handleChange} />
+                  <Form.Control className="mb-3" type="date" name="dob" onChange={handleChange} />
+                  <Form.Select className="mb-3" name="gender" onChange={handleChange}>
+                    <option value="">Gender</option>
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                  </Form.Select>
+                  <Form.Control className="mb-3" name="address" placeholder="Address" onChange={handleChange} />
+                </>
+              )}
 
-        {/* ✅ DOCTOR (FIXED INPUT) */}
-        {form.role === "DOCTOR" && (
-          <>
-            <Form.Control
-              className="mt-2"
-              type="number"                 // ✅ CRITICAL FIX
-              name="experience"
-              placeholder="Experience (years)"
-              onChange={handleChange}
-            />
-            <Form.Control className="mt-2" name="qualification" placeholder="Qualification" onChange={handleChange} />
-          </>
-        )}
+              {form.role === "DOCTOR" && (
+                <>
+                  <Form.Control className="mb-3" type="number" name="experience" placeholder="Experience (years)" onChange={handleChange} />
+                  <Form.Control className="mb-3" name="qualification" placeholder="Qualification" onChange={handleChange} />
+                </>
+              )}
 
-        <Button className="mt-3 w-100" type="submit">
-          Register
-        </Button>
-      </Form>
-    </Card>
+              <Button type="submit" className="w-100 mt-2">
+                Register
+              </Button>
+            </Form>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 }
