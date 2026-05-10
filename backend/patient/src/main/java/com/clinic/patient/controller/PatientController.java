@@ -3,10 +3,13 @@ package com.clinic.patient.controller;
 import com.clinic.patient.dto.AuthRegisterRequest;
 import com.clinic.patient.dto.PatientSignupRequest;
 import com.clinic.patient.entity.Patient;
+import com.clinic.patient.exception.PatientExistsException;
+import com.clinic.patient.repository.PatientRepository;
 import com.clinic.patient.service.PatientService;
 import com.clinic.patient.util.ResponseMessage;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.ws.rs.client.Entity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -14,138 +17,122 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @RestController
-@RequestMapping("")
+@RequestMapping("/patient")
 public class PatientController {
 
     private final PatientService patientService;
+    private final PatientRepository patientRepository;
+    private final RestTemplate restTemplate;
 
-    public PatientController(PatientService patientService) {
+    // ✅ IMPORTANT FOR INTERNAL CALLS
+    @Value("${app.internal-key}")
+    private String internalKeyFromYaml;
+
+    public PatientController(PatientService patientService,
+                             PatientRepository patientRepository,
+                             RestTemplate restTemplate) {
         this.patientService = patientService;
+        this.patientRepository = patientRepository;
+        this.restTemplate = restTemplate;
     }
 
-    @Autowired
-    private RestTemplate restTemplate;
-
+    // ✅ ✅ PATIENT SIGNUP
     @PostMapping("/signup")
-    public ResponseEntity<ResponseMessage> signupPatient(
-            @RequestBody PatientSignupRequest request) {
+    public ResponseEntity<ResponseMessage> signupPatient(@RequestBody PatientSignupRequest request) {
 
-        // 1️⃣ Build request for auth-service
+        String email = request.getEmail().trim().toLowerCase();
+        String phone = request.getPhone().trim();
+
+        if (patientRepository.existsByEmail(email)) {
+            return ResponseEntity.badRequest()
+                    .body(new ResponseMessage("Email already exists"));
+        }
+
+        if (patientRepository.existsByPhone(phone)) {
+            return ResponseEntity.badRequest()
+                    .body(new ResponseMessage("Phone already exists"));
+        }
+
+        // ✅ create user in auth-service
         AuthRegisterRequest authRequest =
-                new AuthRegisterRequest(
-                        request.getEmail(),
-                        request.getPassword()
-                );
+                new AuthRegisterRequest(email, request.getPassword());
 
-        // 2️⃣ Force JSON (this fixes your 400)
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<AuthRegisterRequest> entity =
                 new HttpEntity<>(authRequest, headers);
 
-        // 3️⃣ Call auth-service
-        try {
-            restTemplate.postForEntity(
-                    "http://auth-service/auth/signup",
-                    entity,
-                    Void.class
-            );
-        } catch (org.springframework.web.client.HttpStatusCodeException ex) {
-            System.out.println("Auth-service status: " + ex.getStatusCode());
-            System.out.println("Auth-service body  : " + ex.getResponseBodyAsString());
-            return ResponseEntity.badRequest()
-                    .body(new ResponseMessage("Failed to create auth user"));
-        }
+        restTemplate.postForEntity(
+                "http://auth-service/auth/signup",
+                entity,
+                String.class
+        );
 
-        // 4️⃣ Save patient only AFTER auth success
+        // ✅ save patient
         Patient patient = new Patient();
         patient.setName(request.getName());
         patient.setAge(request.getAge());
         patient.setDob(request.getDob());
         patient.setGender(request.getGender());
-        patient.setPhone(request.getPhone());
-        patient.setEmail(request.getEmail());
+        patient.setPhone(phone);
+        patient.setEmail(email);
         patient.setAddress(request.getAddress());
         patient.setStatus("ACTIVE");
 
-
         patientService.save(patient);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(new ResponseMessage("Patient registered successfully"));
-    }
-    @GetMapping("/test")
-    public ResponseEntity<String> test(HttpServletRequest request) {
-
-        String email = request.getHeader("X-User-Email");
-        String role = request.getHeader("X-User-Role");
-
-        System.out.println("User Email: " + email);
-        System.out.println("User Role : " + role);
-
-        return ResponseEntity.ok("Headers received");
+        return ResponseEntity.ok(
+                new ResponseMessage("Patient registered successfully")
+        );
     }
 
+    // ✅ ✅ GET LOGGED-IN PROFILE
     @GetMapping("/me")
     public ResponseEntity<Patient> getMyProfile(HttpServletRequest request) {
 
         String email = request.getHeader("X-User-Email");
-        String role  = request.getHeader("X-User-Role");
 
-        // Safety check (extra, gateway already enforces role)
-        if (email == null || role == null) {
+        if (email == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        Patient patient = patientService.getLoggedInPatient(email);
+        Patient patient = patientService.getLoggedInPatient(email.trim().toLowerCase());
+
         return ResponseEntity.ok(patient);
     }
 
-    @GetMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Patient>> findAllPatients() {
+    // ✅ ✅ INTERNAL API (used by appointment-service)
+    @GetMapping("/internal/id")
+    public ResponseEntity<Integer> getPatientIdByEmail(
+            @RequestHeader("X-INTERNAL-KEY") String key,
+            @RequestParam String email) {
+
+        if (!internalKeyFromYaml.equals(key)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        Patient p = patientRepository.findByEmail(email.trim().toLowerCase())
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
+
+        return ResponseEntity.ok(p.getPatientId());
+    }
+
+    // ✅ ✅ GET ALL PATIENTS
+    @GetMapping("/all")public ResponseEntity<List<Patient>> getAllPatientsForStaff(HttpServletRequest request) {
+        String role = request.getHeader("X-User-Role");
+
+        if (!role.equalsIgnoreCase("ADMIN") && !role.equalsIgnoreCase("STAFF")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         return ResponseEntity.ok(patientService.getAllPatients());
     }
 
-    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Patient> getOnePatient(@PathVariable Integer id) {
+
+    // ✅ ✅ GET ONE PATIENT
+    @GetMapping("/{id}")
+    public ResponseEntity<Patient> getPatient(@PathVariable Integer id) {
         return ResponseEntity.ok(patientService.getOnePatient(id));
-    }
-
-    @PostMapping(
-            path = "/",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<Patient> storePatient(@RequestBody Patient patient) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(patientService.save(patient));
-    }
-
-    @PutMapping(
-            path = "/",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<Patient> updatePatient(@RequestBody Patient patient) {
-        return ResponseEntity.ok(patientService.update(patient));
-    }
-
-    @DeleteMapping(path = "/")
-    public ResponseEntity<ResponseMessage> removePatient(
-            @RequestParam(name = "patientId", required = true) Integer id) {
-        patientService.delete(id);
-        return ResponseEntity.ok(new ResponseMessage("Patient deleted"));
-    }
-
-    @PatchMapping(
-            path = "/{id}",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<Patient> updatePatientPartially(
-            @PathVariable Integer id,
-            @RequestBody Patient patient) {
-        return ResponseEntity.ok(patientService.partialUpdate(id, patient));
     }
 }

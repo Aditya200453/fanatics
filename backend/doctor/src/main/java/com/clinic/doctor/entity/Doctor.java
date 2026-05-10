@@ -33,7 +33,14 @@ public class Doctor {
     private String email;
 
     @Column(length = 20)
-    private String status = "ACTIVE";
+    private String status = "PENDING";
+
+    /**
+     * ✅ TEMP password only until approval.
+     * After approval, we will set it to null.
+     */
+    @Column(name = "temp_password", length = 255)
+    private String tempPassword;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -56,75 +63,33 @@ public class Doctor {
 
     // getters & setters
 
-    public Integer getDoctorId() {
-        return doctorId;
-    }
+    public Integer getDoctorId() { return doctorId; }
+    public void setDoctorId(Integer doctorId) { this.doctorId = doctorId; }
 
-    public void setDoctorId(Integer doctorId) {
-        this.doctorId = doctorId;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getName() {
-        return name;
-    }
+    public Integer getExperience() { return experience; }
+    public void setExperience(Integer experience) { this.experience = experience; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getQualification() { return qualification; }
+    public void setQualification(String qualification) { this.qualification = qualification; }
 
-    public Integer getExperience() {
-        return experience;
-    }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public void setExperience(Integer experience) {
-        this.experience = experience;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getQualification() {
-        return qualification;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public void setQualification(String qualification) {
-        this.qualification = qualification;
-    }
+    public String getTempPassword() { return tempPassword; }
+    public void setTempPassword(String tempPassword) { this.tempPassword = tempPassword; }
 
-    public String getPhone() {
-        return phone;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

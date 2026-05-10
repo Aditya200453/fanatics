@@ -5,6 +5,7 @@ export default function OtherLogin() {
     <BaseLogin
       title="Staff Login"
       subtitle="Access assigned operational tools"
+       expectedRole="STAFF"
     />
   );
 }

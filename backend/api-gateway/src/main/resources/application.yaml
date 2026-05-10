@@ -3,7 +3,7 @@ server:
 
 spring:
   main:
-    web-application-type: reactive   # ✅ IMPORTANT
+    web-application-type: reactive
 
   application:
     name: api-gateway
@@ -11,59 +11,55 @@ spring:
   cloud:
     gateway:
       server:
-        webflux:
-          discovery:
-            locator:
-              enabled: true
-              lower-case-service-id: true
+        webflux:   # ✅ REQUIRED FOR SPRING BOOT 3.5+
+
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+            cors-configurations:
+              '[/**]':
+                allowedOrigins:
+                  - "http://localhost:5173"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders:
+                  - "*"
+                allowCredentials: true
 
           routes:
-            # ✅ AUTH SERVICE (PUBLIC)
             - id: auth-service
               uri: lb://auth-service
               predicates:
                 - Path=/auth/**
 
-            # ✅ PROTECTED SERVICES
             - id: patient-service
-              uri: lb://patient-service
+              uri: lb://patient
               predicates:
                 - Path=/patient/**
 
             - id: doctor-service
-              uri: lb://doctor-service
+              uri: lb://doctor
               predicates:
                 - Path=/doctor/**
 
-            - id: appointment-service
-              uri: lb://appointment-service
+            - id: appointment
+              uri: lb://appointment
               predicates:
                 - Path=/appointment/**
 
-            - id: diagnostic-service
-              uri: lb://diagnostic-service
+            - id: speciality-api
+              uri: lb://doctor
               predicates:
-                - Path=/diagnostic/**
+                - Path=/speciality/**
 
-            - id: prescription-service
-              uri: lb://prescription-service
-              predicates:
-                - Path=/prescription/**
-
+# ✅ ✅ THIS IS THE FIX FOR YOUR ERROR
 jwt:
-  secret: clinic-auth-secret-key-please-make-this-very-long-32chars
+  secret: "MDEyMzQ1Njc4OWFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHg="
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-
-logging:
-  level:
-    org.springframework.cloud.gateway: DEBUG

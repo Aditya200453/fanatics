@@ -4,6 +4,8 @@ import com.clinic.doctor.entity.Doctor;
 import com.clinic.doctor.entity.Speciality;
 import com.clinic.doctor.entity.SpecialityDoctorMap;
 import com.clinic.doctor.service.SpecialityService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,9 +29,18 @@ public class SpecialityController {
 
     // Get ALL -> GET http://localhost:8072/speciality/
     @GetMapping("/")
-    public ResponseEntity<List<Speciality>> getAllSpecialities() {
+    public ResponseEntity<List<Speciality>> getAllSpecialities(HttpServletRequest request) {
+
+        String role = request.getHeader("X-User-Role");
+
+        // ✅ ONLY ADMIN + STAFF
+        if (role == null || !(role.equalsIgnoreCase("ADMIN") || role.equalsIgnoreCase("STAFF"))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         return ResponseEntity.ok(specialityService.getAllSpecialities());
     }
+
 
     // Get by ID -> GET http://localhost:8072/speciality/1
     @GetMapping("/{id}")
@@ -56,7 +67,17 @@ public class SpecialityController {
 
     // Get Doctors by Speciality -> GET http://localhost:8072/speciality/1/doctors
     @GetMapping("/{id}/doctors")
-    public ResponseEntity<List<Doctor>> getDoctorsBySpeciality(@PathVariable Integer id) {
+    public ResponseEntity<List<Doctor>> getDoctorsBySpeciality(
+            @PathVariable Integer id,
+            HttpServletRequest request) {
+
+        String role = request.getHeader("X-User-Role");
+
+        if (role == null || !(role.equalsIgnoreCase("ADMIN") || role.equalsIgnoreCase("STAFF"))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         return ResponseEntity.ok(specialityService.getDoctorsBySpeciality(id));
     }
+
 }

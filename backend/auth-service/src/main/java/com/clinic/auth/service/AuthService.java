@@ -8,10 +8,13 @@ import com.clinic.auth.entity.Role;
 import com.clinic.auth.entity.User;
 import com.clinic.auth.repository.UserRepository;
 import com.clinic.auth.security.JwtUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Service
 public class AuthService {
@@ -19,6 +22,9 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+
+    @Value("${app.internal-key}")
+    private String appInternalKey;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
@@ -28,67 +34,98 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
+    // ✅ LOGIN (block if not ACTIVE)
     public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
+        String email = normalizeEmail(request.getEmail());
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED, "Invalid credentials"
+                ));
 
-//        System.out.println("RAW password = [" + request.getPassword() + "]");
-//        System.out.println("DB hash      = [" + user.getPassword() + "]");
-//        boolean match = passwordEncoder.matches(
-//                request.getPassword(),
-//                user.getPassword()
-//        );
-//        System.out.println("PASSWORD MATCH = " + match);
-
-        if (user.getStatus() != AccountStatus.ACTIVE) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Account disabled");
+        // ✅ PENDING / DISABLED handling
+        if (AccountStatus.PENDING.equals(user.getStatus())) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Account pending admin approval"
+            );
+        }
+        if (!AccountStatus.ACTIVE.equals(user.getStatus())) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Account disabled. Please contact admin."
+            );
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED, "Invalid credentials"
+            );
         }
 
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+        String token = jwtUtil.generateToken(
+                user.getEmail(),
+                user.getRole().name()
+        );
 
-        return new LoginResponse("Login successful", token, user.getRole().name());
+        return new LoginResponse(
+                "Login successful",
+                token,
+                user.getRole().name()
+        );
     }
 
-    public void forceCreateAdmin() {
-
-        User user = userRepository.findByEmail("admin@clinic.com")
-                .orElse(new User());
-
-        user.setEmail("admin@clinic.com");
-        user.setPassword(passwordEncoder.encode("admin123")); // ✅ regenerate hash
-        user.setRole(Role.ADMIN);
-        user.setStatus(AccountStatus.ACTIVE);
-
-        userRepository.save(user);
-    }
-
-
-    // Optional: signup (keep if you want)
+    // ✅ SIGNUP (PATIENT default, STAFF -> PENDING approval)
     public String signup(SignupRequest request) {
+        String email = normalizeEmail(request.getEmail());
 
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
+        if (userRepository.existsByEmail(email)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Email already exists"
+            );
+        }
+
+        Role roleToCreate = parseRoleOrDefault(request.getRole(), Role.PATIENT);
+
+        // ✅ Secure: do NOT allow public creation of ADMIN / DOCTOR
+        if (roleToCreate == Role.ADMIN || roleToCreate == Role.DOCTOR) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Cannot self-register as " + roleToCreate.name()
+            );
         }
 
         User user = new User();
-        user.setEmail(request.getEmail());
+        user.setEmail(email);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(roleToCreate);
 
-        // ✅ patient signup flow: role is system decided
-        user.setRole(Role.PATIENT);
-        user.setStatus(AccountStatus.ACTIVE);
+        // ✅ STAFF requires approval
+        if (roleToCreate == Role.STAFF) {
+            user.setStatus(AccountStatus.PENDING);
+        } else {
+            user.setStatus(AccountStatus.ACTIVE);
+        }
 
         userRepository.save(user);
+
+        if (roleToCreate == Role.STAFF) {
+            return "Signup successful. Awaiting admin approval.";
+        }
         return "Signup successful";
     }
 
-    public void registerDoctor(SignupRequest request) {
+    // ✅ DOCTOR REGISTRATION (internal/admin flow)
+    public void registerDoctor(String internalKey, SignupRequest request) {
+        if (internalKey == null || !internalKey.equals(appInternalKey)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Forbidden (internal)"
+            );
+        }
 
-        if (userRepository.existsByEmail(request.getEmail())) {
+        String email = normalizeEmail(request.getEmail());
+        if (userRepository.existsByEmail(email)) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Doctor already exists"
@@ -96,13 +133,59 @@ public class AuthService {
         }
 
         User user = new User();
-        user.setEmail(request.getEmail());
+        user.setEmail(email);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(Role.DOCTOR);
         user.setStatus(AccountStatus.ACTIVE);
-
         userRepository.save(user);
     }
 
+    // ✅ ADMIN: list pending STAFF
+    public List<User> getPendingStaff() {
+        return userRepository.findAllByRoleAndStatus(Role.STAFF, AccountStatus.PENDING);
+    }
 
+    // ✅ ADMIN: approve STAFF
+    public String approveStaff(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (user.getRole() != Role.STAFF) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only STAFF can be approved here");
+        }
+
+        user.setStatus(AccountStatus.ACTIVE);
+        userRepository.save(user);
+        return "Staff approved";
+    }
+
+    // ✅ ADMIN: reject/disable STAFF
+    public String rejectStaff(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (user.getRole() != Role.STAFF) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only STAFF can be rejected here");
+        }
+
+        user.setStatus(AccountStatus.DISABLED);
+        userRepository.save(user);
+        return "Staff rejected/disabled";
+    }
+
+    private Role parseRoleOrDefault(String roleStr, Role defaultRole) {
+        if (roleStr == null || roleStr.trim().isEmpty()) return defaultRole;
+        try {
+            return Role.valueOf(roleStr.trim().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Invalid role: " + roleStr
+            );
+        }
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null ? null : email.trim().toLowerCase();
+    }
 }

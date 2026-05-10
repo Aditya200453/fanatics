@@ -1,162 +1,101 @@
 package com.clinic.appointment.service;
 
+import com.clinic.appointment.dto.BookAppointmentRequest;
 import com.clinic.appointment.entity.Appointment;
-import com.clinic.appointment.exception.AppointmentConflictException;
-import com.clinic.appointment.exception.AppointmentNotFoundException;
 import com.clinic.appointment.repository.AppointmentRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
 
-    private final AppointmentRepository appointmentRepository;
+    private final AppointmentRepository repo;
+    private final RestTemplate restTemplate;
 
-    public AppointmentServiceImpl(AppointmentRepository appointmentRepository) {
-        this.appointmentRepository = appointmentRepository;
+    @Value("${app.internal-key}")
+    private String internalKey;
+
+    public AppointmentServiceImpl(AppointmentRepository repo,
+                                  RestTemplate restTemplate) {
+        this.repo = repo;
+        this.restTemplate = restTemplate;
     }
 
+    // ✅ ✅ BOOK APPOINTMENT
     @Override
-    public List<Appointment> getAllAppointments() {
-        return appointmentRepository.findAll();
+    public Appointment bookForLoggedInPatient(String patientEmail,
+                                              BookAppointmentRequest req) {
+
+        // ✅ Get patientId (internal API)
+        Integer patientId = getPatientId(patientEmail);
+
+        // ✅ Create appointment
+        Appointment appointment = new Appointment();
+        appointment.setPatientId(patientId);
+        appointment.setDoctorId(req.getDoctorId());
+        appointment.setAppointmentDate(req.getAppointmentDate());
+        appointment.setAppointmentTime(req.getAppointmentTime());
+        appointment.setStatus("BOOKED");
+        appointment.setSymptoms(req.getSymptoms());
+        appointment.setRemarks(null);
+
+        // ✅ Save in DB
+        return repo.save(appointment);
     }
 
+    // ✅ ✅ PATIENT APPOINTMENTS
     @Override
-    public Appointment getAppointment(Integer id) {
-        return appointmentRepository.findById(id)
-                .orElseThrow(() -> new AppointmentNotFoundException("Appointment with Id " + id + " not found"));
+    public List<Appointment> myAppointments(String patientEmail) {
+
+        Integer patientId = getPatientId(patientEmail);
+
+        return repo.findByPatientIdOrderByAppointmentDateDesc(patientId);
     }
 
-    // ✅ CREATE (BOOK)
+    // ✅ ✅ DOCTOR APPOINTMENTS
     @Override
-    public Appointment bookAppointment(Appointment appointment) {
-        validateMandatoryFields(appointment);
+    public List<Appointment> doctorAppointments(String doctorEmail) {
 
-        // Align with DB default
-        if (appointment.getStatus() == null || appointment.getStatus().isBlank()) {
-            appointment.setStatus("BOOKED");
-        }
+        Integer doctorId = getDoctorId(doctorEmail);
 
-        Integer patientId = appointment.getPatientId();
-        Integer doctorId = appointment.getDoctorId();
-        LocalDate date = appointment.getAppointmentDate();
-        LocalTime time = appointment.getAppointmentTime();
-
-        // Doctor slot conflict
-        if (appointmentRepository.existsByDoctorIdAndAppointmentDateAndAppointmentTime(doctorId, date, time)) {
-            throw new AppointmentConflictException("Doctor already has an appointment at " + date + " " + time);
-        }
-
-        // Patient slot conflict
-        if (appointmentRepository.existsByPatientIdAndAppointmentDateAndAppointmentTime(patientId, date, time)) {
-            throw new AppointmentConflictException("Patient already has an appointment at " + date + " " + time);
-        }
-
-        return appointmentRepository.save(appointment);
+        return repo.findByDoctorIdOrderByAppointmentDateDesc(doctorId);
     }
 
-    // ✅ UPDATE (FULL)
-    @Override
-    public Appointment updateAppointment(Appointment appointment) {
-        validateMandatoryFields(appointment);
+    // ✅ ✅ INTERNAL CALL → PATIENT ID
+    private Integer getPatientId(String email) {
 
-        Integer apptId = appointment.getAppointmentId();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-INTERNAL-KEY", internalKey);
 
-        // ✅ FIXED BUG: proper condition
-        if (apptId == null || !appointmentRepository.existsById(apptId)) {
-            throw new AppointmentNotFoundException("Appointment not found for update");
-        }
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        // Preserve createdAt (audit safety)
-        Appointment existing = getAppointment(apptId);
-        appointment.setCreatedAt(existing.getCreatedAt());
-
-        // Align with DB default
-        if (appointment.getStatus() == null || appointment.getStatus().isBlank()) {
-            appointment.setStatus(existing.getStatus() != null ? existing.getStatus() : "BOOKED");
-        }
-
-        Integer patientId = appointment.getPatientId();
-        Integer doctorId = appointment.getDoctorId();
-        LocalDate date = appointment.getAppointmentDate();
-        LocalTime time = appointment.getAppointmentTime();
-
-        if (appointmentRepository.existsByDoctorIdAndAppointmentDateAndAppointmentTimeAndAppointmentIdNot(doctorId, date, time, apptId)) {
-            throw new AppointmentConflictException("Doctor already has an appointment at " + date + " " + time);
-        }
-
-        if (appointmentRepository.existsByPatientIdAndAppointmentDateAndAppointmentTimeAndAppointmentIdNot(patientId, date, time, apptId)) {
-            throw new AppointmentConflictException("Patient already has an appointment at " + date + " " + time);
-        }
-
-        return appointmentRepository.save(appointment);
+        return restTemplate.exchange(
+                "http://patient/patient/internal/id?email=" + email,
+                HttpMethod.GET,
+                entity,
+                Integer.class
+        ).getBody();
     }
 
-    // ✅ PATCH (PARTIAL)
-    @Override
-    public Appointment patchAppointment(Integer id, Appointment patch) {
-        Appointment existing = getAppointment(id);
+    // ✅ ✅ INTERNAL CALL → DOCTOR ID
+    private Integer getDoctorId(String email) {
 
-        // Only apply non-null fields
-        if (patch.getPatientId() != null) existing.setPatientId(patch.getPatientId());
-        if (patch.getDoctorId() != null) existing.setDoctorId(patch.getDoctorId());
-        if (patch.getAppointmentDate() != null) existing.setAppointmentDate(patch.getAppointmentDate());
-        if (patch.getAppointmentTime() != null) existing.setAppointmentTime(patch.getAppointmentTime());
-        if (patch.getStatus() != null && !patch.getStatus().isBlank()) existing.setStatus(patch.getStatus());
-        if (patch.getSymptoms() != null) existing.setSymptoms(patch.getSymptoms());
-        if (patch.getRemarks() != null) existing.setRemarks(patch.getRemarks());
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-INTERNAL-KEY", internalKey);
 
-        // Re-check conflicts only if slot-related fields are present or changed
-        validateMandatoryFields(existing);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        Integer patientId = existing.getPatientId();
-        Integer doctorId = existing.getDoctorId();
-        LocalDate date = existing.getAppointmentDate();
-        LocalTime time = existing.getAppointmentTime();
-
-        if (appointmentRepository.existsByDoctorIdAndAppointmentDateAndAppointmentTimeAndAppointmentIdNot(doctorId, date, time, id)) {
-            throw new AppointmentConflictException("Doctor already has an appointment at " + date + " " + time);
-        }
-        if (appointmentRepository.existsByPatientIdAndAppointmentDateAndAppointmentTimeAndAppointmentIdNot(patientId, date, time, id)) {
-            throw new AppointmentConflictException("Patient already has an appointment at " + date + " " + time);
-        }
-
-        return appointmentRepository.save(existing);
-    }
-
-    @Override
-    public void deleteAppointment(Integer id) {
-        if (!appointmentRepository.existsById(id)) {
-            throw new AppointmentNotFoundException("Appointment with Id " + id + " not found");
-        }
-        appointmentRepository.deleteById(id);
-    }
-
-    @Override
-    public List<Appointment> getAppointmentsByPatient(Integer patientId) {
-        return appointmentRepository.findByPatientId(patientId);
-    }
-
-    @Override
-    public List<Appointment> getAppointmentsByDoctorAndDate(Integer doctorId, LocalDate date) {
-        return appointmentRepository.findByDoctorIdAndAppointmentDate(doctorId, date);
-    }
-
-    private void validateMandatoryFields(Appointment appointment) {
-        if (appointment.getPatientId() == null) {
-            throw new AppointmentConflictException("patientId is required");
-        }
-        if (appointment.getDoctorId() == null) {
-            throw new AppointmentConflictException("doctorId is required");
-        }
-        if (appointment.getAppointmentDate() == null) {
-            throw new AppointmentConflictException("appointmentDate is required");
-        }
-        if (appointment.getAppointmentTime() == null) {
-            throw new AppointmentConflictException("appointmentTime is required");
-        }
+        return restTemplate.exchange(
+                "http://doctor/doctor/internal/id?email=" + email,
+                HttpMethod.GET,
+                entity,
+                Integer.class
+        ).getBody();
     }
 }

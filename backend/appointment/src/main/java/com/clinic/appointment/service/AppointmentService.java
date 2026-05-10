@@ -1,22 +1,19 @@
 package com.clinic.appointment.service;
 
+import com.clinic.appointment.dto.BookAppointmentRequest;
 import com.clinic.appointment.entity.Appointment;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface AppointmentService {
 
-    List<Appointment> getAllAppointments();
-    Appointment getAppointment(Integer id);
+    // ✅ Book appointment (no slots)
+    Appointment bookForLoggedInPatient(String patientEmail,
+                                       BookAppointmentRequest req);
 
-    Appointment bookAppointment(Appointment appointment); // Create
-    Appointment updateAppointment(Appointment appointment); // Update (full)
+    // ✅ Patient → view own appointments
+    List<Appointment> myAppointments(String patientEmail);
 
-    Appointment patchAppointment(Integer id, Appointment patch); // Partial update (PATCH)
-
-    void deleteAppointment(Integer id);
-
-    List<Appointment> getAppointmentsByPatient(Integer patientId);
-    List<Appointment> getAppointmentsByDoctorAndDate(Integer doctorId, LocalDate date);
+    // ✅ Doctor → view appointments
+    List<Appointment> doctorAppointments(String doctorEmail);
 }

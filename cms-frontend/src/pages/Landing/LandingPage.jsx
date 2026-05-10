@@ -1,3 +1,5 @@
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 import {
   Container,
   Nav,
@@ -18,26 +20,32 @@ export default function LandingPage() {
     <div className="lp">
       {/* NAVBAR */}
       <Navbar expand="lg" className="lp-navbar" variant="dark" fixed="top">
-        <Container fluid className="px-4">
+        <Container fluid className="px-4 lp-navwrap">
           <Navbar.Brand className="fw-bold">ClinicCare</Navbar.Brand>
-          <Navbar.Toggle aria-controls="lp-nav" />
-          <Navbar.Collapse id="lp-nav">
-            <Nav className="mx-auto gap-lg-3">
+
+          <Navbar.Toggle aria-controls="lp-nav" className="lp-toggler" />
+
+          <Navbar.Collapse id="lp-nav" className="lp-collapse">
+            {/* CENTER LINKS */}
+            <Nav className="lp-nav-center">
               <Nav.Link href="#home">Home</Nav.Link>
               <Nav.Link href="#about">About</Nav.Link>
               <Nav.Link href="#services">Our Services</Nav.Link>
-              {/* ❌ Roles removed */}
               <Nav.Link href="#contact">Contact</Nav.Link>
             </Nav>
 
             {/* RIGHT SIDE ACTIONS */}
-            <Nav className="ms-auto align-items-center gap-2">
+            <Nav className="lp-nav-actions">
               <Dropdown align="end">
-                <Dropdown.Toggle variant="info" className="ms-1">
+                <Dropdown.Toggle
+                  id="login-dropdown"
+                  variant="info"
+                  className="lp-btn lp-login-btn"
+                >
                   Login
                 </Dropdown.Toggle>
 
-                <Dropdown.Menu>
+                <Dropdown.Menu className="lp-menu">
                   <Dropdown.Item onClick={() => navigate("/login/admin")}>
                     Admin Login
                   </Dropdown.Item>
@@ -56,7 +64,7 @@ export default function LandingPage() {
 
               <Button
                 variant="info"
-                className="ms-1"
+                className="lp-btn"
                 onClick={() => navigate("/register")}
               >
                 Register
@@ -65,7 +73,7 @@ export default function LandingPage() {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      
+
       {/* HERO SECTION */}
       <section id="home" className="lp-hero">
         <div className="lp-hero-overlay" />
@@ -81,7 +89,7 @@ export default function LandingPage() {
                 diagnostics in one role‑based platform.
               </p>
 
-              <div className="d-flex flex-wrap gap-2 mt-3">
+              <div className="lp-hero-actions">
                 <Button
                   variant="info"
                   size="lg"
@@ -107,67 +115,68 @@ export default function LandingPage() {
         </Container>
       </section>
 
-{/* ABOUT SECTION */}
-<section id="about" className="lp-section bg-light">
-  <Container>
-    <h2 className="text-center mb-5 fw-bold">
-      What our <span className="lp-accent">ClinicCare does</span>?
-    </h2>
+      {/* ABOUT SECTION */}
+      <section id="about" className="lp-section bg-light">
+        <Container>
+          <h2 className="text-center mb-5 fw-bold">
+            What our <span className="lp-accent">ClinicCare does</span>?
+          </h2>
 
-    <Row className="g-4">
-      {[
-        {
-          icon: "bi-clipboard-heart",
-          title: "Complete Patient Management",
-          desc: "Manage patient registrations, medical history, visit records, and treatment details in a centralized and secure system.",
-        },
-        {
-          icon: "bi-calendar-check",
-          title: "Appointment & Scheduling System",
-          desc: "Handle doctor availability, patient appointments, follow-ups, and cancellations with an organized scheduling workflow.",
-        },
-        {
-          icon: "bi-prescription2",
-          title: "Prescriptions & Treatment Records",
-          desc: "Digitally manage prescriptions, medicines, dosage instructions, and treatment plans for easy access and continuity of care.",
-        },
-        {
-          icon: "bi-file-earmark-medical",
-          title: "Diagnostics & Medical Reports",
-          desc: "Assign diagnostic tests, store lab reports, and maintain accurate records linked directly to patient profiles.",
-        },
-        {
-          icon: "bi-people-fill",
-          title: "Doctor & Staff Coordination",
-          desc: "Enable smooth coordination between doctors, patients, and administrative staff through role-based system access.",
-        },
-        {
-          icon: "bi-shield-lock",
-          title: "Secure & Role-Based Access",
-          desc: "Ensure data privacy and security with controlled access for Admins, Doctors, and Patients based on their roles.",
-        },
-      ].map((item) => (
-        <Col md={6} lg={4} key={item.title}>
-          <Card className="lp-feature-card h-100 border-0 about-card">
-            <Card.Body className="p-4 text-center">
-              <div className="lp-feature-icon mb-3">
-                <i className={`bi ${item.icon}`} />
-              </div>
+          <Row className="g-4">
+            {[
+              {
+                icon: "bi-clipboard-heart",
+                title: "Complete Patient Management",
+                desc: "Manage patient registrations, medical history, visit records, and treatment details in a centralized and secure system.",
+              },
+              {
+                icon: "bi-calendar-check",
+                title: "Appointment & Scheduling System",
+                desc: "Handle doctor availability, patient appointments, follow-ups, and cancellations with an organized scheduling workflow.",
+              },
+              {
+                icon: "bi-prescription2",
+                title: "Prescriptions & Treatment Records",
+                desc: "Digitally manage prescriptions, medicines, dosage instructions, and treatment plans for easy access and continuity of care.",
+              },
+              {
+                icon: "bi-file-earmark-medical",
+                title: "Diagnostics & Medical Reports",
+                desc: "Assign diagnostic tests, store lab reports, and maintain accurate records linked directly to patient profiles.",
+              },
+              {
+                icon: "bi-people-fill",
+                title: "Doctor & Staff Coordination",
+                desc: "Enable smooth coordination between doctors, patients, and administrative staff through role-based system access.",
+              },
+              {
+                icon: "bi-shield-lock",
+                title: "Secure & Role-Based Access",
+                desc: "Ensure data privacy and security with controlled access for Admins, Doctors, and Patients based on their roles.",
+              },
+            ].map((item) => (
+              <Col md={6} lg={4} key={item.title}>
+                <Card className="lp-feature-card h-100 border-0 about-card">
+                  <Card.Body className="p-4 text-center">
+                    <div className="lp-feature-icon mb-3">
+                      <i className={`bi ${item.icon}`} />
+                    </div>
 
-              <Card.Title className="fw-bold mb-2">
-                {item.title}
-              </Card.Title>
+                    <Card.Title className="fw-bold mb-2">
+                      {item.title}
+                    </Card.Title>
 
-              <Card.Text className="text-muted mb-0">
-                {item.desc}
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-      ))}
-    </Row>
-  </Container>
-</section>
+                    <Card.Text className="text-muted mb-0">
+                      {item.desc}
+                    </Card.Text>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </Container>
+      </section>
+
       {/* SERVICES */}
       <section id="services" className="lp-section">
         <Container>
@@ -201,12 +210,8 @@ export default function LandingPage() {
                     <div className="lp-feature-icon">
                       <i className={`bi ${x.icon}`} />
                     </div>
-                    <Card.Title className="mt-3 fw-bold">
-                      {x.title}
-                    </Card.Title>
-                    <Card.Text className="text-muted mb-0">
-                      {x.desc}
-                    </Card.Text>
+                    <Card.Title className="mt-3 fw-bold">{x.title}</Card.Title>
+                    <Card.Text className="text-muted mb-0">{x.desc}</Card.Text>
                   </Card.Body>
                 </Card>
               </Col>

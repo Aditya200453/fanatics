@@ -5,6 +5,7 @@ export default function DoctorLogin() {
     <BaseLogin
       title="Doctor Login"
       subtitle="Manage appointments and patient consultations"
+      expectedRole="DOCTOR"
     />
   );
 }   
