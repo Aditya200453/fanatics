@@ -112,9 +112,21 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     }
 
     private boolean isPublic(String path) {
-        return path.equals("/auth/login")
-                || path.equals("/auth/signup")
-                || path.startsWith("/auth/internal/");
+        return
+                // ✅ AUTH public
+                path.equals("/auth/login")
+                        || path.equals("/auth/signup")
+                        || path.startsWith("/auth/internal/")
+
+                        // ✅ PATIENT public
+                        || path.equals("/patient/signup")
+
+                        // ✅ DOCTOR public
+                        || path.equals("/doctor/signup")
+
+                        // ✅ Optional public doctor listing
+                        || path.equals("/doctor/public/active")
+                        || path.startsWith("/doctor/public/");
     }
 
 

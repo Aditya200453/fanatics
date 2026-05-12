@@ -19,4 +19,6 @@ public interface PatientService {
     Patient partialUpdate(Integer id, Patient patient);
 
     Patient getLoggedInPatient(String email);
+
+    List<Patient> searchPatients(String name);
 }
