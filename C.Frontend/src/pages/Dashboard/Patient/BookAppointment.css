@@ -1,0 +1,78 @@
+/* root aligns with patient dashboard */
+.ba-root {
+  position: relative;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+/* dark gradient background overlay */
+.ba-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(6, 34, 46, 0.92),
+    rgba(6, 34, 46, 0.85)
+  );
+  z-index: 0;
+}
+
+/* card */
+.ba-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 560px;
+  padding: 8px;
+}
+
+/* header */
+.ba-header {
+  margin-bottom: 24px;
+}
+
+.ba-header h3 {
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.ba-header p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* form layout */
+.ba-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* section grouping */
+.ba-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* inputs */
+.ba-root .form-control,
+.ba-root .form-select {
+  height: 46px;
+  border-radius: 14px;
+}
+
+/* CTA */
+.ba-btn {
+  margin-top: 10px;
+  height: 50px;
+  font-weight: 800;
+  border-radius: 16px;
+}
+
+/* message */
+.ba-msg {
+  margin-top: 14px;
+  text-align: center;
+  font-weight: 600;
+}
