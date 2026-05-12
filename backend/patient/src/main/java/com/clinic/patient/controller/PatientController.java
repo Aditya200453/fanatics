@@ -135,9 +135,4 @@ public class PatientController {
     public ResponseEntity<Patient> getPatient(@PathVariable Integer id) {
         return ResponseEntity.ok(patientService.getOnePatient(id));
     }
-
-    @GetMapping("/search")
-    public ResponseEntity<List<Patient>> searchPatients(@RequestParam String name) {
-        return ResponseEntity.ok(patientService.searchPatients(name));
-    }
 }

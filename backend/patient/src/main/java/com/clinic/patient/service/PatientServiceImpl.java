@@ -134,9 +134,4 @@ public class PatientServiceImpl implements PatientService {
                         new PatientNotFoundException("Patient not found for email: " + email)
                 );
     }
-    
-    public List<Patient> searchPatients(String name) {
-        return patientRepository.findByNameContainingIgnoreCase(name);
-    }
-
 }

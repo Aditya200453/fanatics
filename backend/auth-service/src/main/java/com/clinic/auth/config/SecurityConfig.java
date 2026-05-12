@@ -26,7 +26,7 @@ public class SecurityConfig {
                 // ✅ Add JWT parsing filter
 //                .addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        // public
+                        //public
                         .requestMatchers("/auth/login", "/auth/signup").permitAll()
 
                         // internal (server-to-server)

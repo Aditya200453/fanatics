@@ -1,0 +1,232 @@
+
+.ba-container{
+  max-width: 1180px;
+  padding: 32px 12px 56px;
+}
+
+.ba-heroCenter{
+  text-align:center;
+  margin-bottom: 22px;
+}
+.ba-heroCenter h2{
+  color:#fff;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  font-size: clamp(2.2rem, 4vw, 2.8rem);
+  margin: 0;
+}
+.ba-heroCenter p{
+  margin-top: 8px;
+  color:#dbeafe;
+}
+.ba-step{
+  margin-top: 10px;
+  border-radius: 999px;
+  padding: 10px 14px;
+}
+
+.ba-wideCard{
+  margin: 0 auto;
+}
+
+.ba-topFilters{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+@media (max-width: 992px){
+  .ba-topFilters{ grid-template-columns: 1fr; }
+}
+
+.ba-field label{
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.ba-grid{
+  display:grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 22px;
+  align-items: start;
+}
+@media (max-width: 992px){
+  .ba-grid{ grid-template-columns: 1fr; }
+}
+
+/* Calendar */
+.ba-calendar{
+  border: 1px solid rgba(15,23,42,0.10);
+  border-radius: 16px;
+  padding: 16px;
+  background: rgba(255,255,255,0.70);
+}
+
+.ba-calHeader{
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ba-calTitle{
+  font-weight: 800;
+  color:#0f172a;
+}
+
+.ba-calNav{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+}
+
+.ba-navBtn{
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(15,23,42,0.12);
+  background: rgba(255,255,255,0.9);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ba-month{
+  font-weight: 700;
+  color:#0f172a;
+  min-width: 140px;
+  text-align:center;
+}
+
+.ba-weekdays{
+  display:grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin: 10px 0 6px;
+}
+.ba-wd{
+  text-align:center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color:#64748b;
+}
+
+.ba-days{
+  display:grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.ba-day.empty{
+  height: 38px;
+}
+
+.ba-dayBtn{
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid rgba(15,23,42,0.10);
+  background: rgba(255,255,255,0.92);
+  font-weight: 700;
+  color:#0f172a;
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease, background .15s ease;
+}
+
+.ba-dayBtn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(37,99,235,0.35);
+}
+
+.ba-dayBtn.active{
+  background: rgba(37,99,235,0.14);
+  border-color: rgba(37,99,235,0.55);
+  box-shadow: 0 10px 22px rgba(37,99,235,0.18);
+}
+
+.ba-dayBtn:disabled{
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.ba-calHint{
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color:#64748b;
+}
+
+/* Slots panel */
+.ba-slotsPanel{
+  border: 1px solid rgba(15,23,42,0.10);
+  border-radius: 16px;
+  padding: 16px;
+  background: rgba(255,255,255,0.70);
+}
+
+.ba-slotHeader{
+  display:flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.ba-slotHint{
+  font-size: .9rem;
+  color:#64748b;
+  font-weight: 600;
+}
+
+.ba-slotGrid{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.ba-slotGrid.disabled{
+  opacity: .55;
+}
+
+.ba-slotBtn{
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(15,23,42,0.12);
+  background: rgba(255,255,255,0.92);
+  font-weight: 800;
+  color:#0f172a;
+  cursor:pointer;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.ba-slotBtn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(37,99,235,0.35);
+}
+
+.ba-slotBtn.active{
+  background: #2563eb;
+  color:#fff;
+  border-color:#2563eb;
+  box-shadow: 0 12px 26px rgba(37,99,235,0.28);
+}
+
+.ba-slotBtn:disabled{
+  opacity: .45;
+  cursor:not-allowed;
+}
+
+.ba-cta{
+  width: 220px;
+  margin: 0 auto;
+  display:block;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-weight: 800;
+}
+
+.ba-msg{
+  margin-top: 16px;
+  text-align:center;
+  font-weight: 700;
+  color:#0f172a;
+}

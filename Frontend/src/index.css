@@ -1,0 +1,165 @@
+/* ===================== GLOBAL RESET ===================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+/* ===================== FONT SYSTEM ===================== */
+:root {
+  /* Premium SaaS Typography */
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-heading: "Manrope", system-ui, sans-serif;
+
+  /* Text colors */
+  --text-light: #e5e7eb;
+  --text-muted: #cbd5e1;
+  --text-dark: #0f172a;
+}
+
+/* ===================== BODY ===================== */
+body {
+  background: transparent !important;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  letter-spacing: 0.18px;
+  color: var(--text-light);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===================== ROOT ===================== */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: transparent !important;
+}
+
+/* ===================== APP BACKGROUND ===================== */
+.app-root {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  isolation: isolate;
+
+  background:
+    radial-gradient(circle at 15% 20%, rgba(59, 130, 246, 0.22), transparent 45%),
+    radial-gradient(circle at 85% 25%, rgba(16, 185, 129, 0.18), transparent 40%),
+    radial-gradient(circle at 75% 85%, rgba(14, 165, 233, 0.18), transparent 45%),
+    linear-gradient(135deg, #0b1220 0%, #102a43 50%, #07131f 100%);
+}
+
+/* ===================== WATERMARK ===================== */
+.app-root::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/medical-watermark.svg");
+  background-repeat: repeat;
+  background-size: 320px;
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ===================== TYPOGRAPHY ===================== */
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.04em;
+  color: #ffffff;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+}
+
+p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+/* ===================== DASHBOARD HERO ===================== */
+.pd-header h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.8rem, 4vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1.05;
+}
+
+.pd-header p {
+  margin-top: 8px;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* ===================== GLASS CARDS ===================== */
+.pd-card,
+.pd-cta {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  border-radius: 18px;
+  border: none;
+  padding: 22px;
+
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+}
+
+/* ===================== CARD CONTENT ===================== */
+.pd-card h6 {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #3b82f6;
+  margin-bottom: 6px;
+}
+
+.pd-card p {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.pd-card small {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+/* ===================== BUTTONS ===================== */
+.btn {
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 11px 18px;
+  letter-spacing: 0.2px;
+}
+
+.btn-primary {
+  box-shadow: 0 10px 26px rgba(37, 99, 235, 0.45);
+}
+
+/* ===================== TABLE ===================== */
+.pd-table thead th {
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.pd-table tbody td {
+  font-size: 0.95rem;
+  color: var(--text-dark);
+}
