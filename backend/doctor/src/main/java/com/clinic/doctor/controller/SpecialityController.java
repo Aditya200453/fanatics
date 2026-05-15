@@ -15,69 +15,98 @@ import java.util.List;
 @RequestMapping("/speciality")
 public class SpecialityController {
 
-    private SpecialityService specialityService;
+    private final SpecialityService specialityService;
 
     public SpecialityController(SpecialityService specialityService) {
         this.specialityService = specialityService;
     }
 
-    // Add Speciality -> POST http://localhost:8072/speciality/
+    // =====================================================
+    // ✅ ADMIN ONLY – CREATE SPECIALITY (MASTER DATA)
+    // =====================================================
     @PostMapping("/")
-    public ResponseEntity<Speciality> addSpeciality(@RequestBody Speciality speciality) {
+    public ResponseEntity<Speciality> addSpeciality(
+            @RequestHeader("X-User-Role") String role,
+            @RequestBody Speciality speciality) {
+
+        if (!"ADMIN".equalsIgnoreCase(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         return ResponseEntity.ok(specialityService.addSpeciality(speciality));
     }
 
-    // Get ALL -> GET http://localhost:8072/speciality/
+    // =====================================================
+    // ✅ READ‑ONLY – ADMIN + STAFF + PATIENT
+    // Used by: patient booking, staff/admin dashboards
+    // =====================================================
     @GetMapping("/")
-    public ResponseEntity<List<Speciality>> getAllSpecialities(HttpServletRequest request) {
+    public ResponseEntity<List<Speciality>> getAllSpecialities(
+            @RequestHeader("X-User-Role") String role) {
 
-        String role = request.getHeader("X-User-Role");
+        if (role == null || !(role.equalsIgnoreCase("ADMIN")
+                || role.equalsIgnoreCase("STAFF")
+                || role.equalsIgnoreCase("PATIENT"))) {
 
-        // ✅ ONLY ADMIN + STAFF
-        if (role == null || !(role.equalsIgnoreCase("ADMIN") || role.equalsIgnoreCase("STAFF"))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         return ResponseEntity.ok(specialityService.getAllSpecialities());
     }
 
-
-    // Get by ID -> GET http://localhost:8072/speciality/1
-    @GetMapping("/{id}")
-    public ResponseEntity<Speciality> getSpeciality(@PathVariable Integer id) {
-        return ResponseEntity.ok(specialityService.getSpeciality(id));
-    }
-
-    // Map Doctor -> POST http://localhost:8072/speciality/map
-    // Body: { "specialityId":1, "doctorId":6 }
-    @PostMapping("/map")
-    public ResponseEntity<SpecialityDoctorMap> mapDoctor(@RequestBody SpecialityDoctorMap map) {
-        return ResponseEntity.ok(
-                specialityService.mapDoctorToSpeciality(map.getSpecialityId(), map.getDoctorId())
-        );
-    }
-
-    // Remove mapping -> DELETE http://localhost:8072/speciality/map?specialityId=1&doctorId=6
-    @DeleteMapping("/map")
-    public ResponseEntity<Void> unmapDoctor(@RequestParam Integer specialityId,
-                                            @RequestParam Integer doctorId) {
-        specialityService.removeDoctorFromSpeciality(specialityId, doctorId);
-        return ResponseEntity.ok().build();
-    }
-
-    // Get Doctors by Speciality -> GET http://localhost:8072/speciality/1/doctors
+    // =====================================================
+    // ✅ READ‑ONLY – ADMIN + STAFF + PATIENT
+    // Used by: appointment booking doctor selection
+    // =====================================================
     @GetMapping("/{id}/doctors")
     public ResponseEntity<List<Doctor>> getDoctorsBySpeciality(
             @PathVariable Integer id,
-            HttpServletRequest request) {
+            @RequestHeader("X-User-Role") String role) {
 
-        String role = request.getHeader("X-User-Role");
+        if (role == null || !(role.equalsIgnoreCase("ADMIN")
+                || role.equalsIgnoreCase("STAFF")
+                || role.equalsIgnoreCase("PATIENT"))) {
 
-        if (role == null || !(role.equalsIgnoreCase("ADMIN") || role.equalsIgnoreCase("STAFF"))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         return ResponseEntity.ok(specialityService.getDoctorsBySpeciality(id));
     }
 
+    // =====================================================
+    // ✅ ADMIN + STAFF – MAP DOCTOR → SPECIALITY
+    // =====================================================
+    @PostMapping("/map")
+    public ResponseEntity<SpecialityDoctorMap> mapDoctor(
+            @RequestHeader("X-User-Role") String role,
+            @RequestBody SpecialityDoctorMap map) {
+
+        if (!(role.equalsIgnoreCase("ADMIN") || role.equalsIgnoreCase("STAFF"))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        return ResponseEntity.ok(
+                specialityService.mapDoctorToSpeciality(
+                        map.getSpecialityId(),
+                        map.getDoctorId()
+                )
+        );
+    }
+
+    // =====================================================
+    // ✅ ADMIN + STAFF – REMOVE DOCTOR FROM SPECIALITY
+    // =====================================================
+    @DeleteMapping("/map")
+    public ResponseEntity<Void> unmapDoctor(
+            @RequestHeader("X-User-Role") String role,
+            @RequestParam Integer specialityId,
+            @RequestParam Integer doctorId) {
+
+        if (!(role.equalsIgnoreCase("ADMIN") || role.equalsIgnoreCase("STAFF"))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        specialityService.removeDoctorFromSpeciality(specialityId, doctorId);
+        return ResponseEntity.ok().build();
+    }
 }

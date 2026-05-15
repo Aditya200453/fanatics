@@ -1,0 +1,8 @@
+# Optional optimization — discovery auto-routing
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true

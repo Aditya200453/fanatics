@@ -18,7 +18,7 @@ public class PrescriptionController {
         this.prescriptionService = prescriptionService;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<Prescription>> getAll() {
         return ResponseEntity.ok(prescriptionService.getAllPrescriptions());
     }
@@ -28,12 +28,13 @@ public class PrescriptionController {
         return ResponseEntity.ok(prescriptionService.getPrescription(id));
     }
 
-    @PostMapping("/")
+    // ✅ IMPORTANT: no trailing slash
+    @PostMapping
     public ResponseEntity<Prescription> create(@RequestBody Prescription prescription) {
         return ResponseEntity.ok(prescriptionService.createPrescription(prescription));
     }
 
-    @PutMapping("/")
+    @PutMapping
     public ResponseEntity<Prescription> update(@RequestBody Prescription prescription) {
         return ResponseEntity.ok(prescriptionService.updatePrescription(prescription));
     }
@@ -43,7 +44,7 @@ public class PrescriptionController {
         return ResponseEntity.ok(prescriptionService.patchPrescription(id, updates));
     }
 
-    @DeleteMapping("/")
+    @DeleteMapping
     public ResponseEntity<ResponseMessage> delete(@RequestParam Integer id) {
         prescriptionService.deletePrescription(id);
         return ResponseEntity.ok(new ResponseMessage("Prescription deleted"));

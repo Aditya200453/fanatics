@@ -1,29 +1,28 @@
-debug: true
-
-server:
-  port: 8071
-
 spring:
   application:
-    name: patient
+    # ✅ IMPORTANT: keep consistent naming for Eureka + Gateway routes
+    name: patient-service
 
-  datasource:
-    url: jdbc:mariadb://localhost:3307/cms
-    username: root
-    password: root
-    driver-class-name: org.mariadb.jdbc.Driver
+  profiles:
+    # ✅ Docker compose sets SPRING_PROFILES_ACTIVE=docker via .env
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
-  jpa:
-    database-platform: org.hibernate.dialect.MariaDBDialect
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+server:
+  port: ${SERVER_PORT:8071}
 
+# ✅ Eureka config shared across profiles
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: ${EUREKA_URL}
 
+# ✅ Internal-key used by gateway/auth for internal validation (no hardcode)
 app:
-  internal-key: "CLINIC_INTERNAL_SECRET"
+  internal-key: ${INTERNAL_SECRET}
 
+# ✅ Health endpoint (useful for Docker healthchecks)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

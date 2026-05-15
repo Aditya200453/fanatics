@@ -1,25 +1,22 @@
-debug: true
-
-server:
-  port: 8073
-
 spring:
   application:
-    name: diagnostic
+    name: diagnostic-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
-  datasource:
-    url: jdbc:mariadb://localhost:3307/cms
-    username: root
-    password: root
-    driver-class-name: org.mariadb.jdbc.Driver
+server:
+  port: ${SERVER_PORT:8073}
 
-  jpa:
-    database-platform: org.hibernate.dialect.MariaDBDialect
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL}
 
-  eureka:
-    client:
-      service-url:
-        defaultZone: http://localhost:8761/eureka
+app:
+  internal-key: ${INTERNAL_SECRET}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

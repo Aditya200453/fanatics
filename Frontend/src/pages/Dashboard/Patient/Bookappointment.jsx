@@ -4,28 +4,57 @@ import { useNavigate } from "react-router-dom";
 import http from "../../../api/http";
 import "./BookAppointment.css";
 
+/* ================= UTIL FUNCTIONS ================= */
 function pad(n) {
   return String(n).padStart(2, "0");
 }
+
 function toYMD(d) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
+
 function startOfMonth(d) {
   return new Date(d.getFullYear(), d.getMonth(), 1);
 }
+
 function daysInMonth(d) {
   return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
 }
+
 function sameDay(a, b) {
-  return a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  return (
+    a &&
+    b &&
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
 }
+
 function isPastDay(d) {
   const today = new Date();
-  today.setHours(0,0,0,0);
+  today.setHours(0, 0, 0, 0);
   const x = new Date(d);
-  x.setHours(0,0,0,0);
+  x.setHours(0, 0, 0, 0);
   return x < today;
 }
+
+function isPastSlot(selectedDateStr, slotTime) {
+  if (!selectedDateStr) return false;
+
+  const now = new Date();
+  const todayYMD = now.toISOString().split("T")[0];
+
+  if (selectedDateStr > todayYMD) return false;
+  if (selectedDateStr < todayYMD) return true;
+
+  const [hh, mm] = slotTime.split(":").map(Number);
+  const slotMinutes = hh * 60 + mm;
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  return slotMinutes <= nowMinutes;
+}
+
 function formatSlotLabel(t24) {
   const [hh, mm] = t24.split(":").map(Number);
   const ampm = hh >= 12 ? "pm" : "am";
@@ -33,28 +62,32 @@ function formatSlotLabel(t24) {
   return `${pad(hh12)}:${pad(mm)} ${ampm}`;
 }
 
+/* ================= COMPONENT ================= */
+
 export default function BookAppointment() {
   const navigate = useNavigate();
 
   const [specialities, setSpecialities] = useState([]);
   const [specialityId, setSpecialityId] = useState("");
-
   const [doctors, setDoctors] = useState([]);
   const [doctorId, setDoctorId] = useState("");
 
-  // We'll store date as YYYY-MM-DD (same as your backend expects)
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-
   const [symptoms, setSymptoms] = useState("");
   const [msg, setMsg] = useState("");
 
-  // Calendar state
-  const [monthCursor, setMonthCursor] = useState(() => startOfMonth(new Date()));
-  const selectedDateObj = useMemo(() => (date ? new Date(date + "T00:00:00") : null), [date]);
+  const [monthCursor, setMonthCursor] = useState(() =>
+    startOfMonth(new Date())
+  );
+
+  const selectedDateObj = useMemo(
+    () => (date ? new Date(date + "T00:00:00") : null),
+    [date]
+  );
 
   const timeSlots = useMemo(
-    () => ["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00"],
+    () => ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"],
     []
   );
 
@@ -63,9 +96,8 @@ export default function BookAppointment() {
       try {
         const res = await http.get("/speciality/");
         setSpecialities(res.data || []);
-        setMsg("");
-      } catch (err) {
-        setMsg("❌ Failed to load specialities (backend returned error/403)");
+      } catch {
+        setMsg("❌ Failed to load specialities");
       }
     })();
   }, []);
@@ -76,9 +108,8 @@ export default function BookAppointment() {
       try {
         const res = await http.get(`/speciality/${specialityId}/doctors`);
         setDoctors(res.data || []);
-        setMsg("");
-      } catch (err) {
-        setMsg("❌ Failed to load doctors (backend returned error/403)");
+      } catch {
+        setMsg("❌ Failed to load doctors");
       }
     })();
   }, [specialityId]);
@@ -99,18 +130,16 @@ export default function BookAppointment() {
     }
   };
 
-  // calendar grid data
   const cal = useMemo(() => {
     const first = startOfMonth(monthCursor);
     const total = daysInMonth(monthCursor);
-    const startWeekday = first.getDay(); // 0 Sun ... 6 Sat
+    const startWeekday = first.getDay();
     const cells = [];
-    // blanks
+
     for (let i = 0; i < startWeekday; i++) cells.push(null);
     for (let d = 1; d <= total; d++) {
       cells.push(new Date(first.getFullYear(), first.getMonth(), d));
     }
-    // pad to complete weeks (optional)
     while (cells.length % 7 !== 0) cells.push(null);
     return cells;
   }, [monthCursor]);
@@ -131,16 +160,30 @@ export default function BookAppointment() {
   return (
     <div className="pd-root ba-root">
       <Container className="ba-container">
-        {/* HERO TITLE CENTER (like your reference) */}
+
+        {/* ================= HERO ================= */}
         <div className="ba-heroCenter">
           <h2>Make an Appointment</h2>
           <p>Choose speciality, doctor, date & time slot</p>
           <Badge bg="info" className="ba-step">{stepBadge}</Badge>
+
+          {/* ✅ BACK TO DASHBOARD */}
+          <div className="ba-hero-actions">
+            <Button
+              variant="outline-primary"
+              className="ba-back-btn"
+              onClick={() => navigate("/dashboard/patient")}
+            >
+              ← Back to Dashboard
+            </Button>
+          </div>
         </div>
 
-        {/* Top filters row (keeps your functionality) */}
+        {/* ================= MAIN CARD ================= */}
         <Card className="pd-card ba-wideCard">
           <Card.Body>
+
+            {/* ================= FILTERS ================= */}
             <div className="ba-topFilters">
               <Form.Group className="ba-field">
                 <Form.Label>Speciality</Form.Label>
@@ -190,9 +233,10 @@ export default function BookAppointment() {
               </Form.Group>
             </div>
 
-            {/* Main grid exactly like reference: Left calendar, Right slots */}
+            {/* ================= CALENDAR + SLOTS ================= */}
             <div className="ba-grid">
-              {/* LEFT: Calendar */}
+
+              {/* LEFT CALENDAR */}
               <div className="ba-calendar">
                 <div className="ba-calHeader">
                   <div className="ba-calTitle">Select Date</div>
@@ -200,8 +244,11 @@ export default function BookAppointment() {
                     <button
                       type="button"
                       className="ba-navBtn"
-                      onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() - 1, 1))}
-                      aria-label="Prev month"
+                      onClick={() =>
+                        setMonthCursor(
+                          new Date(monthCursor.getFullYear(), monthCursor.getMonth() - 1, 1)
+                        )
+                      }
                     >
                       ‹
                     </button>
@@ -209,8 +256,11 @@ export default function BookAppointment() {
                     <button
                       type="button"
                       className="ba-navBtn"
-                      onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1))}
-                      aria-label="Next month"
+                      onClick={() =>
+                        setMonthCursor(
+                          new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1)
+                        )
+                      }
                     >
                       ›
                     </button>
@@ -230,7 +280,6 @@ export default function BookAppointment() {
                     const active = sameDay(d, selectedDateObj);
                     return (
                       <button
-                        type="button"
                         key={idx}
                         className={`ba-dayBtn ${active ? "active" : ""}`}
                         disabled={disabled}
@@ -238,20 +287,15 @@ export default function BookAppointment() {
                           setDate(toYMD(d));
                           setTime("");
                         }}
-                        title={toYMD(d)}
                       >
                         {d.getDate()}
                       </button>
                     );
                   })}
                 </div>
-
-                <div className="ba-calHint">
-                  {doctorId ? "Pick any available date" : "Select doctor to enable date selection"}
-                </div>
               </div>
 
-              {/* RIGHT: Slots */}
+              {/* RIGHT SLOTS */}
               <div className="ba-slotsPanel">
                 <div className="ba-slotHeader">
                   <div className="ba-calTitle">Select Time</div>
@@ -264,10 +308,15 @@ export default function BookAppointment() {
                   {timeSlots.map((t) => (
                     <button
                       key={t}
-                      type="button"
                       className={`ba-slotBtn ${time === t ? "active" : ""}`}
-                      disabled={!date || !doctorId}
-                      onClick={() => setTime(t)}
+                      disabled={!date || !doctorId || isPastSlot(date, t)}
+                      onClick={() => {
+                        if (isPastSlot(date, t)) {
+                          setMsg("❌ You cannot book a past time slot");
+                          return;
+                        }
+                        setTime(t);
+                      }}
                     >
                       {formatSlotLabel(t)}
                     </button>
@@ -276,7 +325,6 @@ export default function BookAppointment() {
 
                 <Button
                   className="ba-cta"
-                  variant="primary"
                   disabled={!specialityId || !doctorId || !date || !time}
                   onClick={confirmBooking}
                 >

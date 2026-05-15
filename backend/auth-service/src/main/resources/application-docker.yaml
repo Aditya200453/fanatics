@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    # ✅ Use container DNS name "db" from docker-compose
+    url: jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DATABASE}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: none   # ✅ IMPORTANT: we are using init.sql, no auto schema creation
+    show-sql: true
+
+# ✅ Optional but recommended
+logging:
+  level:
+    org.springframework: INFO

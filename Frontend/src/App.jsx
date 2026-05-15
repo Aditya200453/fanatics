@@ -16,9 +16,11 @@ import DoctorDashboard from "./pages/Dashboard/Doctor/DoctorDashboard";
 import AdminDashboard from "./pages/Dashboard/Admin/AdminDashboard";
 import StaffDashboard from "./pages/Dashboard/Staff/StaffDashboard";
 
-/* PATIENT FEATURES */
+/* FEATURES */
 import BookAppointment from "./pages/Dashboard/Patient/BookAppointment";
 import MyAppointments from "./pages/Dashboard/Patient/MyAppointments";
+import AddPrescription from "./pages/Dashboard/Doctor/AddPrescription";
+import ViewPrescription from "./pages/Dashboard/Patient/ViewPrescription";
 
 /* ROUTE GUARD */
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -26,24 +28,22 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 /* ✅ CHATBOT */
 import ChatbotWidget from "./Chatbot/ChatbotWidget";
 
-
 export default function App() {
   return (
-    <div className="app-root">
+    <>
       <Routes>
-        {/* ===================== PUBLIC ===================== */}
+        {/* ========== PUBLIC ========== */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* ============== LOGIN ROLE SELECT ================= */}
+        {/* ========== LOGIN ========== */}
         <Route path="/login" element={<OthersLogin />} />
-
-        {/* ================ ROLE LOGINS ===================== */}
         <Route path="/login/admin" element={<AdminLogin />} />
         <Route path="/login/doctor" element={<DoctorLogin />} />
         <Route path="/login/patient" element={<PatientLogin />} />
+        <Route path="/login/staff" element={<OthersLogin />} />
 
-        {/* ================= PATIENT ======================== */}
+        {/* ========== PATIENT ========== */}
         <Route
           path="/dashboard/patient"
           element={
@@ -71,7 +71,12 @@ export default function App() {
           }
         />
 
-        {/* ================= DOCTOR ========================= */}
+        <Route
+          path="/patient/prescription/:appointmentId"
+          element={<ViewPrescription />}
+        />
+
+        {/* ========== DOCTOR ========== */}
         <Route
           path="/dashboard/doctor"
           element={
@@ -81,7 +86,16 @@ export default function App() {
           }
         />
 
-        {/* ================= ADMIN ========================== */}
+        <Route
+          path="/doctor/prescription/:appointmentId"
+          element={
+            <ProtectedRoute allowedRoles={["DOCTOR"]}>
+              <AddPrescription />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ========== ADMIN ========== */}
         <Route
           path="/dashboard/admin"
           element={
@@ -91,7 +105,7 @@ export default function App() {
           }
         />
 
-        {/* ================= STAFF ========================== */}
+        {/* ========== STAFF ========== */}
         <Route
           path="/dashboard/staff"
           element={
@@ -101,20 +115,18 @@ export default function App() {
           }
         />
 
-        {/* ================= FALLBACK ======================= */}
+        {/* ========== FALLBACK ========== */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      {/* ✅ CHATBOT AVAILABLE ON ALL PAGES */}
+      {/* ✅ CHATBOT ON ALL PAGES */}
       <ChatbotWidget
-        
-agent={{
+        agent={{
           mode: "whatsapp",
           value:
             "https://wa.me/919999999999?text=Hi%20I%20need%20help%20with%20my%20clinic%20query",
         }}
       />
-    </div>
-
+    </>
   );
 }

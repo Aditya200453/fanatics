@@ -1,28 +1,59 @@
+/* PAGE */
 .login-page {
-  width: 100%;
+  padding: 0;
+  background: #f5fbfd;
+  font-family: "Inter", system-ui, sans-serif;
 }
 
+/* LEFT IMAGE COLUMN */
 .login-visual {
   position: relative;
-  background: url("/hero.png") center/cover no-repeat;
+  background:
+    linear-gradient(
+      rgba(6, 60, 90, 0.55),
+      rgba(6, 60, 90, 0.55)
+    ),
+    url("/Register.png") center center / cover no-repeat;
 }
 
+/* OPTIONAL OVERLAY (can keep empty div) */
 .login-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(5,40,56,.85);
+  background: transparent;
 }
 
-.login-text {
-  position: relative;
-  z-index: 2;
-  color: white;
-  padding: 80px;
+
+.login-page .col-md-5 {
+  background: transparent !important;
 }
 
+
+
+/* LOGIN CARD */
 .login-card {
   width: 100%;
   max-width: 420px;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0,0,0,.12);
+  border-radius: 18px;
+  border: none;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.12);
+}
+
+/* INPUTS */
+.login-card input {
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #dbe5ec;
+}
+
+.login-card input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
+}
+
+/* BUTTONS */
+.login-card button {
+  border-radius: 10px;
+  padding: 12px;
+  font-weight: 600;
 }

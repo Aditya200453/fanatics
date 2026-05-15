@@ -1,33 +1,26 @@
-server:
-  port: 8191
-
 spring:
   application:
     name: auth-service
 
-  datasource:
-    url: jdbc:mariadb://localhost:3307/auth_db
-    username: root
-    password: root
-    driver-class-name: org.mariadb.jdbc.Driver
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: true
+server:
+  port: ${SERVER_PORT:8191}
 
+# ✅ Common settings (shared across all profiles)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+# ✅ Eureka config (common)
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: ${EUREKA_URL}
 
-jwt:
-  # ✅ MUST be Base64 encoded and >= 32 bytes after decoding
-  # (Important fix for your JwtUtil)
-  secret: "MDEyMzQ1Njc4OWFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHg="
-  expiry-ms: 3600000  # 1 hour
-
+# ✅ Internal communication security (custom header)
 app:
-  # ✅ Used in AuthService for internal API security
-  internal-key: "CLINIC_INTERNAL_SECRET"
-
+  internal-key: ${INTERNAL_SECRET}

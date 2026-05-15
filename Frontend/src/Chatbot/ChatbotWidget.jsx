@@ -4,7 +4,7 @@ import { BOT_NAME, FLOWS } from "./Chatbotflows";
 
 export default function ChatbotWidget({
   agent = {
-    mode: "whatsapp", // "whatsapp" | "tel" | "mailto" | "url"
+    mode: "whatsapp", 
     value:
       "https://wa.me/919999999999?text=Hi%20I%20need%20help%20with%20my%20clinic%20query",
   },

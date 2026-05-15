@@ -27,7 +27,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         final String path = exchange.getRequest().getURI().getPath();
         final HttpMethod method = exchange.getRequest().getMethod();
 
-        // ✅ Allow CORS preflight to pass
+        // ✅ Allow CORS preflight
         if (HttpMethod.OPTIONS.equals(method)) {
             return chain.filter(exchange);
         }
@@ -37,6 +37,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
             return chain.filter(exchange);
         }
 
+        // ✅ Require Bearer token
         final String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ") || authHeader.length() <= 7) {
             return unauthorized(exchange);
@@ -50,7 +51,6 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         try {
             Claims claims = jwtUtil.validateToken(token);
 
-            // ✅ Make them FINAL for lambda usage
             final String email = claims.getSubject();
             final String roleRaw = claims.get("role", String.class);
 
@@ -60,37 +60,51 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
             final String role = roleRaw.toUpperCase();
 
-            // ✅ PATIENT SERVICE
+            // ==========================================================
+            // ✅ ROLE-BASED ACCESS RULES
+            // ==========================================================
+
+            // ✅ PATIENT SERVICE: ADMIN / PATIENT / STAFF
             if (isPath(path, "/patient") &&
                     !(role.equals("ADMIN") || role.equals("PATIENT") || role.equals("STAFF"))) {
                 return forbidden(exchange);
             }
 
-            // ✅ DOCTOR SERVICE
+            // ✅ DOCTOR SERVICE: ADMIN / DOCTOR / STAFF
             if (isPath(path, "/doctor") &&
                     !(role.equals("ADMIN") || role.equals("DOCTOR") || role.equals("STAFF"))) {
                 return forbidden(exchange);
             }
 
-            // ✅ APPOINTMENT
+            // ✅ SPECIALITY: ADMIN / STAFF / PATIENT
+            // (needed for patient booking page to load specialities + doctors)
+            if (isPath(path, "/speciality") &&
+                    !(role.equals("ADMIN") || role.equals("STAFF") || role.equals("PATIENT"))) {
+                return forbidden(exchange);
+            }
+
+            // ✅ APPOINTMENT: ADMIN / DOCTOR / PATIENT / STAFF
             if (isPath(path, "/appointment") &&
                     !(role.equals("ADMIN") || role.equals("DOCTOR") || role.equals("PATIENT") || role.equals("STAFF"))) {
                 return forbidden(exchange);
             }
 
-            // ✅ SPECIALITY
-            if (isPath(path, "/speciality") &&
-                    !(role.equals("ADMIN") || role.equals("STAFF"))) {
+            // ✅ DIAGNOSTIC: ADMIN / STAFF / DOCTOR (optional) / PATIENT (optional)
+            // If you want PATIENT to view tests, include PATIENT here.
+            // If you want ONLY STAFF to manage tests, keep PATIENT out.
+            if (isPath(path, "/diagnostic") &&
+                    !(role.equals("ADMIN") || role.equals("STAFF") || role.equals("DOCTOR"))) {
                 return forbidden(exchange);
             }
 
-            // ✅ Protect admin approval endpoints
+            // ✅ AUTH ADMIN endpoints: ADMIN only
             if (isPath(path, "/auth/admin") && !role.equals("ADMIN")) {
                 return forbidden(exchange);
             }
 
-
-            // ✅ Forward identity to services (remove first to prevent spoofing)
+            // ==========================================================
+            // ✅ Forward identity headers to microservices (prevent spoofing)
+            // ==========================================================
             ServerWebExchange mutated = exchange.mutate()
                     .request(r -> r.headers(headers -> {
                         headers.remove("X-User-Email");
@@ -99,10 +113,6 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
                         headers.add("X-User-Role", role);
                     }))
                     .build();
-
-//            TESTING
-//            System.out.println("ROLE = " + role);
-//            System.out.println("PATH = " + path);
 
             return chain.filter(mutated);
 
@@ -113,22 +123,19 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     private boolean isPublic(String path) {
         return
-                // ✅ AUTH public
+                // ✅ Auth public
                 path.equals("/auth/login")
                         || path.equals("/auth/signup")
                         || path.startsWith("/auth/internal/")
 
-                        // ✅ PATIENT public
+                        // ✅ Signup endpoints public
                         || path.equals("/patient/signup")
-
-                        // ✅ DOCTOR public
                         || path.equals("/doctor/signup")
 
-                        // ✅ Optional public doctor listing
+                        // ✅ Optional doctor public endpoints
                         || path.equals("/doctor/public/active")
                         || path.startsWith("/doctor/public/");
     }
-
 
     private boolean isPath(String path, String base) {
         return path.equals(base) || path.startsWith(base + "/");

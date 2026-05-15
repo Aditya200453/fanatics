@@ -12,27 +12,27 @@ import java.util.List;
 @RequestMapping("/prescription")
 public class PrescriptionMedicineController {
 
-    private PrescriptionMedicineService medicineService;
+    private final PrescriptionMedicineService medicineService;
 
     public PrescriptionMedicineController(PrescriptionMedicineService medicineService) {
         this.medicineService = medicineService;
     }
 
-    // Add medicine to a prescription
-    @PostMapping("/{prescriptionId}/medicine/")
-    public ResponseEntity<PrescriptionMedicine> addMedicine(@PathVariable Integer prescriptionId,
-                                                            @RequestBody PrescriptionMedicine medicine) {
+    // ✅ no trailing slash
+    @PostMapping("/{prescriptionId}/medicine")
+    public ResponseEntity<PrescriptionMedicine> addMedicine(
+            @PathVariable Integer prescriptionId,
+            @RequestBody PrescriptionMedicine medicine) {
+
         return ResponseEntity.ok(medicineService.addMedicine(prescriptionId, medicine));
     }
 
-    // List medicines of a prescription
-    @GetMapping("/{prescriptionId}/medicine/")
+    @GetMapping("/{prescriptionId}/medicine")
     public ResponseEntity<List<PrescriptionMedicine>> getMedicines(@PathVariable Integer prescriptionId) {
         return ResponseEntity.ok(medicineService.getMedicines(prescriptionId));
     }
 
-    // Delete a medicine row
-    @DeleteMapping("/medicine/")
+    @DeleteMapping("/medicine")
     public ResponseEntity<ResponseMessage> deleteMedicine(@RequestParam Integer id) {
         medicineService.deleteMedicine(id);
         return ResponseEntity.ok(new ResponseMessage("Medicine deleted"));

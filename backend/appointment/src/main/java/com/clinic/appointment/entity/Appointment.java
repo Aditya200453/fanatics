@@ -1,11 +1,8 @@
 package com.clinic.appointment.entity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.Instant;
 
 @Entity
 @Table(name = "appointment")
@@ -28,8 +25,9 @@ public class Appointment {
     @Column(name = "appointment_time", nullable = false)
     private LocalTime appointmentTime;
 
-    @Column(name = "status", length = 20)
-    private String status = "BOOKED"; // BOOKED / COMPLETED / CANCELLED
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private AppointmentStatus status;
 
     @Column(name = "symptoms", length = 255)
     private String symptoms;
@@ -37,11 +35,9 @@ public class Appointment {
     @Column(name = "remarks", length = 255)
     private String remarks;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private Instant createdAt;
+    // created_at exists in DB with default current_timestamp() per schema
+    // You can optionally map it; keeping it unmapped is fine.
 
-    // getters/setters
     public Integer getAppointmentId() { return appointmentId; }
     public void setAppointmentId(Integer appointmentId) { this.appointmentId = appointmentId; }
 
@@ -57,14 +53,12 @@ public class Appointment {
     public LocalTime getAppointmentTime() { return appointmentTime; }
     public void setAppointmentTime(LocalTime appointmentTime) { this.appointmentTime = appointmentTime; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public AppointmentStatus getStatus() { return status; }
+    public void setStatus(AppointmentStatus status) { this.status = status; }
 
     public String getSymptoms() { return symptoms; }
     public void setSymptoms(String symptoms) { this.symptoms = symptoms; }
 
     public String getRemarks() { return remarks; }
     public void setRemarks(String remarks) { this.remarks = remarks; }
-
-    public Instant getCreatedAt() { return createdAt; }
 }

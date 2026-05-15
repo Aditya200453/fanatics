@@ -1,17 +1,30 @@
 /* ================= HEADER (CLEAN & BALANCED) ================= */
 
 .pd-header {
-  padding: 32px 0 48px;     /* ⬅ HERO HEIGHT */
-  margin-bottom: 48px;      /* ⬅ separation from cards */
+  padding: 32px 0 48px;
+  margin-bottom: 48px;
+
+  /* ✅ subtle separation so background stays visible */
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(2px);
 }
+
+/* Header row */
 
 .pd-header-row {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 24px;
-  flex-wrap: wrap;
 }
+
+.pd-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+
 
 /* Top label */
 .pd-kicker {
@@ -21,7 +34,9 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #7dd3fc;
+
+  /* ✅ medical blue */
+  color: #2563eb;
 }
 
 /* Main Title */
@@ -30,15 +45,19 @@
   font-weight: 800;
   line-height: 1.05;
   letter-spacing: -0.05em;
-  color: #ffffff;
+
+  /* ✅ DARK text for light medical background */
+  color: #0f172a;
   margin-bottom: 10px;
 }
 
 /* Subtitle */
 .pd-header p {
   font-size: 1rem;
-  color: #d9e6f2;
   max-width: 760px;
+
+  /* ✅ readable on light background */
+  color: #475569;
 }
 
 /* Right status chip */
@@ -48,15 +67,21 @@
   gap: 10px;
   padding: 10px 16px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  color: #eaf6ff;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+
+  /* ✅ light glass effect */
+  background: rgba(255, 255, 255, 0.65);
+  color: #0f172a;
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
   font-size: 0.92rem;
   font-weight: 600;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
 }
 
+/* Status dot */
 .pd-chip-dot {
   width: 10px;
   height: 10px;
@@ -64,52 +89,134 @@
   background: #22c55e;
   box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
 }
+
 /* ===== DASHBOARD TOP INFO CARD ===== */
-.dashboard-info-card {
+.dashboard-info-card,
+.pd-card,
+.pd-cta {
   background: linear-gradient(
-    135deg,
+    180deg,
     #ffffff 0%,
-    #f8fbff 100%
+    #f6faff 100%
   );
 
   border-radius: 20px;
-  padding: 28px 32px;
-  margin-bottom: 28px;
-
-  border-left: 6px solid #3b82f6;
 
   box-shadow:
-    0 18px 40px rgba(15, 23, 42, 0.10);
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),   /* ✅ inner highlight */
+    0 18px 38px rgba(15, 23, 42, 0.12);
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
+
+.dashboard-info-card:hover,
+.pd-card:hover {
+  transform: translateY(-6px);
+
+  box-shadow:
+    0 30px 60px rgba(15, 23, 42, 0.12),
+    0 12px 24px rgba(15, 23, 42, 0.08);
+
+  background-color: #fdfefe;
+}
+.dashboard-info-card:active,
+.pd-card:active {
+  transform: translateY(-2px) scale(0.995);
+}
+.dashboard-info-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-info-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 6px;
+  background: linear-gradient(
+    180deg,
+    #3b82f6,
+    #22c55e
+  );
+  border-radius: 20px 0 0 20px;
+}
+
+
 /* CTA card heading */
+.pd-cta {
+  background: linear-gradient(
+    135deg,
+    #ffffff,
+    #f8fbff
+  );
+}
+
+.pd-cta:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 30px 60px rgba(37, 99, 235, 0.15);
+}
+
 .pd-cta h5 {
-  color: #0f172a;           /* dark readable */
+  color: #0f172a;
   font-weight: 700;
   margin-bottom: 6px;
 }
 
 /* CTA description text */
 .pd-cta p {
-  color: #475569;           /* visible slate gray */
+  color: #475569;
   font-size: 0.95rem;
-  margin-bottom: 20px;      /* space before buttons */
+  margin-bottom: 20px;
 }
-/* Action buttons container */
-/* CTA actions container */
-.pd-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;          /* proper spacing */
-  flex-wrap: wrap;
+/* ================= PRIMARY CTA CARD ================= */
+
+/* Make Book Appointment card visually dominant */
+.pd-cta-primary {
+  position: relative;
+  overflow: hidden;
+
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #eef6ff 30%,
+    #e0f2fe 100%
+  );
+
+  border: 2px solid rgba(37, 99, 235, 0.35);
+
+  box-shadow:
+    0 30px 60px rgba(37, 99, 235, 0.25),
+    0 12px 24px rgba(37, 99, 235, 0.15);
+
+  transform: scale(1.02);
 }
 
-/* Primary action (Book Appointment) – optional polish */
-/* CTA actions container */
+/* Subtle glow stripe on the left */
+.pd-cta-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 8px;
+  background: linear-gradient(
+    180deg,
+    #2563eb,
+    #22c55e
+  );
+  border-radius: 20px 0 0 20px;
+}
+
+/* Slight attention animation on load */
+@keyframes subtlePulse {
+  0% { box-shadow: 0 0 0 rgba(37,99,235,0.0); }
+  50% { box-shadow: 0 0 0 8px rgba(37,99,235,0.12); }
+  100% { box-shadow: 0 0 0 rgba(37,99,235,0.0); }
+}
+
+.pd-cta-primary {
+  animation: subtlePulse 2.5s ease-out 1;
+}
+
+/* CTA actions */
 .pd-actions {
   display: flex;
   align-items: center;
@@ -117,24 +224,87 @@
   flex-wrap: wrap;
 }
 
-/* Primary button (Book Appointment) */
+/* Primary button */
 .pd-actions .btn-primary {
   padding: 10px 20px;
   font-weight: 600;
 }
 
-/* ✅ My Appointments – slightly darker light button */
+/* My Appointments button */
 .pd-actions .btn-outline-primary {
-  background-color: #dbeafe;   /* darker light blue */
-  border: 1.5px solid #93c5fd; /* visible border */
-  color: #1d4ed8;              /* strong blue text */
+  background-color: #dbeafe;
+  border: 1.5px solid #93c5fd;
+  color: #1d4ed8;
   padding: 10px 20px;
   font-weight: 600;
 }
 
-/* Hover polish */
 .pd-actions .btn-outline-primary:hover {
   background-color: #bfdbfe;
   border-color: #60a5fa;
   color: #1e40af;
+}
+.pd-logout {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 1000;
+}
+/* HERO ACTION FOR DASHBOARD */
+.pd-hero-actions {
+  margin-top: 18px;
+}
+
+.pd-home-btn {
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-weight: 700;
+}
+/* ================= STATUS BADGES ================= */
+
+.pd-status {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Pending */
+.pd-status.pending {
+  background: #fef3c7;
+  color: #92400e;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.18);
+}
+
+/* Booked */
+.pd-status.booked {
+  background: #dbeafe;
+  color: #1e40af;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18);
+}
+
+/* Completed */
+.pd-status.completed {
+  background: #dcfce7;
+  color: #166534;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
+}
+
+/* Future-ready */
+.pd-status.cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

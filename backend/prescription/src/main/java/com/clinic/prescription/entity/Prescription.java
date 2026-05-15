@@ -1,6 +1,8 @@
 package com.clinic.prescription.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
 
 @Entity
@@ -15,6 +17,8 @@ public class Prescription {
     @Column(name = "appointment_id", nullable = false)
     private Integer appointmentId;
 
+    // ✅ ensures JSON "yyyy-MM-dd" parses correctly
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Column(name = "prescription_date", nullable = false)
     private LocalDate prescriptionDate;
 
@@ -26,43 +30,18 @@ public class Prescription {
 
     public Prescription() {}
 
-    public Integer getPrescriptionId() {
-        return prescriptionId;
-    }
+    public Integer getPrescriptionId() { return prescriptionId; }
+    public void setPrescriptionId(Integer prescriptionId) { this.prescriptionId = prescriptionId; }
 
-    public void setPrescriptionId(Integer prescriptionId) {
-        this.prescriptionId = prescriptionId;
-    }
+    public Integer getAppointmentId() { return appointmentId; }
+    public void setAppointmentId(Integer appointmentId) { this.appointmentId = appointmentId; }
 
-    public Integer getAppointmentId() {
-        return appointmentId;
-    }
+    public LocalDate getPrescriptionDate() { return prescriptionDate; }
+    public void setPrescriptionDate(LocalDate prescriptionDate) { this.prescriptionDate = prescriptionDate; }
 
-    public void setAppointmentId(Integer appointmentId) {
-        this.appointmentId = appointmentId;
-    }
+    public String getDiagnosis() { return diagnosis; }
+    public void setDiagnosis(String diagnosis) { this.diagnosis = diagnosis; }
 
-    public LocalDate getPrescriptionDate() {
-        return prescriptionDate;
-    }
-
-    public void setPrescriptionDate(LocalDate prescriptionDate) {
-        this.prescriptionDate = prescriptionDate;
-    }
-
-    public String getDiagnosis() {
-        return diagnosis;
-    }
-
-    public void setDiagnosis(String diagnosis) {
-        this.diagnosis = diagnosis;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
 }

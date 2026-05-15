@@ -1,26 +1,22 @@
-server:
-  port: 8072
-
 spring:
   application:
-    name: doctor
+    name: doctor-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
-  datasource:
-    url: jdbc:mariadb://localhost:3307/cms
-    username: root
-    password: root
-    driver-class-name: org.mariadb.jdbc.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+server:
+  port: ${SERVER_PORT:8072}
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: ${EUREKA_URL}
 
-# ✅ ✅ ADD THIS BLOCK (MANDATORY)
 app:
-  internal-key: "CLINIC_INTERNAL_SECRET"
+  internal-key: ${INTERNAL_SECRET}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

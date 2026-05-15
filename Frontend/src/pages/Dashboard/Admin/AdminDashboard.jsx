@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import http from "../../../api/http";
 import "./AdminDashboard.css";
@@ -6,287 +6,287 @@ import "./AdminDashboard.css";
 export default function AdminDashboard() {
   const navigate = useNavigate();
 
-  // ---------------- DOCTORS ----------------
   const [doctors, setDoctors] = useState([]);
-  const [specialities, setSpecialities] = useState([]);
-  const [selectedDoctor, setSelectedDoctor] = useState("");
-  const [selectedSpeciality, setSelectedSpeciality] = useState("");
-  const [loadingDoctors, setLoadingDoctors] = useState(true);
-
-  // ---------------- STAFF ----------------
   const [staff, setStaff] = useState([]);
-  const [loadingStaff, setLoadingStaff] = useState(true);
-
+  const [specialities, setSpecialities] = useState([]);
+  const [selectedSpecByDoctor, setSelectedSpecByDoctor] = useState({});
   const [msg, setMsg] = useState("");
 
-  // ------------ LOAD DOCTORS ------------
-  const loadDoctors = async () => {
-    setLoadingDoctors(true);
-    setMsg("");
-    try {
-      const res = await http.get("/doctor/admin/doctors");
-      setDoctors(res.data || []);
-    } catch (err) {
-      setMsg("❌ Failed to load doctors");
-    } finally {
-      setLoadingDoctors(false);
-    }
-  };
+  /* ===== SEARCH & FILTER STATE ===== */
+  const [staffSearch, setStaffSearch] = useState("");
+  const [doctorSearch, setDoctorSearch] = useState("");
+  const [doctorStatus, setDoctorStatus] = useState("ALL");
+  const [doctorSpeciality, setDoctorSpeciality] = useState("ALL");
 
-  // ------------ LOAD SPECIALITIES ------------
-  const loadSpecialities = async () => {
+  // ================= LOAD =================
+  const load = async () => {
     try {
-      const res = await http.get("/speciality/");
-      setSpecialities(res.data || []);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+      const [docRes, staffRes, specRes] = await Promise.all([
+        http.get("/doctor/admin/doctors"),
+        http.get("/auth/admin/staff/pending"),
+        http.get("/speciality/")
+      ]);
 
-  // ------------ LOAD PENDING STAFF ------------
-  const loadPendingStaff = async () => {
-    setLoadingStaff(true);
-    setMsg("");
-    try {
-      const res = await http.get("/auth/admin/staff/pending");
-      setStaff(res.data || []);
-    } catch (err) {
-      setMsg("❌ Failed to load pending staff");
-    } finally {
-      setLoadingStaff(false);
+      setDoctors(docRes.data || []);
+      setStaff(staffRes.data || []);
+      setSpecialities(specRes.data || []);
+    } catch {
+      setMsg("❌ Failed to load data");
     }
   };
 
   useEffect(() => {
-    loadDoctors();
-    loadSpecialities();
-    loadPendingStaff();
+    load();
+  }, []);
+  useEffect(() => {
+    window.history.pushState(null, "", window.location.href);
+
+    const blockBack = () => {
+      window.history.pushState(null, "", window.location.href);
+    };
+
+    window.addEventListener("popstate", blockBack);
+
+    return () => {
+      window.removeEventListener("popstate", blockBack);
+    };
   }, []);
 
-  // ------------ APPROVE DOCTOR ------------
-  const approveDoctor = async (doctorId) => {
-    try {
-      await http.post(`/doctor/admin/approve/${doctorId}`);
-      setMsg("✅ Doctor approved successfully");
-      loadDoctors();
-    } catch {
-      setMsg("❌ Doctor approval failed");
-    }
+  // ================= FILTERED DATA =================
+
+  const filteredStaff = useMemo(() => {
+    return staff.filter(s =>
+      s.email.toLowerCase().includes(staffSearch.toLowerCase())
+    );
+  }, [staff, staffSearch]);
+
+  const filteredDoctors = useMemo(() => {
+    return doctors
+      .filter(d =>
+        d.name.toLowerCase().includes(doctorSearch.toLowerCase()) ||
+        d.email.toLowerCase().includes(doctorSearch.toLowerCase())
+      )
+      .filter(d =>
+        doctorStatus === "ALL" ? true : d.status === doctorStatus
+      )
+      .filter(d =>
+        doctorSpeciality === "ALL"
+          ? true
+          : String(d.specialityId) === doctorSpeciality
+      );
+  }, [doctors, doctorSearch, doctorStatus, doctorSpeciality]);
+
+  // ================= ACTIONS =================
+
+  const approveStaff = async (id) => {
+    await http.put(`/auth/admin/staff/${id}/approve`);
+    setMsg("✅ Staff approved");
+    load();
   };
 
-  // ------------ MAP DOCTOR -> SPECIALITY ------------
-  const mapDoctor = async () => {
-    if (!selectedDoctor || !selectedSpeciality) {
-      setMsg("❌ Select doctor and speciality");
+  const rejectStaff = async (id) => {
+    await http.put(`/auth/admin/staff/${id}/reject`);
+    setMsg("❌ Staff rejected");
+    load();
+  };
+
+  const approveDoctor = async (doctorId) => {
+    const specId = selectedSpecByDoctor[doctorId];
+    if (!specId) {
+      setMsg("❌ Select speciality first");
       return;
     }
 
-    try {
-      await http.post("/speciality/map", {
-        doctorId: Number(selectedDoctor),
-        specialityId: Number(selectedSpeciality),
-      });
-      setMsg("✅ Doctor mapped successfully");
-    } catch {
-      setMsg("❌ Mapping failed");
-    }
-  };
+    await http.post(`/doctor/admin/approve/${doctorId}`);
+    await http.post("/speciality/map", {
+      doctorId,
+      specialityId: Number(specId),
+    });
 
-  // ------------ APPROVE STAFF ------------
-  const approveStaff = async (id) => {
-    try {
-      await http.put(`/auth/admin/staff/${id}/approve`);
-      setMsg("✅ Staff approved successfully");
-      loadPendingStaff();
-    } catch {
-      setMsg("❌ Staff approval failed");
-    }
-  };
-
-  // ------------ REJECT STAFF ------------
-  const rejectStaff = async (id) => {
-    try {
-      await http.put(`/auth/admin/staff/${id}/reject`);
-      setMsg("✅ Staff rejected/disabled");
-      loadPendingStaff();
-    } catch {
-      setMsg("❌ Staff reject failed");
-    }
+    setMsg("✅ Doctor approved & mapped");
+    load();
   };
 
   return (
     <div className="admin-container">
-      <div className="admin-header-row">
-        <h2 className="admin-title">Admin Dashboard ✅</h2>
 
-        {/* ✅ LOGIN AS OTHER */}
+{/* ================= HEADER ================= */}
+<div className="admin-header">
+  <div className="admin-header-row">
+
+    {/* LEFT SIDE */}
+    <div className="admin-header-left">
+      <span className="pd-kicker">Admin Panel</span>
+      <h2 className="admin-title">Admin Dashboard</h2>
+      <p>Manage staff approvals and doctor onboarding</p>
+
+      {/* BACK TO HOME */}
+      <div className="admin-hero-actions">
         <button
-          className="btn btn-secondary"
-          onClick={() => navigate("/login")}
+          className="admin-home-btn"
+          onClick={() => navigate("/")}
         >
-          Login as Other
+          ⌂ Go to Home
         </button>
       </div>
+    </div>
 
-      {msg && <div className="admin-msg">{msg}</div>}
+    {/* RIGHT SIDE */}
+    <div className="admin-header-actions">
 
-      {/* REFRESH */}
-      <div className="card">
-        <button className="btn btn-secondary me-2" onClick={loadDoctors}>
-          Refresh Doctors
-        </button>
-        <button className="btn btn-secondary" onClick={loadPendingStaff}>
-          Refresh Staff
-        </button>
-      </div>
+      <button
+        className="admin-logout-btn"
+        onClick={() => {
+          localStorage.clear();
+          navigate("/login");
+        }}
+      >
+        Logout
+      </button>
+    </div>
 
-      {/* STAFF APPROVAL */}
+  </div>
+</div>
+      {/* ================= STAFF ================= */}
       <div className="card">
         <h3>Pending Staff Approvals</h3>
 
-        {loadingStaff ? (
-          <h4>Loading staff...</h4>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th style={{ width: "220px" }}>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {staff.length === 0 ? (
-                <tr>
-                  <td colSpan="5">No pending staff</td>
+        {/* SEARCH */}
+        <div className="admin-filter-bar">
+          <input
+            placeholder="Search staff by email"
+            value={staffSearch}
+            onChange={(e) => setStaffSearch(e.target.value)}
+          />
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filteredStaff.length === 0 ? (
+              <tr><td colSpan="5">No matching staff</td></tr>
+            ) : (
+              filteredStaff.map((s) => (
+                <tr key={s.id}>
+                  <td>{s.id}</td>
+                  <td>{s.email}</td>
+                  <td>{s.role}</td>
+                  <td className="status-pending">{s.status}</td>
+                  <td>
+                    <button className="btn btn-success me-2" onClick={() => approveStaff(s.id)}>
+                      Approve
+                    </button>
+                    <button className="btn btn-danger" onClick={() => rejectStaff(s.id)}>
+                      Reject
+                    </button>
+                  </td>
                 </tr>
-              ) : (
-                staff.map((s) => (
-                  <tr key={s.id}>
-                    <td>{s.id}</td>
-                    <td>{s.email}</td>
-                    <td>{s.role}</td>
-                    <td>
-                      <span className="status-pending">{s.status}</span>
-                    </td>
-                    <td>
-                      <button
-                        className="btn btn-success me-2"
-                        onClick={() => approveStaff(s.id)}
-                      >
-                        Accept
-                      </button>
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => rejectStaff(s.id)}
-                      >
-                        Reject
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        )}
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
 
-      {/* MAP DOCTOR -> SPECIALITY */}
+      {/* ================= DOCTORS ================= */}
       <div className="card">
-        <h3>Assign Doctor to Speciality</h3>
+        <h3>Doctors</h3>
 
-        <div className="form-row">
-          <select
-            value={selectedDoctor}
-            onChange={(e) => setSelectedDoctor(e.target.value)}
-          >
-            <option value="">Select Doctor</option>
-            {doctors.map((d) => (
-              <option key={d.doctorId} value={d.doctorId}>
-                {d.name}
-              </option>
-            ))}
+        {/* SEARCH + FILTER */}
+        <div className="admin-filter-bar">
+          <input
+            placeholder="Search doctor by name or email"
+            value={doctorSearch}
+            onChange={(e) => setDoctorSearch(e.target.value)}
+          />
+
+          <select onChange={(e) => setDoctorStatus(e.target.value)}>
+            <option value="ALL">All Status</option>
+            <option value="ACTIVE">Active</option>
+            <option value="PENDING">Pending</option>
           </select>
 
-          <select
-            value={selectedSpeciality}
-            onChange={(e) => setSelectedSpeciality(e.target.value)}
-          >
-            <option value="">Select Speciality</option>
-            {specialities.map((s) => (
+          <select onChange={(e) => setDoctorSpeciality(e.target.value)}>
+            <option value="ALL">All Specialities</option>
+            {specialities.map(s => (
               <option key={s.specialityId} value={s.specialityId}>
                 {s.name}
               </option>
             ))}
           </select>
-
-          <button className="btn btn-primary" onClick={mapDoctor}>
-            Map Doctor
-          </button>
         </div>
-      </div>
 
-      {/* DOCTOR LIST */}
-      <div className="card">
-        {loadingDoctors ? (
-          <h3>Loading doctors...</h3>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Experience</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Experience</th>
+              <th>Status</th>
+              <th>Speciality</th>
+              <th>Action</th>
+            </tr>
+          </thead>
 
-            <tbody>
-              {doctors.length === 0 ? (
-                <tr>
-                  <td colSpan="6">No doctors found</td>
-                </tr>
-              ) : (
-                doctors.map((doc) => (
-                  <tr key={doc.doctorId}>
-                    <td>{doc.doctorId}</td>
-                    <td>{doc.name}</td>
-                    <td>{doc.email}</td>
-                    <td>{doc.experience}</td>
-                    <td>
-                      <span
-                        className={
-                          doc.status === "ACTIVE"
-                            ? "status-active"
-                            : "status-pending"
+          <tbody>
+            {filteredDoctors.length === 0 ? (
+              <tr><td colSpan="7">No matching doctors</td></tr>
+            ) : (
+              filteredDoctors.map(doc => (
+                <tr key={doc.doctorId}>
+                  <td>{doc.doctorId}</td>
+                  <td>{doc.name}</td>
+                  <td>{doc.email}</td>
+                  <td>{doc.experience}</td>
+
+                  <td className={doc.status === "ACTIVE" ? "status-active" : "status-pending"}>
+                    {doc.status}
+                  </td>
+
+                  <td>
+                    {doc.status === "PENDING" ? (
+                      <select
+                        value={selectedSpecByDoctor[doc.doctorId] || ""}
+                        onChange={(e) =>
+                          setSelectedSpecByDoctor(prev => ({
+                            ...prev,
+                            [doc.doctorId]: e.target.value
+                          }))
                         }
                       >
-                        {doc.status}
-                      </span>
-                    </td>
-                    <td>
-                      {doc.status === "PENDING" ? (
-                        <button
-                          className="btn btn-success"
-                          onClick={() => approveDoctor(doc.doctorId)}
-                        >
-                          Approve
-                        </button>
-                      ) : (
-                        "Approved"
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        )}
+                        <option value="">Select</option>
+                        {specialities.map(s => (
+                          <option key={s.specialityId} value={s.specialityId}>
+                            {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    ) : "-"}
+                  </td>
+
+                  <td>
+                    {doc.status === "PENDING" ? (
+                      <button className="btn btn-success" onClick={() => approveDoctor(doc.doctorId)}>
+                        Approve
+                      </button>
+                    ) : "Approved"}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
+
     </div>
   );
 }

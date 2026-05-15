@@ -1,5 +1,5 @@
 server:
-  port: 8076
+  port: ${SERVER_PORT:8076}
 
 spring:
   main:
@@ -8,10 +8,13 @@ spring:
   application:
     name: api-gateway
 
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
   cloud:
     gateway:
       server:
-        webflux:   # ✅ REQUIRED FOR SPRING BOOT 3.5+
+        webflux:
 
           globalcors:
             add-to-simple-url-handler-mapping: true
@@ -24,42 +27,70 @@ spring:
                   - POST
                   - PUT
                   - DELETE
+                  - PATCH
                   - OPTIONS
                 allowedHeaders:
                   - "*"
                 allowCredentials: true
 
           routes:
+
+            # ✅ AUTH
             - id: auth-service
               uri: lb://auth-service
               predicates:
                 - Path=/auth/**
 
+            # ✅ PATIENT
             - id: patient-service
-              uri: lb://patient
+              uri: lb://patient-service
               predicates:
                 - Path=/patient/**
 
+            # ✅ DOCTOR
             - id: doctor-service
-              uri: lb://doctor
+              uri: lb://doctor-service
               predicates:
                 - Path=/doctor/**
 
-            - id: appointment
-              uri: lb://appointment
+            # ✅ APPOINTMENT
+            - id: appointment-service
+              uri: lb://appointment-service
               predicates:
                 - Path=/appointment/**
 
-            - id: speciality-api
-              uri: lb://doctor
+            # ✅ SPECIALITY (doctor-service handles it)
+            - id: speciality
+              uri: lb://doctor-service
               predicates:
                 - Path=/speciality/**
 
-# ✅ ✅ THIS IS THE FIX FOR YOUR ERROR
+            # ✅ DIAGNOSTIC
+            - id: diagnostic-service
+              uri: lb://diagnostic-service
+              predicates:
+                - Path=/diagnostic/**
+
+            # ✅ PRESCRIPTION
+            - id: prescription-service
+              uri: lb://prescription-service
+              predicates:
+                - Path=/prescription/**
+
+# ✅ Move secrets to env
 jwt:
-  secret: "MDEyMzQ1Njc4OWFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHg="
+  secret: ${JWT_SECRET}
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: ${EUREKA_URL}
+
+app:
+  internal-key: ${INTERNAL_SECRET}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

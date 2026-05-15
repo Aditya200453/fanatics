@@ -1,0 +1,221 @@
+services:
+  # ======================
+  # DATABASE (single MariaDB)
+  # ======================
+  db:
+    image: mariadb:11.8
+    container_name: cms-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      # Optional: allow host machine to connect (Workbench/Postman debugging)
+      - "${DB_HOST_PORT}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # init scripts run only when volume is empty
+      - ./docker/mysql/initdb:/docker-entrypoint-initdb.d:ro
+    networks:
+      - cms-net
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -p${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  # ======================
+  # EUREKA SERVER (Phase 2)
+  # ======================
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    container_name: eureka-server
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SERVER_PORT: 8761
+    ports:
+      # Optional: view Eureka dashboard in browser
+      - "8761:8761"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - cms-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health | grep UP || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  # ======================
+  # AUTH SERVICE (Phase 3) - scaffold (we'll finalize next)
+  # ======================
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SERVER_PORT: 8191
+
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DATABASE: ${DB_NAME_AUTH}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+
+      EUREKA_URL: ${EUREKA_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRY_MS: ${JWT_EXPIRY_MS}
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+    expose:
+      - "8191"
+    depends_on:
+      db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - cms-net
+
+  # ======================
+  # OTHER SERVICES (Phase 4) - scaffold
+  # Each will use cms DB
+  # ======================
+  patient-service:
+    build: { context: ./patient, dockerfile: Dockerfile }
+    container_name: patient-service
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SERVER_PORT: 8071
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DATABASE: ${DB_NAME_CMS}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      EUREKA_URL: ${EUREKA_URL}
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+    expose: ["8071"]
+    depends_on:
+      db: { condition: service_healthy }
+      eureka-server: { condition: service_healthy }
+    networks: [cms-net]
+
+  doctor-service:
+    build: { context: ./doctor, dockerfile: Dockerfile }
+    container_name: doctor-service
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SERVER_PORT: 8072
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DATABASE: ${DB_NAME_CMS}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      EUREKA_URL: ${EUREKA_URL}
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+    expose: ["8072"]
+    depends_on:
+      db: { condition: service_healthy }
+      eureka-server: { condition: service_healthy }
+    networks: [cms-net]
+
+  diagnostic-service:
+    build: { context: ./diagnostic, dockerfile: Dockerfile }
+    container_name: diagnostic-service
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SERVER_PORT: 8073
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DATABASE: ${DB_NAME_CMS}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      EUREKA_URL: ${EUREKA_URL}
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+    expose: ["8073"]
+    depends_on:
+      db: { condition: service_healthy }
+      eureka-server: { condition: service_healthy }
+    networks: [cms-net]
+
+  appointment-service:
+    build: { context: ./appointment, dockerfile: Dockerfile }
+    container_name: appointment-service
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SERVER_PORT: 8074
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DATABASE: ${DB_NAME_CMS}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      EUREKA_URL: ${EUREKA_URL}
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+    expose: ["8074"]
+    depends_on:
+      db: { condition: service_healthy }
+      eureka-server: { condition: service_healthy }
+    networks: [cms-net]
+
+  prescription-service:
+    build: { context: ./prescription, dockerfile: Dockerfile }
+    container_name: prescription-service
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SERVER_PORT: 8075
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DATABASE: ${DB_NAME_CMS}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      EUREKA_URL: ${EUREKA_URL}
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+    expose: ["8075"]
+    depends_on:
+      db: { condition: service_healthy }
+      eureka-server: { condition: service_healthy }
+    networks: [cms-net]
+
+  # ======================
+  # API GATEWAY (Phase 5) - scaffold
+  # ======================
+  api-gateway:
+    build: { context: ./api-gateway, dockerfile: Dockerfile }
+    container_name: api-gateway
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SERVER_PORT: 8076
+      EUREKA_URL: ${EUREKA_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+    ports:
+      # This will be the only public entry point in the final setup
+      - "8076:8076"
+    depends_on:
+      eureka-server: { condition: service_healthy }
+      auth-service: { condition: service_started }
+      patient-service: { condition: service_started }
+      doctor-service: { condition: service_started }
+      diagnostic-service: { condition: service_started }
+      appointment-service: { condition: service_started }
+      prescription-service: { condition: service_started }
+    networks: [cms-net]
+
+networks:
+  cms-net:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    name: mysql_data

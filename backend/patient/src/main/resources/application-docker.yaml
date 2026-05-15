@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    # ✅ In Docker: DB host is service name "db" and port 3306 internally
+    url: jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DATABASE}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    # ✅ Because schema is created by init SQL file (01-init.sql)
+    # "validate" ensures tables exist; doesn't create/alter tables.
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect
+
+logging:
+  level:
+    org.springframework: INFO
