@@ -4,13 +4,20 @@ pipeline {
     stages {
 
         stage('Build Backend') {
-            steps {
-                dir('Backend') {   // ✅ MUST BE PRESENT
-                    bat 'dir'      // ✅ TEMP DEBUG
-                    bat 'mvn clean package -DskipTests'
-                }
-            }
+    steps {
+        dir('Backend') {
+            // ✅ CORE SERVICES
+            bat 'cd auth-service && mvn clean package -DskipTests'
+            bat 'cd patient-service && mvn clean package -DskipTests'
+            bat 'cd doctor-service && mvn clean package -DskipTests'
+            bat 'cd appointment-service && mvn clean package -DskipTests'
+            bat 'cd diagnostic-service && mvn clean package -DskipTests'
+            bat 'cd prescription-service && mvn clean package -DskipTests'
+            bat 'cd eureka-server && mvn clean package -DskipTests'
+            bat 'cd api-gateway && mvn clean package -DskipTests'
         }
+    }
+}
 
         stage('Docker Build') {
             steps {
