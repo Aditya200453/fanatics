@@ -6,35 +6,35 @@ pipeline {
         stage('Build Backend') {
             steps {
 
-                dir('backend/auth-service') {
+                dir('Backend/auth-service') {
                     bat 'mvn clean package -DskipTests'
                 }
 
-                dir('backend/patient-service') {
+                dir('Backend/patient') {
                     bat 'mvn clean package -DskipTests'
                 }
 
-                dir('backend/doctor-service') {
+                dir('Backend/doctor') {
                     bat 'mvn clean package -DskipTests'
                 }
 
-                dir('backend/appointment-service') {
+                dir('Backend/appointment') {
                     bat 'mvn clean package -DskipTests'
                 }
 
-                dir('backend/diagnostic-service') {
+                dir('Backend/diagnostic') {
                     bat 'mvn clean package -DskipTests'
                 }
 
-                dir('backend/prescription-service') {
+                dir('Backend/prescription') {
                     bat 'mvn clean package -DskipTests'
                 }
 
-                dir('backend/eureka-server') {
+                dir('Backend/eureka-server') {
                     bat 'mvn clean package -DskipTests'
                 }
 
-                dir('backend/api-gateway') {
+                dir('Backend/api-gateway') {
                     bat 'mvn clean package -DskipTests'
                 }
 
