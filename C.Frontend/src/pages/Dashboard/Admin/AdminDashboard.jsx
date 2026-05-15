@@ -1,275 +1,292 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import http from "../../../api/http";
 import "./AdminDashboard.css";
- 
+
 export default function AdminDashboard() {
- 
   const navigate = useNavigate();
- 
-  // ✅ DOCTORS
+
   const [doctors, setDoctors] = useState([]);
-  const [loadingDoctors, setLoadingDoctors] = useState(true);
- 
-  // ✅ SPECIALITIES
-  const [specialities, setSpecialities] = useState([]);
- 
-  // ✅ store selected speciality per doctor
-  const [selectedSpecByDoctor, setSelectedSpecByDoctor] = useState({});
- 
-  // ✅ STAFF
   const [staff, setStaff] = useState([]);
-  const [loadingStaff, setLoadingStaff] = useState(true);
- 
+  const [specialities, setSpecialities] = useState([]);
+  const [selectedSpecByDoctor, setSelectedSpecByDoctor] = useState({});
   const [msg, setMsg] = useState("");
- 
-  // ================= LOAD DATA =================
- 
-  const loadDoctors = async () => {
-    setLoadingDoctors(true);
+
+  /* ===== SEARCH & FILTER STATE ===== */
+  const [staffSearch, setStaffSearch] = useState("");
+  const [doctorSearch, setDoctorSearch] = useState("");
+  const [doctorStatus, setDoctorStatus] = useState("ALL");
+  const [doctorSpeciality, setDoctorSpeciality] = useState("ALL");
+
+  // ================= LOAD =================
+  const load = async () => {
     try {
-      const res = await http.get("/doctor/admin/doctors");
-      setDoctors(res.data || []);
+      const [docRes, staffRes, specRes] = await Promise.all([
+        http.get("/doctor/admin/doctors"),
+        http.get("/auth/admin/staff/pending"),
+        http.get("/speciality/")
+      ]);
+
+      setDoctors(docRes.data || []);
+      setStaff(staffRes.data || []);
+      setSpecialities(specRes.data || []);
     } catch {
-      setMsg("❌ Failed to load doctors");
-    } finally {
-      setLoadingDoctors(false);
+      setMsg("❌ Failed to load data");
     }
   };
- 
-  const loadSpecialities = async () => {
-    try {
-      const res = await http.get("/speciality/");
-      setSpecialities(res.data || []);
-    } catch {
-      setMsg("❌ Failed to load specialities");
-    }
-  };
- 
-  const loadPendingStaff = async () => {
-    setLoadingStaff(true);
-    try {
-      const res = await http.get("/auth/admin/staff/pending");
-      setStaff(res.data || []);
-    } catch {
-      setMsg("❌ Failed to load staff");
-    } finally {
-      setLoadingStaff(false);
-    }
-  };
- 
+
   useEffect(() => {
-    loadDoctors();
-    loadSpecialities();
-    loadPendingStaff();
+    load();
   }, []);
- 
-  // ================= STAFF ACTIONS =================
- 
+  useEffect(() => {
+    window.history.pushState(null, "", window.location.href);
+
+    const blockBack = () => {
+      window.history.pushState(null, "", window.location.href);
+    };
+
+    window.addEventListener("popstate", blockBack);
+
+    return () => {
+      window.removeEventListener("popstate", blockBack);
+    };
+  }, []);
+
+  // ================= FILTERED DATA =================
+
+  const filteredStaff = useMemo(() => {
+    return staff.filter(s =>
+      s.email.toLowerCase().includes(staffSearch.toLowerCase())
+    );
+  }, [staff, staffSearch]);
+
+  const filteredDoctors = useMemo(() => {
+    return doctors
+      .filter(d =>
+        d.name.toLowerCase().includes(doctorSearch.toLowerCase()) ||
+        d.email.toLowerCase().includes(doctorSearch.toLowerCase())
+      )
+      .filter(d =>
+        doctorStatus === "ALL" ? true : d.status === doctorStatus
+      )
+      .filter(d =>
+        doctorSpeciality === "ALL"
+          ? true
+          : String(d.specialityId) === doctorSpeciality
+      );
+  }, [doctors, doctorSearch, doctorStatus, doctorSpeciality]);
+
+  // ================= ACTIONS =================
+
   const approveStaff = async (id) => {
-    try {
-      await http.put(`/auth/admin/staff/${id}/approve`);
-      setMsg("✅ Staff approved");
-      loadPendingStaff();
-    } catch (err) {
-      console.error(err);
-      setMsg("❌ Failed to approve staff");
-    }
+    await http.put(`/auth/admin/staff/${id}/approve`);
+    setMsg("✅ Staff approved");
+    load();
   };
- 
+
   const rejectStaff = async (id) => {
-    try {
-      await http.put(`/auth/admin/staff/${id}/reject`);
-      setMsg("❌ Staff rejected");
-      loadPendingStaff();
-    } catch (err) {
-      console.error(err);
-      setMsg("❌ Failed to reject staff");
-    }
+    await http.put(`/auth/admin/staff/${id}/reject`);
+    setMsg("❌ Staff rejected");
+    load();
   };
- 
-  // ================= DOCTOR ACTION =================
- 
-  const approveAndMapDoctor = async (doctorId) => {
- 
-    const specialityId = selectedSpecByDoctor[doctorId];
- 
-    if (!specialityId) {
-      setMsg("❌ Please select speciality first");
+
+  const approveDoctor = async (doctorId) => {
+    const specId = selectedSpecByDoctor[doctorId];
+    if (!specId) {
+      setMsg("❌ Select speciality first");
       return;
     }
- 
-    try {
-      await http.post(`/doctor/admin/approve/${doctorId}`);
- 
-      await http.post("/speciality/map", {
-        doctorId: Number(doctorId),
-        specialityId: Number(specialityId),
-      });
- 
-      setMsg("✅ Doctor approved & mapped");
-      loadDoctors();
- 
-    } catch (err) {
-      console.error(err);
-      setMsg("❌ Failed doctor approval");
-    }
+
+    await http.post(`/doctor/admin/approve/${doctorId}`);
+    await http.post("/speciality/map", {
+      doctorId,
+      specialityId: Number(specId),
+    });
+
+    setMsg("✅ Doctor approved & mapped");
+    load();
   };
- 
+
   return (
     <div className="admin-container">
- 
-      {/* HEADER */}
-      <div className="admin-header-row">
-        <h2>Admin Dashboard ✅</h2>
- 
-        <button onClick={() => navigate("/login")}>
-          Login as Other
+
+{/* ================= HEADER ================= */}
+<div className="admin-header">
+  <div className="admin-header-row">
+
+    {/* LEFT SIDE */}
+    <div className="admin-header-left">
+      <span className="pd-kicker">Admin Panel</span>
+      <h2 className="admin-title">Admin Dashboard</h2>
+      <p>Manage staff approvals and doctor onboarding</p>
+
+      {/* BACK TO HOME */}
+      <div className="admin-hero-actions">
+        <button
+          className="admin-home-btn"
+          onClick={() => navigate("/")}
+        >
+          ⌂ Go to Home
         </button>
       </div>
- 
-      {msg && <div className="admin-msg">{msg}</div>}
- 
-      {/* ✅ STAFF APPROVAL */}
+    </div>
+
+    {/* RIGHT SIDE */}
+    <div className="admin-header-actions">
+
+      <button
+        className="admin-logout-btn"
+        onClick={() => {
+          localStorage.clear();
+          navigate("/login");
+        }}
+      >
+        Logout
+      </button>
+    </div>
+
+  </div>
+</div>
+      {/* ================= STAFF ================= */}
       <div className="card">
         <h3>Pending Staff Approvals</h3>
- 
-        {loadingStaff ? (
-          <h4>Loading staff...</h4>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
- 
-            <tbody>
-              {staff.length === 0 ? (
-                <tr>
-                  <td colSpan="5">No pending staff</td>
+
+        {/* SEARCH */}
+        <div className="admin-filter-bar">
+          <input
+            placeholder="Search staff by email"
+            value={staffSearch}
+            onChange={(e) => setStaffSearch(e.target.value)}
+          />
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filteredStaff.length === 0 ? (
+              <tr><td colSpan="5">No matching staff</td></tr>
+            ) : (
+              filteredStaff.map((s) => (
+                <tr key={s.id}>
+                  <td>{s.id}</td>
+                  <td>{s.email}</td>
+                  <td>{s.role}</td>
+                  <td className="status-pending">{s.status}</td>
+                  <td>
+                    <button className="btn btn-success me-2" onClick={() => approveStaff(s.id)}>
+                      Approve
+                    </button>
+                    <button className="btn btn-danger" onClick={() => rejectStaff(s.id)}>
+                      Reject
+                    </button>
+                  </td>
                 </tr>
-              ) : (
-                staff.map((s) => (
-                  <tr key={s.id}>
- 
-                    <td>{s.id}</td>
-                    <td>{s.email}</td>
-                    <td>{s.role}</td>
-                    <td>{s.status}</td>
- 
-                    <td>
-                      <button
-                        className="btn btn-success me-2"
-                        onClick={() => approveStaff(s.id)}
-                      >
-                        Approve ✅
-                      </button>
- 
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => rejectStaff(s.id)}
-                      >
-                        Reject ❌
-                      </button>
-                    </td>
- 
-                  </tr>
-                ))
-              )}
-            </tbody>
- 
-          </table>
-        )}
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
- 
-      {/* ✅ DOCTORS */}
+
+      {/* ================= DOCTORS ================= */}
       <div className="card">
         <h3>Doctors</h3>
- 
-        {loadingDoctors ? (
-          <h4>Loading doctors...</h4>
-        ) : (
-          <table>
- 
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Experience</th>
-                <th>Status</th>
-                <th>Speciality</th>
-                <th>Action</th>
-              </tr>
-            </thead>
- 
-            <tbody>
-              {doctors.length === 0 ? (
-                <tr>
-                  <td colSpan="7">No doctors found</td>
+
+        {/* SEARCH + FILTER */}
+        <div className="admin-filter-bar">
+          <input
+            placeholder="Search doctor by name or email"
+            value={doctorSearch}
+            onChange={(e) => setDoctorSearch(e.target.value)}
+          />
+
+          <select onChange={(e) => setDoctorStatus(e.target.value)}>
+            <option value="ALL">All Status</option>
+            <option value="ACTIVE">Active</option>
+            <option value="PENDING">Pending</option>
+          </select>
+
+          <select onChange={(e) => setDoctorSpeciality(e.target.value)}>
+            <option value="ALL">All Specialities</option>
+            {specialities.map(s => (
+              <option key={s.specialityId} value={s.specialityId}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Experience</th>
+              <th>Status</th>
+              <th>Speciality</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filteredDoctors.length === 0 ? (
+              <tr><td colSpan="7">No matching doctors</td></tr>
+            ) : (
+              filteredDoctors.map(doc => (
+                <tr key={doc.doctorId}>
+                  <td>{doc.doctorId}</td>
+                  <td>{doc.name}</td>
+                  <td>{doc.email}</td>
+                  <td>{doc.experience}</td>
+
+                  <td className={doc.status === "ACTIVE" ? "status-active" : "status-pending"}>
+                    {doc.status}
+                  </td>
+
+                  <td>
+                    {doc.status === "PENDING" ? (
+                      <select
+                        value={selectedSpecByDoctor[doc.doctorId] || ""}
+                        onChange={(e) =>
+                          setSelectedSpecByDoctor(prev => ({
+                            ...prev,
+                            [doc.doctorId]: e.target.value
+                          }))
+                        }
+                      >
+                        <option value="">Select</option>
+                        {specialities.map(s => (
+                          <option key={s.specialityId} value={s.specialityId}>
+                            {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    ) : "-"}
+                  </td>
+
+                  <td>
+                    {doc.status === "PENDING" ? (
+                      <button className="btn btn-success" onClick={() => approveDoctor(doc.doctorId)}>
+                        Approve
+                      </button>
+                    ) : "Approved"}
+                  </td>
                 </tr>
-              ) : (
-                doctors.map((doc) => (
-                  <tr key={doc.doctorId}>
- 
-                    <td>{doc.doctorId}</td>
-                    <td>{doc.name}</td>
-                    <td>{doc.email}</td>
-                    <td>{doc.experience}</td>
- 
-                    <td>
-                      {doc.status === "ACTIVE" ? "Active" : "Pending"}
-                    </td>
- 
-                    <td>
-                      {doc.status === "PENDING" ? (
-                        <select
-                          value={selectedSpecByDoctor[doc.doctorId] || ""}
-                          onChange={(e) =>
-                            setSelectedSpecByDoctor(prev => ({
-                              ...prev,
-                              [doc.doctorId]: e.target.value
-                            }))
-                          }
-                        >
-                          <option value="">Select Speciality</option>
- 
-                          {specialities.map((s) => (
-                            <option key={s.specialityId} value={s.specialityId}>
-                              {s.name}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
- 
-                    <td>
-                      {doc.status === "PENDING" ? (
-                        <button
-                          onClick={() => approveAndMapDoctor(doc.doctorId)}
-                        >
-                          Approve ✅
-                        </button>
-                      ) : "Approved"}
-                    </td>
- 
-                  </tr>
-                ))
-              )}
-            </tbody>
- 
-          </table>
-        )}
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
- 
+
     </div>
   );
 }
- 

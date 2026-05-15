@@ -25,6 +25,21 @@ export default function PatientDashboard() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    window.history.pushState(null, "", window.location.href);
+
+    const blockBack = () => {
+      window.history.pushState(null, "", window.location.href);
+    };
+
+    window.addEventListener("popstate", blockBack);
+
+    return () => {
+      window.removeEventListener("popstate", blockBack);
+    };
+  }, []);
+
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login");
@@ -47,6 +62,17 @@ export default function PatientDashboard() {
               Track appointments, check recent activity, and book your next
               consultation easily.
             </p>
+
+            {/* ✅ HERO ACTION – ONLY HOME */}
+            <div className="pd-hero-actions">
+              <Button
+                variant="outline-primary"
+                className="pd-home-btn"
+                onClick={() => navigate("/")}
+              >
+                ⌂ Go to Home
+              </Button>
+            </div>
           </div>
 
           {/* ✅ RIGHT SIDE ACTIONS */}
@@ -65,6 +91,32 @@ export default function PatientDashboard() {
             </Button>
           </div>
         </div>
+        {/* ===== CTA CARD ===== */}
+        <Card className="pd-cta pd-cta-primary mb-4">
+          <Card.Body className="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+              <h5>Book a New Appointment</h5>
+              <p>
+                Select a doctor, date &amp; time slot to confirm your visit.
+              </p>
+            </div>
+
+            <div className="pd-actions">
+              <Button onClick={() => navigate("/dashboard/patient/book")}>
+                Book Appointment
+              </Button>
+
+              <Button
+                variant="outline-primary"
+                onClick={() =>
+                  navigate("/dashboard/patient/appointments")
+                }
+              >
+                My Appointments
+              </Button>
+            </div>
+          </Card.Body>
+        </Card>
 
         {/* ===== INFO CARDS ===== */}
         <Row className="g-4 mb-4">
@@ -104,32 +156,6 @@ export default function PatientDashboard() {
           </Col>
         </Row>
 
-        {/* ===== CTA CARD ===== */}
-        <Card className="pd-cta mb-4">
-          <Card.Body className="d-flex justify-content-between align-items-center flex-wrap">
-            <div>
-              <h5>Book a New Appointment</h5>
-              <p>
-                Select a doctor, date &amp; time slot to confirm your visit.
-              </p>
-            </div>
-
-            <div className="pd-actions">
-              <Button onClick={() => navigate("/dashboard/patient/book")}>
-                Book Appointment
-              </Button>
-
-              <Button
-                variant="outline-primary"
-                onClick={() =>
-                  navigate("/dashboard/patient/appointments")
-                }
-              >
-                My Appointments
-              </Button>
-            </div>
-          </Card.Body>
-        </Card>
 
         {/* ===== RECENT APPOINTMENTS ===== */}
         <Card className="pd-card">
@@ -164,7 +190,9 @@ export default function PatientDashboard() {
 
                       {/* ✅ STATUS FIRST */}
                       <td>
-                        <Badge bg="info">{a.status}</Badge>
+                        <span className={`pd-status ${a.status.toLowerCase()}`}>
+                          {a.status}
+                        </span>
                       </td>
 
                       {/* ✅ PRESCRIPTION SECOND */}

@@ -1,231 +1,291 @@
-.ba-container{
-  max-width: 1180px;
-  padding: 32px 12px 56px;
+/* =====================================================/* ================================================= background from index.css)
+   ===================================================== */
+
+.ba-root {
+  min-height: 100vh;
+  background: transparent;
 }
 
-.ba-heroCenter{
-  text-align:center;
-  margin-bottom: 22px;
+/* =====================================================
+   CONTAINER
+   ===================================================== */
+
+.ba-container {
+  max-width: 1180px;
+  padding: 40px 16px 64px;
 }
-.ba-heroCenter h2{
-  color:#fff;
+
+/* =====================================================
+   HERO / PAGE HEADER
+   ===================================================== */
+
+.ba-heroCenter {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.ba-heroCenter h2 {
   font-weight: 800;
   letter-spacing: -0.04em;
   font-size: clamp(2.2rem, 4vw, 2.8rem);
   margin: 0;
+  color: #0f172a; /* ✅ matches other pages */
 }
-.ba-heroCenter p{
+
+.ba-heroCenter p {
   margin-top: 8px;
-  color:#dbeafe;
+  font-size: 1rem;
+  color: #475569;
 }
-.ba-step{
-  margin-top: 10px;
+
+.ba-step {
+  margin-top: 12px;
   border-radius: 999px;
-  padding: 10px 14px;
+  padding: 10px 16px;
+  font-weight: 700;
 }
 
-.ba-wideCard{
+/* =====================================================
+   MAIN CARD (Floating SaaS card)
+   ===================================================== */
+
+.ba-wideCard {
   margin: 0 auto;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 24px;
+  box-shadow:
+    0 30px 60px rgba(15, 23, 42, 0.25),
+    0 10px 24px rgba(15, 23, 42, 0.12);
 }
 
-.ba-topFilters{
-  display:grid;
+.ba-wideCard .card-body {
+  padding: 32px 36px;
+}
+
+/* =====================================================
+   TOP FILTERS
+   ===================================================== */
+
+.ba-topFilters {
+  display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 16px;
-  margin-bottom: 20px;
-}
-@media (max-width: 992px){
-  .ba-topFilters{ grid-template-columns: 1fr; }
+  margin-bottom: 28px;
 }
 
-.ba-field label{
+@media (max-width: 992px) {
+  .ba-topFilters {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ba-field label {
   font-weight: 700;
   color: #0f172a;
   margin-bottom: 8px;
 }
 
-.ba-grid{
-  display:grid;
+/* =====================================================
+   MAIN GRID
+   ===================================================== */
+
+.ba-grid {
+  display: grid;
   grid-template-columns: 1.1fr 0.9fr;
-  gap: 22px;
+  gap: 24px;
   align-items: start;
 }
-@media (max-width: 992px){
-  .ba-grid{ grid-template-columns: 1fr; }
+
+@media (max-width: 992px) {
+  .ba-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-/* Calendar */
-.ba-calendar{
-  border: 1px solid rgba(15,23,42,0.10);
-  border-radius: 16px;
-  padding: 16px;
-  background: rgba(255,255,255,0.70);
+/* =====================================================
+   CALENDAR
+   ===================================================== */
+
+.ba-calendar {
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 18px;
+  padding: 18px;
+  background: #ffffff;
 }
 
-.ba-calHeader{
-  display:flex;
+.ba-calHeader {
+  display: flex;
   justify-content: space-between;
-  align-items:center;
-  gap: 10px;
-  margin-bottom: 10px;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
-.ba-calTitle{
+.ba-calTitle {
   font-weight: 800;
-  color:#0f172a;
+  color: #0f172a;
 }
 
-.ba-calNav{
-  display:flex;
-  align-items:center;
+.ba-calNav {
+  display: flex;
+  align-items: center;
   gap: 10px;
 }
 
-.ba-navBtn{
+.ba-navBtn {
   width: 34px;
   height: 34px;
   border-radius: 10px;
   border: 1px solid rgba(15,23,42,0.12);
-  background: rgba(255,255,255,0.9);
+  background: #f8fafc;
   font-weight: 800;
   cursor: pointer;
 }
 
-.ba-month{
+.ba-month {
   font-weight: 700;
-  color:#0f172a;
+  color: #0f172a;
   min-width: 140px;
-  text-align:center;
+  text-align: center;
 }
 
-.ba-weekdays{
-  display:grid;
+.ba-weekdays {
+  display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 6px;
-  margin: 10px 0 6px;
+  margin: 12px 0 8px;
 }
-.ba-wd{
-  text-align:center;
-  font-size: 0.78rem;
+
+.ba-wd {
+  text-align: center;
+  font-size: 0.75rem;
   font-weight: 700;
-  color:#64748b;
+  color: #64748b;
 }
 
-.ba-days{
-  display:grid;
+.ba-days {
+  display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 6px;
 }
 
-.ba-day.empty{
+.ba-day.empty {
   height: 38px;
 }
 
-.ba-dayBtn{
-  height: 38px;
+.ba-dayBtn {
+  height: 40px;
   border-radius: 12px;
-  border: 1px solid rgba(15,23,42,0.10);
-  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(15,23,42,0.1);
+  background: #ffffff;
   font-weight: 700;
-  color:#0f172a;
+  color: #0f172a;
   cursor: pointer;
-  transition: transform .15s ease, border-color .15s ease, background .15s ease;
 }
 
-.ba-dayBtn:hover{
-  transform: translateY(-1px);
+.ba-dayBtn:hover {
   border-color: rgba(37,99,235,0.35);
 }
 
-.ba-dayBtn.active{
-  background: rgba(37,99,235,0.14);
-  border-color: rgba(37,99,235,0.55);
+.ba-dayBtn.active {
+  background: rgba(37,99,235,0.12);
+  border-color: #2563eb;
   box-shadow: 0 10px 22px rgba(37,99,235,0.18);
 }
 
-.ba-dayBtn:disabled{
-  opacity: .45;
+.ba-dayBtn:disabled {
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
-.ba-calHint{
-  margin-top: 10px;
-  font-size: 0.9rem;
-  color:#64748b;
+.ba-calHint {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: #64748b;
 }
 
-/* Slots panel */
-.ba-slotsPanel{
-  border: 1px solid rgba(15,23,42,0.10);
-  border-radius: 16px;
-  padding: 16px;
-  background: rgba(255,255,255,0.70);
+/* =====================================================
+   TIME SLOTS
+   ===================================================== */
+
+.ba-slotsPanel {
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 18px;
+  padding: 18px;
+  background: #ffffff;
 }
 
-.ba-slotHeader{
-  display:flex;
+.ba-slotHeader {
+  display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
-.ba-slotHint{
-  font-size: .9rem;
-  color:#64748b;
+.ba-slotHint {
+  font-size: 0.85rem;
+  color: #64748b;
   font-weight: 600;
 }
 
-.ba-slotGrid{
-  display:grid;
+.ba-slotGrid {
+  display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
-.ba-slotGrid.disabled{
-  opacity: .55;
-}
-
-.ba-slotBtn{
-  padding: 12px;
-  border-radius: 12px;
+.ba-slotBtn {
+  padding: 14px 12px;
+  border-radius: 14px;
   border: 1px solid rgba(15,23,42,0.12);
-  background: rgba(255,255,255,0.92);
+  background: #ffffff;
   font-weight: 800;
-  color:#0f172a;
-  cursor:pointer;
-  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+  color: #0f172a;
+  cursor: pointer;
 }
 
-.ba-slotBtn:hover{
-  transform: translateY(-1px);
-  border-color: rgba(37,99,235,0.35);
-}
-
-.ba-slotBtn.active{
+.ba-slotBtn.active {
   background: #2563eb;
-  color:#fff;
-  border-color:#2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
   box-shadow: 0 12px 26px rgba(37,99,235,0.28);
 }
 
-.ba-slotBtn:disabled{
-  opacity: .45;
-  cursor:not-allowed;
+.ba-slotBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
-.ba-cta{
-  width: 220px;
+/* =====================================================
+   CTA & MESSAGE
+   ===================================================== */
+
+.ba-cta {
+  width: 240px;
   margin: 0 auto;
-  display:block;
-  border-radius: 14px;
-  padding: 12px 14px;
+  display: block;
+  border-radius: 16px;
+  padding: 14px 16px;
   font-weight: 800;
 }
 
-.ba-msg{
-  margin-top: 16px;
-  text-align:center;
+.ba-msg {
+  margin-top: 18px;
+  text-align: center;
   font-weight: 700;
-  color:#0f172a;
+  color: #0f172a;
+}
+/* ================= HERO ACTION SPACING ================= */
+
+.ba-hero-actions {
+  margin-top: 16px;      /* Step badge se gap */
+  margin-bottom: 24px;  /* Card se gap */
+  display: flex;
+  justify-content: center;
+}
+
+.ba-back-btn {
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-weight: 700;
 }

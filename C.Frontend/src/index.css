@@ -4,13 +4,18 @@
 *::after {
   box-sizing: border-box;
 }
-
+html, body, #root {
+  background: transparent !important;
+}
 html,
 body {
   margin: 0;
   padding: 0;
   width: 100%;
   min-height: 100%;
+}
+.container-fluid {
+  background: transparent !important;
 }
 
 /* ===================== FONT SYSTEM ===================== */
@@ -174,4 +179,39 @@ p {
     opacity: 1;
     transform: translateY(0);
   }
+}
+/* ===================== FINAL BACKGROUND SAFETY OVERRIDES ===================== */
+
+/* Ensure body never shows white beyond content */
+body {
+  background:
+    url("/medical-watermark.svg") repeat,
+    radial-gradient(circle at 20% 20%, rgba(59,130,246,0.22), transparent 45%),
+    radial-gradient(circle at 80% 30%, rgba(16,185,129,0.18), transparent 40%),
+    radial-gradient(circle at 70% 85%, rgba(14,165,233,0.22), transparent 45%),
+    linear-gradient(
+      135deg,
+      #dbeafe 0%,
+      #eef6ff 50%,
+      #def7f2 100%
+    );
+    
+  background-size:
+    220px 220px,
+    auto,
+    auto,
+    auto,
+    auto;
+
+  background-attachment: fixed; /* ✅ kills white gap on scroll */
+}
+
+/* Make sure app wrapper stretches full viewport */
+.app-root {
+  min-height: 100vh;
+}
+
+/* Safety-net: even if content is short */
+#root {
+  min-height: 100vh;
 }

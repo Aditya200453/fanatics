@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Container, Card, Table, Button } from "react-bootstrap";
+import { useParams, useNavigate } from "react-router-dom";
 import http from "../../../api/http";
+import "./ViewPrescription.css";
 
 export default function ViewPrescription() {
-
   const { appointmentId } = useParams();
+  const navigate = useNavigate();
 
   const [prescription, setPrescription] = useState(null);
   const [medicines, setMedicines] = useState([]);
@@ -18,19 +20,21 @@ export default function ViewPrescription() {
     try {
       setMsg("");
 
-      // ✅ GET prescription by appointment
-      const res = await http.get(`/prescription/appointment/${appointmentId}`);
+      const res = await http.get(
+        `/prescription/appointment/${appointmentId}`
+      );
 
       if (!res.data || res.data.length === 0) {
         setMsg("No prescription available");
         return;
       }
 
-      const pres = res.data[0];  // ✅ one prescription per appointment
+      const pres = res.data[0];
       setPrescription(pres);
 
-      // ✅ GET medicines using prescriptionId
-      const medRes = await http.get(`/prescription/${pres.prescriptionId}/medicine`);
+      const medRes = await http.get(
+        `/prescription/${pres.prescriptionId}/medicine`
+      );
       setMedicines(medRes.data || []);
 
     } catch (err) {
@@ -39,48 +43,87 @@ export default function ViewPrescription() {
     }
   };
 
-  if (msg) return <h3>{msg}</h3>;
-  if (!prescription) return <h3>Loading...</h3>;
+  if (msg) return <h3 className="pd-status">{msg}</h3>;
+  if (!prescription) return <h3 className="pd-status">Loading...</h3>;
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Prescription Details 💊</h2>
+    <div className="vp-root">
+      <Container className="vp-container">
 
-      {/* ✅ MAIN PRESCRIPTION */}
-      <div style={{ marginTop: 20 }}>
-        <p><b>Appointment ID:</b> {prescription.appointmentId}</p>
-        <p><b>Date:</b> {prescription.prescriptionDate}</p>
-        <p><b>Diagnosis:</b> {prescription.diagnosis}</p>
-        <p><b>Notes:</b> {prescription.notes}</p>
-      </div>
+        {/* ================= HERO ================= */}
+        <div className="vp-hero">
+          <h2>Prescription Details 💊</h2>
+          <p>Appointment ID: <b>{prescription.appointmentId}</b></p>
 
-      {/* ✅ MEDICINES */}
-      <h3 style={{ marginTop: 30 }}>Medicines</h3>
+          <div className="vp-hero-actions">
+            <Button
+              variant="outline-primary"
+              className="vp-back-btn"
+              onClick={() => navigate("/dashboard/patient")}
+            >
+              ← Back to Dashboard
+            </Button>
 
-      {medicines.length === 0 ? (
-        <p>No medicines</p>
-      ) : (
-        <table border="1" cellPadding="10" style={{ marginTop: 10 }}>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Dosage</th>
-              <th>Duration</th>
-              <th>Instructions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {medicines.map((m) => (
-              <tr key={m.prescriptionMedicineId}>
-                <td>{m.medicineName}</td>
-                <td>{m.dosage}</td>
-                <td>{m.duration}</td>
-                <td>{m.instructions}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+            <Button
+              className="vp-print-btn"
+              onClick={() => window.print()}
+            >
+              🖨 Print Prescription
+            </Button>
+          </div>
+        </div>
+
+        {/* ================= SUMMARY CARDS ================= */}
+        <div className="vp-summary">
+          <div className="vp-summary-card">
+            <span>Date</span>
+            <p>{prescription.prescriptionDate}</p>
+          </div>
+
+          <div className="vp-summary-card">
+            <span>Diagnosis</span>
+            <p>{prescription.diagnosis}</p>
+          </div>
+
+          <div className="vp-summary-card">
+            <span>Doctor Notes</span>
+            <p>{prescription.notes || "-"}</p>
+          </div>
+        </div>
+
+        {/* ================= MEDICINES ================= */}
+        <Card className="vp-meds-card">
+          <Card.Body>
+            <h5 className="mb-3">Prescribed Medicines</h5>
+
+            {medicines.length === 0 ? (
+              <p className="text-muted">No medicines prescribed</p>
+            ) : (
+              <Table hover responsive className="vp-table">
+                <thead>
+                  <tr>
+                    <th>Medicine</th>
+                    <th>Dosage</th>
+                    <th>Duration</th>
+                    <th>Instructions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {medicines.map((m) => (
+                    <tr key={m.prescriptionMedicineId}>
+                      <td><b>{m.medicineName}</b></td>
+                      <td>{m.dosage}</td>
+                      <td>{m.duration}</td>
+                      <td>{m.instructions}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            )}
+          </Card.Body>
+        </Card>
+
+      </Container>
     </div>
   );
 }

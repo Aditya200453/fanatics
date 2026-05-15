@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import http from "../../../api/http";
 import "./StaffDashboard.css";
 
 export default function StaffDashboard() {
+  const navigate = useNavigate();
+
   const TABS = useMemo(
     () => ({
       PATIENTS: "PATIENTS",
@@ -31,7 +34,7 @@ export default function StaffDashboard() {
   // ---------------- APPOINTMENTS ----------------
   const [apptPatientId, setApptPatientId] = useState("");
   const [apptDoctorId, setApptDoctorId] = useState("");
-  const [apptDate, setApptDate] = useState(""); // YYYY-MM-DD
+  const [apptDate, setApptDate] = useState("");
 
   // ---------------- DIAGNOSTIC ----------------
   const [testName, setTestName] = useState("");
@@ -44,10 +47,19 @@ export default function StaffDashboard() {
   const [assignDate, setAssignDate] = useState("");
   const [listPatientTestsId, setListPatientTestsId] = useState("");
 
+  // ================= OVERVIEW COUNTS =================
+  const [allPatientsCount, setAllPatientsCount] = useState(0);
+  const [allDoctorsCount, setAllDoctorsCount] = useState(0);
+  const [pendingAppointmentsCount, setPendingAppointmentsCount] = useState(0);
+  const [allTestsCount, setAllTestsCount] = useState(0);
+
   const safeMsg = (err, fallback) => {
     const status = err?.response?.status;
     const data = err?.response?.data;
-    const m = data?.message || (typeof data === "string" ? data : "") || fallback;
+    const m =
+      data?.message ||
+      (typeof data === "string" ? data : "") ||
+      fallback;
     return status ? `${m} (HTTP ${status})` : m;
   };
 
@@ -58,7 +70,7 @@ export default function StaffDashboard() {
   };
 
   // ---------------------------
-  // Diagnostic base-path fallback (kept)
+  // Diagnostic fallback
   // ---------------------------
   const diagPaths = {
     testsPrimary: "/diagnostic/tests/",
@@ -102,13 +114,53 @@ export default function StaffDashboard() {
     }
   }
 
+  // ================= LOAD OVERVIEW =================
+  const loadOverview = async () => {
+    try {
+      const [patientsRes, doctorsRes, pendingApptRes] = await Promise.all([
+        http.get("/patient/all"),
+        http.get("/doctor/all"),
+        http.get("/appointment/staff/pending"),
+      ]);
+
+      setAllPatientsCount((patientsRes.data || []).length);
+      setAllDoctorsCount((doctorsRes.data || []).length);
+      setPendingAppointmentsCount((pendingApptRes.data || []).length);
+
+      try {
+        const testsRes = await tryGet(diagPaths.testsPrimary, diagPaths.testsFallback);
+        setAllTestsCount((testsRes.data || []).length);
+      } catch {
+        setAllTestsCount(0);
+      }
+    } catch {
+      // overview failure silently ignore; page still works
+    }
+  };
+
   // ---------------- AUTO LOAD ----------------
   useEffect(() => {
     loadAllPatients();
     preloadSpecialities();
+    loadOverview();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+
+    useEffect(() => {
+    window.history.pushState(null, "", window.location.href);
+
+    const blockBack = () => {
+      window.history.pushState(null, "", window.location.href);
+    };
+
+    window.addEventListener("popstate", blockBack);
+
+    return () => {
+      window.removeEventListener("popstate", blockBack);
+    };
+  }, []);
+  
   // ---------------- PATIENT APIs ----------------
   const loadAllPatients = async () => {
     setLoading(true);
@@ -116,6 +168,7 @@ export default function StaffDashboard() {
     try {
       const res = await http.get("/patient/all");
       setRows(res.data || []);
+      setAllPatientsCount((res.data || []).length);
     } catch (err) {
       setMsg(safeMsg(err, "Failed to load patients"));
       setRows([]);
@@ -146,6 +199,7 @@ export default function StaffDashboard() {
     try {
       const res = await http.get("/doctor/all");
       setRows(res.data || []);
+      setAllDoctorsCount((res.data || []).length);
     } catch (err) {
       setMsg(safeMsg(err, "Failed to load doctors"));
       setRows([]);
@@ -222,7 +276,6 @@ export default function StaffDashboard() {
     setLoading(true);
     setMsg("");
     try {
-      // ✅ FIXED: was using "&amp;" in your pasted code (that breaks the request)
       await http.delete(
         `/speciality/map?specialityId=${Number(selectedSpecialityId)}&doctorId=${Number(unmapDoctorId)}`
       );
@@ -236,16 +289,17 @@ export default function StaffDashboard() {
     }
   };
 
-  // ---------------- APPOINTMENT APIs (NOW IMPLEMENTED) ----------------
-
-  // ✅ Staff: pending queue
+  // ---------------- APPOINTMENT APIs ----------------
   const loadPendingAppointments = async () => {
     setLoading(true);
     setMsg("");
     try {
       const res = await http.get("/appointment/staff/pending");
       setRows(res.data || []);
-      if (!res.data || res.data.length === 0) setMsg("No pending appointments");
+      setPendingAppointmentsCount((res.data || []).length);
+      if (!res.data || res.data.length === 0) {
+        setMsg("No pending appointments");
+      }
     } catch (err) {
       setMsg(safeMsg(err, "Failed to load pending appointments"));
       setRows([]);
@@ -254,7 +308,6 @@ export default function StaffDashboard() {
     }
   };
 
-  // ✅ Staff: approve PENDING -> BOOKED
   const approveAppointment = async (appointmentId) => {
     setLoading(true);
     setMsg("");
@@ -262,6 +315,7 @@ export default function StaffDashboard() {
       await http.put(`/appointment/staff/${appointmentId}/approve`);
       setMsg("✅ Appointment approved");
       await loadPendingAppointments();
+      await loadOverview();
     } catch (err) {
       setMsg(safeMsg(err, "Approval failed"));
     } finally {
@@ -269,7 +323,6 @@ export default function StaffDashboard() {
     }
   };
 
-  // ✅ Staff/Admin report: appointments of a patient
   const listAppointmentsByPatient = async () => {
     if (!apptPatientId) return setMsg("Enter Patient ID");
     setLoading(true);
@@ -277,7 +330,9 @@ export default function StaffDashboard() {
     try {
       const res = await http.get(`/appointment/patient/${Number(apptPatientId)}`);
       setRows(res.data || []);
-      if (!res.data || res.data.length === 0) setMsg("No appointments for this patient");
+      if (!res.data || res.data.length === 0) {
+        setMsg("No appointments for this patient");
+      }
     } catch (err) {
       setMsg(safeMsg(err, "Failed to load patient appointments"));
       setRows([]);
@@ -286,9 +341,10 @@ export default function StaffDashboard() {
     }
   };
 
-  // ✅ Staff/Admin report: appointments of a doctor on date
   const listAppointmentsByDoctorAndDate = async () => {
-    if (!apptDoctorId || !apptDate) return setMsg("Enter Doctor ID and Date (YYYY-MM-DD)");
+    if (!apptDoctorId || !apptDate) {
+      return setMsg("Enter Doctor ID and Date");
+    }
     setLoading(true);
     setMsg("");
     try {
@@ -296,7 +352,9 @@ export default function StaffDashboard() {
         `/appointment/doctor/${Number(apptDoctorId)}?date=${apptDate}`
       );
       setRows(res.data || []);
-      if (!res.data || res.data.length === 0) setMsg("No appointments for this doctor on this date");
+      if (!res.data || res.data.length === 0) {
+        setMsg("No appointments for this doctor on this date");
+      }
     } catch (err) {
       setMsg(safeMsg(err, "Failed to load doctor appointments"));
       setRows([]);
@@ -312,12 +370,13 @@ export default function StaffDashboard() {
     try {
       const res = await tryGet(diagPaths.testsPrimary, diagPaths.testsFallback);
       setRows(res.data || []);
+      setAllTestsCount((res.data || []).length);
     } catch (err) {
       setRows([]);
       setMsg(
         safeMsg(
           err,
-          "Diagnostic route not found at Gateway. Fix API Gateway route for /diagnostic/** (or StripPrefix mismatch)."
+          "Diagnostic route not found at Gateway. Fix API Gateway route for /diagnostic/**"
         )
       );
     } finally {
@@ -327,7 +386,7 @@ export default function StaffDashboard() {
 
   const addNewTest = async () => {
     if (!testName) return setMsg("Enter test name");
-    if (!testCost) return setMsg("Enter cost (required)");
+    if (!testCost) return setMsg("Enter cost");
 
     setLoading(true);
     setMsg("");
@@ -345,13 +404,9 @@ export default function StaffDashboard() {
       setTestDesc("");
       setTestCost("");
       await listAllTests();
+      await loadOverview();
     } catch (err) {
-      setMsg(
-        safeMsg(
-          err,
-          "Failed to add test. Check: gateway route, endpoint path, and required fields (cost)."
-        )
-      );
+      setMsg(safeMsg(err, "Failed to add test"));
     } finally {
       setLoading(false);
     }
@@ -369,6 +424,7 @@ export default function StaffDashboard() {
       setMsg("✅ Test deleted");
       setDeleteTestId("");
       await listAllTests();
+      await loadOverview();
     } catch (err) {
       setMsg(safeMsg(err, "Failed to delete test"));
     } finally {
@@ -378,7 +434,7 @@ export default function StaffDashboard() {
 
   const assignTestToPatient = async () => {
     if (!assignPatientId || !assignTestId || !assignDate) {
-      return setMsg("Enter patientId, testId, and testDate (YYYY-MM-DD)");
+      return setMsg("Enter patientId, testId, and testDate");
     }
 
     setLoading(true);
@@ -419,10 +475,22 @@ export default function StaffDashboard() {
     }
   };
 
-  // ---------------- TABLE RENDER ----------------
+  // ---------------- TABLE RENDERERS ----------------
+  const renderEmpty = (title, subtitle) => (
+    <div className="staff-empty">
+      <p>{title}</p>
+      <span>{subtitle}</span>
+    </div>
+  );
+
   const renderTable = () => {
     if (loading) return <div className="staff-hint">Loading…</div>;
-    if (!rows || rows.length === 0) return <div className="staff-hint">No data to show</div>;
+    if (!rows || rows.length === 0) {
+      return renderEmpty(
+        "No data available",
+        "Results for this section will appear here."
+      );
+    }
 
     const cols = Object.keys(rows[0] || {});
     return (
@@ -438,9 +506,29 @@ export default function StaffDashboard() {
           <tbody>
             {rows.map((r, idx) => (
               <tr key={idx}>
-                {cols.map((c) => (
-                  <td key={c}>{String(r?.[c] ?? "")}</td>
-                ))}
+                {cols.map((c) => {
+                  const val = r?.[c];
+
+                  if (String(c).toLowerCase().includes("status")) {
+                    return (
+                      <td key={c}>
+                        <span
+                          className={
+                            String(val).toUpperCase() === "ACTIVE" ||
+                            String(val).toUpperCase() === "BOOKED" ||
+                            String(val).toUpperCase() === "COMPLETED"
+                              ? "staff-badge success"
+                              : "staff-badge warning"
+                          }
+                        >
+                          {String(val ?? "")}
+                        </span>
+                      </td>
+                    );
+                  }
+
+                  return <td key={c}>{String(val ?? "")}</td>;
+                })}
               </tr>
             ))}
           </tbody>
@@ -449,10 +537,14 @@ export default function StaffDashboard() {
     );
   };
 
-  // ✅ Special appointment table for pending approvals (includes Approve button)
   const renderPendingAppointmentsTable = () => {
     if (loading) return <div className="staff-hint">Loading…</div>;
-    if (!rows || rows.length === 0) return <div className="staff-hint">No pending appointments</div>;
+    if (!rows || rows.length === 0) {
+      return renderEmpty(
+        "No pending appointments",
+        "Pending approvals will appear here."
+      );
+    }
 
     return (
       <div className="staff-table-wrap">
@@ -477,8 +569,16 @@ export default function StaffDashboard() {
                 <td>{a.doctorId}</td>
                 <td>{a.appointmentDate}</td>
                 <td>{a.appointmentTime}</td>
-                <td style={{ fontWeight: 700, color: a.status === "PENDING" ? "orange" : "lightgreen" }}>
-                  {a.status}
+                <td>
+                  <span
+                    className={
+                      a.status === "PENDING"
+                        ? "staff-badge warning"
+                        : "staff-badge success"
+                    }
+                  >
+                    {a.status}
+                  </span>
                 </td>
                 <td>{a.symptoms || "-"}</td>
                 <td>
@@ -506,136 +606,288 @@ export default function StaffDashboard() {
     if (tab === TABS.DOCTORS) await loadAllDoctors();
     if (tab === TABS.SPECIALITY) await loadSpecialities();
     if (tab === TABS.DIAGNOSTIC) await listAllTests();
+    if (tab === TABS.APPOINTMENTS) await loadPendingAppointments();
+  };
 
-    // ✅ NEW: appointments tab default loads pending queue
-    if (tab === TABS.APPOINTMENTS) {
-      await loadPendingAppointments();
-    }
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login", { replace: true });
   };
 
   return (
     <div className="staff-container">
-      <div className="staff-header">
-        <h2>Staff Dashboard</h2>
-        <span className="staff-sub">Operational console</span>
+
+      {/* HEADER */}
+      <div className="staff-header-row">
+        <div className="staff-header">
+          <span className="staff-kicker">Staff Console</span>
+          <h2 className="staff-title">Staff Dashboard</h2>
+          <p>Operational management for patients, doctors, appointments and diagnostics</p>
+
+          <div className="staff-hero-actions">
+            <button className="staff-home-btn" onClick={() => navigate("/")}>
+              ⌂ Go to Home
+            </button>
+          </div>
+        </div>
+
+        <div className="staff-header-actions">
+          <button className="staff-logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
       </div>
 
-      <div className="staff-nav">
-        <button className={activeTab === TABS.PATIENTS ? "active" : ""} onClick={() => onTab(TABS.PATIENTS)}>Patients</button>
-        <button className={activeTab === TABS.DOCTORS ? "active" : ""} onClick={() => onTab(TABS.DOCTORS)}>Doctors</button>
-        <button className={activeTab === TABS.SPECIALITY ? "active" : ""} onClick={() => onTab(TABS.SPECIALITY)}>Speciality</button>
-        <button className={activeTab === TABS.APPOINTMENTS ? "active" : ""} onClick={() => onTab(TABS.APPOINTMENTS)}>Appointments</button>
-        <button className={activeTab === TABS.DIAGNOSTIC ? "active" : ""} onClick={() => onTab(TABS.DIAGNOSTIC)}>Diagnostic</button>
+      {/* OVERVIEW CARDS */}
+      <div className="staff-overview">
+        <div className="staff-overview-card">
+          <span>Total Patients</span>
+          <p>{allPatientsCount}</p>
+        </div>
+
+        <div className="staff-overview-card">
+          <span>Total Doctors</span>
+          <p>{allDoctorsCount}</p>
+        </div>
+
+        <div className="staff-overview-card">
+          <span>Pending Appointments</span>
+          <p>{pendingAppointmentsCount}</p>
+        </div>
+
+        <div className="staff-overview-card">
+          <span>Diagnostic Tests</span>
+          <p>{allTestsCount}</p>
+        </div>
+      </div>
+
+      {/* NAV TABS */}
+      <div className="staff-tabs">
+        {Object.values(TABS).map((tab) => (
+          <button
+            key={tab}
+            className={activeTab === tab ? "active" : ""}
+            onClick={() => onTab(tab)}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
 
       {msg && <div className="staff-msg">{msg}</div>}
 
       {/* PATIENTS */}
       {activeTab === TABS.PATIENTS && (
-        <div className="staff-panel">
-          <div className="staff-row">
-            <button onClick={loadAllPatients}>List All Patients</button>
-            <input value={patientId} onChange={(e) => setPatientId(e.target.value)} placeholder="Patient ID" />
-            <button onClick={getPatientById}>Find by ID</button>
+        <div className="staff-card">
+          <div className="staff-card-header">
+            <h4>Patients</h4>
           </div>
+
+          <div className="staff-actions">
+            <button onClick={loadAllPatients}>List All Patients</button>
+            <input
+              value={patientId}
+              onChange={(e) => setPatientId(e.target.value)}
+              placeholder="Patient ID"
+            />
+            <button onClick={getPatientById} disabled={!patientId}>
+              Find by ID
+            </button>
+          </div>
+
           {renderTable()}
         </div>
       )}
 
       {/* DOCTORS */}
       {activeTab === TABS.DOCTORS && (
-        <div className="staff-panel">
-          <div className="staff-row">
+        <div className="staff-card">
+          <div className="staff-card-header">
+            <h4>Doctors</h4>
+          </div>
+
+          <div className="staff-actions">
             <button onClick={loadAllDoctors}>List All Doctors</button>
           </div>
+
           {renderTable()}
         </div>
       )}
 
       {/* SPECIALITY */}
       {activeTab === TABS.SPECIALITY && (
-        <div className="staff-panel">
-          <div className="staff-row">
-            <button onClick={loadSpecialities}>List All Specialities</button>
-            <select value={selectedSpecialityId} onChange={(e) => setSelectedSpecialityId(e.target.value)}>
-              <option value="">Select Speciality</option>
-              {specialities.map((s) => (
-                <option key={s.specialityId} value={s.specialityId}>{s.name}</option>
-              ))}
-            </select>
-            <button onClick={listDoctorsBySpeciality}>List Doctors</button>
+        <div className="staff-card">
+          <div className="staff-card-header">
+            <h4>Speciality Mapping</h4>
           </div>
 
-          <div className="staff-row">
-            <input value={mapDoctorId} onChange={(e) => setMapDoctorId(e.target.value)} placeholder="Doctor ID to map" />
-            <button onClick={mapDoctorToSpeciality}>Add Doctor</button>
+          <div className="staff-actions">
+            <button onClick={loadSpecialities}>List All Specialities</button>
 
-            <input value={unmapDoctorId} onChange={(e) => setUnmapDoctorId(e.target.value)} placeholder="Doctor ID to unmap" />
-            <button className="danger" onClick={unmapDoctorFromSpeciality}>Remove Doctor</button>
+            <select
+              value={selectedSpecialityId}
+              onChange={(e) => setSelectedSpecialityId(e.target.value)}
+            >
+              <option value="">Select Speciality</option>
+              {specialities.map((s) => (
+                <option key={s.specialityId} value={s.specialityId}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+
+            <button onClick={listDoctorsBySpeciality} disabled={!selectedSpecialityId}>
+              List Doctors
+            </button>
+          </div>
+
+          <div className="staff-actions">
+            <input
+              value={mapDoctorId}
+              onChange={(e) => setMapDoctorId(e.target.value)}
+              placeholder="Doctor ID to map"
+            />
+            <button onClick={mapDoctorToSpeciality} disabled={!selectedSpecialityId || !mapDoctorId}>
+              Add Doctor
+            </button>
+
+            <input
+              value={unmapDoctorId}
+              onChange={(e) => setUnmapDoctorId(e.target.value)}
+              placeholder="Doctor ID to unmap"
+            />
+            <button
+              className="danger"
+              onClick={unmapDoctorFromSpeciality}
+              disabled={!selectedSpecialityId || !unmapDoctorId}
+            >
+              Remove Doctor
+            </button>
           </div>
 
           {renderTable()}
         </div>
       )}
 
-      {/* APPOINTMENTS (NOW WORKING) */}
+      {/* APPOINTMENTS */}
       {activeTab === TABS.APPOINTMENTS && (
-        <div className="staff-panel">
-          <div className="staff-row">
+        <div className="staff-card">
+          <div className="staff-card-header">
+            <h4>Appointments</h4>
+          </div>
+
+          <div className="staff-actions">
             <button onClick={loadPendingAppointments}>Load Pending Appointments</button>
           </div>
 
-          {/* Pending queue table with Approve button */}
           {renderPendingAppointmentsTable()}
 
           <hr />
 
-          {/* Staff reports */}
-          <div className="staff-row">
-            <input value={apptPatientId} onChange={(e) => setApptPatientId(e.target.value)} placeholder="Patient ID" />
-            <button onClick={listAppointmentsByPatient}>Appointments by Patient</button>
+          <div className="staff-actions">
+            <input
+              value={apptPatientId}
+              onChange={(e) => setApptPatientId(e.target.value)}
+              placeholder="Patient ID"
+            />
+            <button onClick={listAppointmentsByPatient} disabled={!apptPatientId}>
+              Appointments by Patient
+            </button>
           </div>
 
-          <div className="staff-row">
-            <input value={apptDoctorId} onChange={(e) => setApptDoctorId(e.target.value)} placeholder="Doctor ID" />
-            <input value={apptDate} onChange={(e) => setApptDate(e.target.value)} placeholder="YYYY-MM-DD" />
-            <button onClick={listAppointmentsByDoctorAndDate}>Appointments by Doctor + Date</button>
+          <div className="staff-actions">
+            <input
+              value={apptDoctorId}
+              onChange={(e) => setApptDoctorId(e.target.value)}
+              placeholder="Doctor ID"
+            />
+            <input
+              type="date"
+              value={apptDate}
+              onChange={(e) => setApptDate(e.target.value)}
+            />
+            <button onClick={listAppointmentsByDoctorAndDate} disabled={!apptDoctorId || !apptDate}>
+              Appointments by Doctor + Date
+            </button>
           </div>
 
-          {/* Results of report queries use generic table */}
           {rows && rows.length > 0 && renderTable()}
         </div>
       )}
 
       {/* DIAGNOSTIC */}
       {activeTab === TABS.DIAGNOSTIC && (
-        <div className="staff-panel">
-          <div className="staff-row">
+        <div className="staff-card">
+          <div className="staff-card-header">
+            <h4>Diagnostic Management</h4>
+          </div>
+
+          <div className="staff-actions">
             <button onClick={listAllTests}>List All Tests</button>
           </div>
 
-          <div className="staff-row">
-            <input value={testName} onChange={(e) => setTestName(e.target.value)} placeholder="Test Name" />
-            <input value={testCost} onChange={(e) => setTestCost(e.target.value)} placeholder="Cost (required)" />
-            <input value={testDesc} onChange={(e) => setTestDesc(e.target.value)} placeholder="Description (optional)" />
-            <button onClick={addNewTest}>Add Test</button>
+          <div className="staff-actions">
+            <input
+              value={testName}
+              onChange={(e) => setTestName(e.target.value)}
+              placeholder="Test Name"
+            />
+            <input
+              value={testCost}
+              onChange={(e) => setTestCost(e.target.value)}
+              placeholder="Cost"
+            />
+            <input
+              value={testDesc}
+              onChange={(e) => setTestDesc(e.target.value)}
+              placeholder="Description"
+            />
+            <button onClick={addNewTest} disabled={!testName || !testCost}>
+              Add Test
+            </button>
           </div>
 
-          <div className="staff-row">
-            <input value={deleteTestId} onChange={(e) => setDeleteTestId(e.target.value)} placeholder="Test ID to delete" />
-            <button className="danger" onClick={deleteTest}>Delete Test</button>
+          <div className="staff-actions">
+            <input
+              value={deleteTestId}
+              onChange={(e) => setDeleteTestId(e.target.value)}
+              placeholder="Test ID to delete"
+            />
+            <button className="danger" onClick={deleteTest} disabled={!deleteTestId}>
+              Delete Test
+            </button>
           </div>
 
-          <div className="staff-row">
-            <input value={assignPatientId} onChange={(e) => setAssignPatientId(e.target.value)} placeholder="Patient ID" />
-            <input value={assignTestId} onChange={(e) => setAssignTestId(e.target.value)} placeholder="Test ID" />
-            <input value={assignDate} onChange={(e) => setAssignDate(e.target.value)} placeholder="YYYY-MM-DD" />
-            <button onClick={assignTestToPatient}>Assign Test</button>
+          <div className="staff-actions">
+            <input
+              value={assignPatientId}
+              onChange={(e) => setAssignPatientId(e.target.value)}
+              placeholder="Patient ID"
+            />
+            <input
+              value={assignTestId}
+              onChange={(e) => setAssignTestId(e.target.value)}
+              placeholder="Test ID"
+            />
+            <input
+              type="date"
+              value={assignDate}
+              onChange={(e) => setAssignDate(e.target.value)}
+            />
+            <button onClick={assignTestToPatient} disabled={!assignPatientId || !assignTestId || !assignDate}>
+              Assign Test
+            </button>
           </div>
 
-          <div className="staff-row">
-            <input value={listPatientTestsId} onChange={(e) => setListPatientTestsId(e.target.value)} placeholder="Patient ID to list tests" />
-            <button onClick={listTestsForPatient}>List Patient Tests</button>
+          <div className="staff-actions">
+            <input
+              value={listPatientTestsId}
+              onChange={(e) => setListPatientTestsId(e.target.value)}
+              placeholder="Patient ID to list tests"
+            />
+            <button onClick={listTestsForPatient} disabled={!listPatientTestsId}>
+              List Patient Tests
+            </button>
           </div>
 
           {renderTable()}

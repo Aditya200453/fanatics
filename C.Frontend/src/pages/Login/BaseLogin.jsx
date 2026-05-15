@@ -28,18 +28,24 @@ export default function BaseLogin({ title, subtitle, expectedRole }) {
       const { token, role } = res.data;
       saveAuth({ token, role });
 
-      // ✅ Wrong login page protection
+      // Wrong login page protection
       if (expectedRole && role !== expectedRole) {
         setError(`You are logged in as ${role}. Please use the correct login page.`);
         return;
       }
 
-      // ✅ Role‑based redirect
-      if (role === "ADMIN") navigate("/dashboard/admin");
-      else if (role === "DOCTOR") navigate("/dashboard/doctor");
-      else if (role === "PATIENT") navigate("/dashboard/patient");
-      else if (role === "STAFF") navigate("/dashboard/staff");
-      else navigate("/");
+      // Role-based redirect with replace:true
+      if (role === "ADMIN") {
+        navigate("/dashboard/admin", { replace: true });
+      } else if (role === "DOCTOR") {
+        navigate("/dashboard/doctor", { replace: true });
+      } else if (role === "PATIENT") {
+        navigate("/dashboard/patient", { replace: true });
+      } else if (role === "STAFF") {
+        navigate("/dashboard/staff", { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
 
     } catch (err) {
       const msg =
@@ -56,10 +62,6 @@ export default function BaseLogin({ title, subtitle, expectedRole }) {
         {/* LEFT */}
         <Col md={7} className="login-visual d-none d-md-block">
           <div className="login-overlay" />
-          <div className="login-text">
-            <h2>ClinicCare</h2>
-            <p>{subtitle}</p>
-          </div>
         </Col>
 
         {/* RIGHT */}
@@ -98,12 +100,12 @@ export default function BaseLogin({ title, subtitle, expectedRole }) {
                 Login
               </Button>
 
-              {/* ✅ LOGIN AS OTHER */}
+              {/* LOGIN AS OTHER */}
               <Button
                 className="w-100 mt-2"
                 variant="outline-secondary"
                 type="button"
-                onClick={() => navigate("/login")}
+                onClick={() => navigate("/login", { replace: true })}
               >
                 Login as Other
               </Button>
