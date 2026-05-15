@@ -5,20 +5,32 @@ pipeline {
 
         stage('Build Backend') {
             steps {
-                bat 'mvn clean package -DskipTests'
+                dir('Backend') {   // ✅ THIS IS THE MAIN FIX
+                    bat 'mvn clean package -DskipTests'
+                }
             }
         }
 
         stage('Docker Build') {
             steps {
-                bat 'docker-compose build'
+                dir('Backend') {
+                    bat 'docker-compose build'
+                }
             }
         }
 
         stage('Deploy') {
             steps {
-                bat 'docker-compose down'
-                bat 'docker-compose up -d'
+                dir('Backend') {
+                    bat 'docker-compose down'
+                    bat 'docker-compose up -d'
+                }
+            }
+        }
+
+        stage('Debug') {
+            steps {
+                bat 'dir'
             }
         }
     }
