@@ -5,7 +5,8 @@ pipeline {
 
         stage('Build Backend') {
             steps {
-                dir('Backend') {   // ✅ THIS IS THE MAIN FIX
+                dir('Backend') {   // ✅ MUST BE PRESENT
+                    bat 'dir'      // ✅ TEMP DEBUG
                     bat 'mvn clean package -DskipTests'
                 }
             }
@@ -25,12 +26,6 @@ pipeline {
                     bat 'docker-compose down'
                     bat 'docker-compose up -d'
                 }
-            }
-        }
-
-        stage('Debug') {
-            steps {
-                bat 'dir'
             }
         }
     }
