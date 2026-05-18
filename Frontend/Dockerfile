@@ -1,5 +1,5 @@
-# Stage 1: Build React app
-FROM node:18-alpine AS build
+# ✅ Use latest stable node (important)
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
@@ -8,9 +8,12 @@ RUN npm install
 
 COPY . .
 
+# ✅ FIX for CustomEvent error
+ENV NODE_OPTIONS=--experimental-global-webcrypto
+
 RUN npm run build
 
-# Stage 2: Serve using nginx
+# Stage 2: Nginx
 FROM nginx:alpine
 
 COPY --from=build /app/dist /usr/share/nginx/html
