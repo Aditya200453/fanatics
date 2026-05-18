@@ -53,19 +53,29 @@ pipeline {
             steps {
                 dir('Backend') {
                     withEnv([
-                        'EUREKA_URL=http://eureka-server:8761/eureka/',
-                        'MYSQL_ROOT_PASSWORD=root',
+                        // ✅ DB
                         'DB_HOST=db',
                         'DB_PORT=3306',
-                        'DATABASE=cms',
-                        'DB_NAME=cms',
+                        'DB_NAME_CMS=cms',
                         'DB_NAME_AUTH=auth_db',
+                        'MYSQL_ROOT_PASSWORD=root',
                         'MYSQL_USER=root',
                         'MYSQL_PASSWORD=root',
+                        'DB_HOST_PORT=3307',
+
+                        // ✅ EUREKA
+                        'EUREKA_HOST=eureka-server',
+                        'EUREKA_PORT=8761',
+                        'EUREKA_URL=http://eureka-server:8761/eureka/',
+
+                        // ✅ SECURITY
                         'JWT_SECRET=VGhpc0lzQVN1cGVyU2VjdXJlS2V5Rm9ySldUU2lnbmluZzEyMw==',
                         'JWT_EXPIRY_MS=3600000',
                         'INTERNAL_SECRET=CHANGE_ME_INTERNAL',
+
+                        // ✅ SPRING
                         'SPRING_PROFILES_ACTIVE=docker'
+
                     ]) {
                         bat 'docker-compose down'
                         bat 'docker-compose up -d'
