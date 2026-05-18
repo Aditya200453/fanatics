@@ -1,13 +1,15 @@
-# ✅ Use stable node (avoid alpine issues)
+# ✅ Build stage (stable setup)
 FROM node:20 AS build
 
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
-RUN npm install
+# ✅ Clean install (important fix)
+COPY package.json package-lock.json ./
+RUN npm ci
 
 COPY . .
 
+# ✅ Build
 RUN npm run build
 
 # ✅ Serve using nginx
