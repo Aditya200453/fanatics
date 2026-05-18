@@ -5,16 +5,45 @@ import http from "../../../api/http";
 import "./MyAppointments.css";
 
 export default function MyAppointments() {
+
   const navigate = useNavigate();
 
   const [items, setItems] = useState([]);
+  const [doctorMap, setDoctorMap] = useState({}); // ✅ NEW
   const [error, setError] = useState("");
 
   const load = async () => {
     try {
       setError("");
+
+      // ✅ Load appointments
       const res = await http.get("/appointment/my");
-      setItems(res.data || []);
+      const appts = res.data || [];
+      setItems(appts);
+
+      // ✅ Fetch all specialities
+      const sp = await http.get("/speciality/");
+      const specialities = sp.data || [];
+
+      // ✅ Fetch doctors per speciality (public endpoint)
+      const doctorLists = await Promise.all(
+        specialities.map((s) =>
+          http.get(`/speciality/${s.specialityId}/doctors`)
+        )
+      );
+
+      // ✅ Build doctor map (doctorId -> name)
+      const map = {};
+      doctorLists.forEach((res) => {
+        (res.data || []).forEach((d) => {
+          if (d?.doctorId != null && !map[d.doctorId]) {
+            map[d.doctorId] = d.name;
+          }
+        });
+      });
+
+      setDoctorMap(map);
+
     } catch (err) {
       console.error(err);
       setError("❌ Failed to load appointments");
@@ -44,13 +73,6 @@ export default function MyAppointments() {
             >
               ← Back to Dashboard
             </Button>
-
-            <Button
-              className="ma-refresh-btn"
-              onClick={load}
-            >
-              Refresh
-            </Button>
           </div>
         </div>
 
@@ -58,11 +80,13 @@ export default function MyAppointments() {
         <Card className="ma-card">
           <Card.Body>
             <div className="ma-table-wrapper">
+
               <Table hover responsive className="ma-table">
+
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>Doctor ID</th>
+                    <th>Doctor</th> {/* ✅ CHANGED */}
                     <th>Date</th>
                     <th>Time</th>
                     <th>Status</th>
@@ -82,8 +106,14 @@ export default function MyAppointments() {
                   ) : (
                     items.map((a) => (
                       <tr key={a.appointmentId}>
+
                         <td>{a.appointmentId}</td>
-                        <td>{a.doctorId}</td>
+
+                        {/* ✅ IMPORTANT CHANGE */}
+                        <td>
+                          {doctorMap[a.doctorId] || `Doctor #${a.doctorId}`}
+                        </td>
+
                         <td>{a.appointmentDate}</td>
                         <td>{a.appointmentTime}</td>
 
@@ -111,15 +141,17 @@ export default function MyAppointments() {
                             <span className="text-muted">-</span>
                           )}
                         </td>
+
                       </tr>
                     ))
                   )}
                 </tbody>
+
               </Table>
+
             </div>
           </Card.Body>
         </Card>
-
       </Container>
     </div>
   );

@@ -1,11 +1,11 @@
 import BaseLogin from "./BaseLogin";
-
-export default function OtherLogin() {
+ 
+export default function OthersLogin({ title, expectedRole }) {
   return (
     <BaseLogin
-      title="Staff Login"
-      subtitle="Access assigned operational tools"
-      expectedRole="STAFF"
+      title={title}
+      expectedRole={expectedRole}
     />
   );
 }
+ 

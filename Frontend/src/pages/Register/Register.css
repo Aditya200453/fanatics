@@ -1,7 +1,7 @@
 /* ==================================================
    REGISTER PAGE – CLEAN REAL‑WORLD BACKGROUND
    ================================================== */
-
+ 
 .register-container {
   min-height: 100vh;
   display: flex;
@@ -10,7 +10,7 @@
   padding: 28px;
   position: relative;
   overflow: hidden;
-
+ 
   /* ✅ Soft medical / SaaS gradient */
   background: linear-gradient(
     135deg,
@@ -18,10 +18,10 @@
     #eef2f7 45%,
     #e9f2ff 100%
   );
-
+ 
   animation: gradientShift 14s ease infinite;
 }
-
+ 
 /* Subtle floating accents (professional look) */
 .register-container::before,
 .register-container::after {
@@ -32,7 +32,7 @@
   opacity: 0.35;
   z-index: 0;
 }
-
+ 
 .register-container::before {
   width: 360px;
   height: 360px;
@@ -41,7 +41,7 @@
   left: -120px;
   animation: floatSlow 14s ease-in-out infinite;
 }
-
+ 
 .register-container::after {
   width: 300px;
   height: 300px;
@@ -50,11 +50,11 @@
   right: -120px;
   animation: floatSlow 18s ease-in-out infinite reverse;
 }
-
+ 
 /* ==================================================
    REGISTER CARD
    ================================================== */
-
+ 
 .register-card {
   width: 100%;
   max-width: 430px;
@@ -64,13 +64,13 @@
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(8px);
   box-shadow: 0 18px 45px rgba(0, 0, 0, 0.14);
-
+ 
   position: relative;
   z-index: 1;
-
+ 
   animation: cardEntry 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-
+ 
 .register-card h4 {
   text-align: center;
   font-weight: 800;
@@ -78,11 +78,11 @@
   color: #0d6efd;
   letter-spacing: 0.3px;
 }
-
+ 
 /* ==================================================
    FORM CONTROLS
    ================================================== */
-
+ 
 .register-card .form-control,
 .register-card .form-select {
   height: 46px;
@@ -91,18 +91,18 @@
   border: 1px solid rgba(0, 0, 0, 0.12);
   transition: all 160ms ease;
 }
-
+ 
 .register-card .form-control:focus,
 .register-card .form-select:focus {
   border-color: #0d6efd;
   box-shadow: 0 0 0 0.18rem rgba(13, 110, 253, 0.18);
   transform: translateY(-1px);
 }
-
+ 
 /* ==================================================
    BUTTON
    ================================================== */
-
+ 
 .register-card button {
   height: 48px;
   border-radius: 12px;
@@ -111,39 +111,39 @@
   border: none;
   transition: transform 150ms ease, box-shadow 150ms ease;
 }
-
+ 
 .register-card button:hover {
   transform: translateY(-1px);
   box-shadow: 0 10px 25px rgba(13, 110, 253, 0.25);
 }
-
+ 
 /* ==================================================
    ALERTS
    ================================================== */
-
+ 
 .register-card .alert {
   font-size: 13px;
   padding: 10px 14px;
   border-radius: 10px;
   animation: fadePop 220ms ease;
 }
-
+ 
 /* ==================================================
    ROLE SECTIONS (PATIENT / DOCTOR)
    ================================================== */
-
+ 
 .register-section {
   animation: sectionReveal 260ms ease;
 }
-
+ 
 .register-card .mt-2 {
   margin-top: 10px !important;
 }
-
+ 
 /* ==================================================
    ANIMATIONS
    ================================================== */
-
+ 
 @keyframes cardEntry {
   from {
     opacity: 0;
@@ -154,7 +154,7 @@
     transform: translateY(0) scale(1);
   }
 }
-
+ 
 @keyframes sectionReveal {
   from {
     opacity: 0;
@@ -165,7 +165,7 @@
     transform: translateY(0);
   }
 }
-
+ 
 @keyframes fadePop {
   from {
     opacity: 0;
@@ -176,7 +176,7 @@
     transform: scale(1);
   }
 }
-
+ 
 @keyframes gradientShift {
   0% {
     background-position: 0% 50%;
@@ -188,7 +188,7 @@
     background-position: 0% 50%;
   }
 }
-
+ 
 @keyframes floatSlow {
   0% {
     transform: translateY(0);
@@ -200,29 +200,31 @@
     transform: translateY(0);
   }
 }
-
+ 
 /* ==================================================
    MOBILE OPTIMIZATION
    ================================================== */
-
+ 
 @media (max-width: 480px) {
   .register-card {
     padding: 20px;
     border-radius: 16px;
   }
-
+ 
   .register-card h4 {
     font-size: 18px;
   }
 }
-
+ 
 /* ==================================================
    ACCESSIBILITY
    ================================================== */
-
+ 
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;
     transition: none !important;
   }
 }
+ 
+ 

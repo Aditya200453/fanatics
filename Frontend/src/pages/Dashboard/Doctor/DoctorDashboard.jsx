@@ -3,32 +3,32 @@ import { Container, Card, Button, Table, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import http from "../../../api/http";
 import "./DoctorDashboard.css";
-
+ 
 export default function DoctorDashboard() {
   const navigate = useNavigate();
-
+ 
   const [doctor, setDoctor] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [dateFilter, setDateFilter] = useState("");
   const [error, setError] = useState("");
   const [remarksMap, setRemarksMap] = useState({});
-
+ 
   const today = new Date().toISOString().slice(0, 10);
-
+ 
   /* ================= LOAD DATA ================= */
   useEffect(() => {
     (async () => {
       try {
         const profile = await http.get("/doctor/me");
         setDoctor(profile.data);
-
+ 
         const res = await http.get("/appointment/doctor/my");
         const data = res.data || [];
-
+ 
         setAppointments(data);
         setFiltered(data);
-
+ 
         const init = {};
         data.forEach(a => (init[a.appointmentId] = a.remarks || ""));
         setRemarksMap(init);
@@ -37,43 +37,43 @@ export default function DoctorDashboard() {
       }
     })();
   }, []);
-
+ 
   /* ================= BLOCK BROWSER BACK ================= */
   useEffect(() => {
     window.history.pushState(null, "", window.location.href);
-
+ 
     const blockBack = () => {
       window.history.pushState(null, "", window.location.href);
     };
-
+ 
     window.addEventListener("popstate", blockBack);
     return () => window.removeEventListener("popstate", blockBack);
   }, []);
-
+ 
   /* ================= LOGOUT ================= */
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login", { replace: true });
   };
-
+ 
   /* ================= DERIVED DATA ================= */
   const todaysCount = useMemo(
     () => appointments.filter(a => a.appointmentDate === today).length,
     [appointments]
   );
-
+ 
   const uniquePatients = useMemo(
     () => new Set(appointments.map(a => a.patientId)).size,
     [appointments]
   );
-
+ 
   const sortedAppointments = useMemo(() => {
     return [
       ...filtered.filter(a => a.appointmentDate === today),
       ...filtered.filter(a => a.appointmentDate !== today),
     ];
   }, [filtered, today]);
-
+ 
   /* ================= FILTER ================= */
   const filterByDate = () => {
     if (!dateFilter) {
@@ -82,7 +82,7 @@ export default function DoctorDashboard() {
     }
     setFiltered(appointments.filter(a => a.appointmentDate === dateFilter));
   };
-
+ 
   /* ================= SAVE REMARKS ================= */
   const saveRemarks = async (id) => {
     try {
@@ -91,28 +91,28 @@ export default function DoctorDashboard() {
       });
     } catch {}
   };
-
+ 
   if (error) return <h3 className="pd-status">{error}</h3>;
   if (!doctor) return <h3 className="pd-status">Loading...</h3>;
-
+ 
   return (
     <div className="dd-root">
       <Container className="dd-container">
-
+ 
         {/* ================= HEADER ================= */}
         <div className="dd-header">
-
+ 
           <div className="dd-header-left">
             <span className="dd-kicker">Doctor Dashboard</span>
-
+ 
             <h2 className="dd-title">
               Welcome, <span>Dr. {doctor.name}</span>
             </h2>
-
+ 
             <p>
               Manage appointments, review patient symptoms, and prescribe medicines.
             </p>
-
+ 
             {/* ✅ SAME AS PATIENT DASHBOARD */}
             <div className="dd-hero-actions">
               <Button
@@ -124,14 +124,14 @@ export default function DoctorDashboard() {
               </Button>
             </div>
           </div>
-
+ 
           {/* ✅ RIGHT SIDE ACTIONS (SAME PATTERN) */}
           <div className="dd-header-right">
             <span className="dd-stat-chip active">● Active</span>
             <span className="dd-stat-chip">
               {appointments.length} Appointments
             </span>
-
+ 
             <Button
               variant="outline-danger"
               size="sm"
@@ -140,27 +140,27 @@ export default function DoctorDashboard() {
               Logout
             </Button>
           </div>
-
+ 
         </div>
-
+ 
         {/* ================= TODAY OVERVIEW ================= */}
         <div className="dd-today-strip">
           <div className="dd-today-card">
             <span>Today's Appointments</span>
             <p>{todaysCount}</p>
           </div>
-
+ 
           <div className="dd-today-card">
             <span>Total Patients</span>
             <p>{uniquePatients}</p>
           </div>
-
+ 
           <div className="dd-today-card">
             <span>Upcoming</span>
             <p>{appointments.length}</p>
           </div>
         </div>
-
+ 
         {/* ================= PROFILE ================= */}
         <Card className="dd-profile-card">
           <Card.Body>
@@ -171,7 +171,7 @@ export default function DoctorDashboard() {
             </div>
           </Card.Body>
         </Card>
-
+ 
         {/* ================= FILTER ================= */}
         <Card className="dd-filter-card">
           <Card.Body className="dd-filter-row">
@@ -183,7 +183,7 @@ export default function DoctorDashboard() {
                 onChange={(e) => setDateFilter(e.target.value)}
               />
             </div>
-
+ 
             <div className="dd-filter-actions">
               <Button onClick={filterByDate}>Search</Button>
               <Button
@@ -198,12 +198,12 @@ export default function DoctorDashboard() {
             </div>
           </Card.Body>
         </Card>
-
+ 
         {/* ================= APPOINTMENTS ================= */}
         <Card className="dd-card">
           <Card.Body>
             <h5 className="mb-3">Appointments</h5>
-
+ 
             <Table responsive hover className="pd-table">
               <thead>
                 <tr>
@@ -235,15 +235,15 @@ export default function DoctorDashboard() {
                       <td>{a.patientId}</td>
                       <td>{a.appointmentDate}</td>
                       <td>{a.appointmentTime}</td>
-
+ 
                       <td>
                         <span className={`pd-status ${a.status.toLowerCase()}`}>
                           {a.status}
                         </span>
                       </td>
-
+ 
                       <td>{a.symptoms || "-"}</td>
-
+ 
                       <td>
                         <Form.Control
                           size="sm"
@@ -256,7 +256,7 @@ export default function DoctorDashboard() {
                           }
                         />
                       </td>
-
+ 
                       <td className="dd-actions">
                         <Button
                           size="sm"
@@ -264,7 +264,7 @@ export default function DoctorDashboard() {
                         >
                           Save
                         </Button>
-
+ 
                         <Button
                           size="sm"
                           variant="outline-primary"
@@ -282,7 +282,7 @@ export default function DoctorDashboard() {
             </Table>
           </Card.Body>
         </Card>
-
+ 
       </Container>
     </div>
   );

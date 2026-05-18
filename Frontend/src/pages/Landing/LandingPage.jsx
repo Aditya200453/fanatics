@@ -12,19 +12,19 @@ import {
 } from "react-bootstrap";
 import "./Landing.css";
 import { useNavigate } from "react-router-dom";
-
+ 
 export default function LandingPage() {
   const navigate = useNavigate();
-
+ 
   return (
     <div className="lp">
       {/* NAVBAR */}
       <Navbar expand="lg" className="lp-navbar" variant="dark" fixed="top">
         <Container fluid className="px-4 lp-navwrap">
           <Navbar.Brand className="fw-bold">ClinicCare</Navbar.Brand>
-
+ 
           <Navbar.Toggle aria-controls="lp-nav" className="lp-toggler" />
-
+ 
           <Navbar.Collapse id="lp-nav" className="lp-collapse">
             {/* CENTER LINKS */}
             <Nav className="lp-nav-center">
@@ -33,35 +33,17 @@ export default function LandingPage() {
               <Nav.Link href="#services">Our Services</Nav.Link>
               <Nav.Link href="#contact">Contact</Nav.Link>
             </Nav>
-
+ 
             {/* RIGHT SIDE ACTIONS */}
             <Nav className="lp-nav-actions">
-              <Dropdown align="end">
-                <Dropdown.Toggle
-                  id="login-dropdown"
-                  variant="info"
-                  className="lp-btn lp-login-btn"
-                >
-                  Login
-                </Dropdown.Toggle>
-
-                <Dropdown.Menu className="lp-menu">
-                  <Dropdown.Item onClick={() => navigate("/login/admin")}>
-                    Admin Login
-                  </Dropdown.Item>
-                  <Dropdown.Item onClick={() => navigate("/login/doctor")}>
-                    Doctor Login
-                  </Dropdown.Item>
-                  <Dropdown.Item onClick={() => navigate("/login/patient")}>
-                    Patient Login
-                  </Dropdown.Item>
-                  <Dropdown.Divider />
-                  <Dropdown.Item onClick={() => navigate("/login/other")}>
-                    Other User Login
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-
+              <Button
+                variant="info"
+                className="lp-btn lp-login-btn"
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </Button>
+ 
               <Button
                 variant="info"
                 className="lp-btn"
@@ -73,7 +55,7 @@ export default function LandingPage() {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-
+ 
       {/* HERO SECTION */}
       <section id="home" className="lp-hero">
         <div className="lp-hero-overlay" />
@@ -81,14 +63,15 @@ export default function LandingPage() {
           <Row className="align-items-center">
             <Col lg={8}>
               <h1 className="lp-title">
-                Clinic Management <span className="lp-accent">System</span>
+                <span className="lp-accent">ClinicCare</span>
               </h1>
-
-              <p className="lp-subtitle">
-                Manage appointments, patient history, consultations and
-                diagnostics in one role‑based platform.
-              </p>
-
+ 
+ <p className="lp-subtitle">
+  Simplify clinic operations with ClinicCare — a modern platform to manage
+  patients, appointments, prescriptions, and staff efficiently in one place.
+</p>
+ 
+ 
               <div className="lp-hero-actions">
                 <Button
                   variant="info"
@@ -97,7 +80,7 @@ export default function LandingPage() {
                 >
                   Get Started
                 </Button>
-
+ 
                 <Button
                   variant="outline-light"
                   size="lg"
@@ -114,14 +97,14 @@ export default function LandingPage() {
           </Row>
         </Container>
       </section>
-
+ 
       {/* ABOUT SECTION */}
       <section id="about" className="lp-section bg-light">
         <Container>
           <h2 className="text-center mb-5 fw-bold">
             What our <span className="lp-accent">ClinicCare does</span>?
           </h2>
-
+ 
           <Row className="g-4">
             {[
               {
@@ -161,11 +144,11 @@ export default function LandingPage() {
                     <div className="lp-feature-icon mb-3">
                       <i className={`bi ${item.icon}`} />
                     </div>
-
+ 
                     <Card.Title className="fw-bold mb-2">
                       {item.title}
                     </Card.Title>
-
+ 
                     <Card.Text className="text-muted mb-0">
                       {item.desc}
                     </Card.Text>
@@ -176,7 +159,7 @@ export default function LandingPage() {
           </Row>
         </Container>
       </section>
-
+ 
       {/* SERVICES */}
       <section id="services" className="lp-section">
         <Container>
@@ -219,16 +202,71 @@ export default function LandingPage() {
           </Row>
         </Container>
       </section>
-
+ 
+      {/* FOOTER */}
       {/* FOOTER */}
       <footer id="contact" className="lp-footer">
-        <Container className="py-4 d-flex flex-column flex-md-row justify-content-between gap-2">
-          <div className="text-white-50">
-            © {new Date().getFullYear()} ClinicCare
+        <Container className="py-5">
+          <Row className="g-4">
+ 
+            {/* ✅ LEFT - BRAND */}
+            <Col md={4}>
+              <h5 className="fw-bold text-white mb-3">ClinicCare</h5>
+              <p className="text-white-50 small">
+                A complete clinic management system for handling patients,
+                appointments, prescriptions, and diagnostics with ease.
+              </p>
+            </Col>
+ 
+            {/* ✅ COMPANY LINKS */}
+            <Col md={2}>
+              <h6 className="text-white mb-3">Company</h6>
+              <ul className="list-unstyled">
+                <li><a href="#about" className="footer-link">About</a></li>
+                <li><a href="#services" className="footer-link">Services</a></li>
+                <li><a href="#contact" className="footer-link">Contact</a></li>
+              </ul>
+            </Col>
+ 
+            {/* ✅ CONTACT DETAILS */}
+            <Col md={4}>
+              <h6 className="text-white mb-3">Contact Us</h6>
+              <ul className="list-unstyled text-white-50 small">
+ 
+                <li className="mb-2">
+                  <i className="bi bi-geo-alt me-2"></i>
+                  Hyderabad, Telangana, India
+                </li>
+ 
+                <li className="mb-2">
+                  <i className="bi bi-telephone me-2"></i>
+                  +91 98765 43210
+                </li>
+ 
+                <li className="mb-2">
+                  <i className="bi bi-envelope me-2"></i>
+                  support@cliniccare.com
+                </li>
+ 
+                <li className="mb-2">
+                  <i className="bi bi-clock me-2"></i>
+                  Mon - Sat: 9:00 AM - 6:00 PM
+                </li>
+ 
+              </ul>
+            </Col>
+ 
+          </Row>
+ 
+          {/* ✅ BOTTOM */}
+          <div className="mt-4 pt-3 border-top d-flex flex-column flex-md-row justify-content-between text-white-50 small">
+            <div>© {new Date().getFullYear()} ClinicCare. All rights reserved.</div>
+            <div>Privacy • Terms • Support</div>
           </div>
-          <div className="text-white-50">Privacy • Terms • Support</div>
         </Container>
       </footer>
+ 
     </div>
   );
 }
+ 

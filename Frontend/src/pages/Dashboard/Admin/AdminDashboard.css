@@ -221,14 +221,14 @@ h4 {
     transform: translateY(0);
   }
 }
-
+ 
 SEARCH.admin-filter-bar {
   display: flex;
   gap: 12px;
   margin-bottom: 16px;
   flex-wrap: wrap;
 }
-
+ 
 .admin-filter-bar input,
 .admin-filter-bar select {
   padding: 10px 12px;
@@ -237,37 +237,37 @@ SEARCH.admin-filter-bar {
   font-weight: 600;
   min-width: 220px;
 }
-
+ 
 .admin-filter-bar input:focus,
 .admin-filter-bar select:focus {
   outline: none;
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
-
+ 
 /* =====================================================
-   ADMIN HEADER – SP  margin-bottom: 40px;           /* space before cards */   
+   ADMIN HEADER – SP  margin-bottom: 40px;           /* space before cards */  
 .admin-header-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 32px;
 }
-
+ 
 /* LEFT */
-
+ 
 .admin-header-left p {
   margin-top: 6px;
   margin-bottom: 18px;           /* space before Home button */
   color: #475569;
 }
-
+ 
 /* ================= HERO ACTIONS ================= */
-
+ 
 .admin-hero-actions {
   margin-top: 12px;
 }
-
+ 
 .admin-home-btn {
   border-radius: 999px;
   padding: 10px 22px;
@@ -278,21 +278,21 @@ SEARCH.admin-filter-bar {
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
+ 
 .admin-home-btn:hover {
   background: rgba(37, 99, 235, 0.08);
   transform: translateY(-1px);
 }
-
+ 
 /* ================= RIGHT ACTIONS ================= */
-
+ 
 .admin-header-actions {
   display: flex;
   gap: 12px;
   align-items: center;
   margin-top: 6px;
 }
-
+ 
 .admin-logout-btn {
   border-radius: 12px;
   padding: 8px 16px;
@@ -302,56 +302,56 @@ SEARCH.admin-filter-bar {
   color: #dc2626;
   cursor: pointer;
 }
-
+ 
 .admin-logout-btn:hover {
   background: rgba(220, 38, 38, 0.08);
 }
-
+ 
 /* ================= RESPONSIVE ================= */
-
+ 
 @media (max-width: 900px) {
   .admin-header-row {
     flex-direction: column;
     gap: 16px;
   }
-
+ 
   .admin-header-actions {
     align-self: flex-start;
   }
 }
-  
+ 
 /* =====================================================/* ================================================= HEADER – SPACING & ACTIONS
    ===================================================== */
-
+ 
 .admin-header {
   margin-bottom: 40px; /* space before cards */
 }
-
+ 
 .admin-header-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 32px;
 }
-
+ 
 /* =====================================================
    LEFT SECTION
    ===================================================== */
-
+ 
 .admin-header-left p {
   margin-top: 6px;
   margin-bottom: 18px; /* space before Home button */
   color: #475569;
 }
-
+ 
 /* =====================================================
    HERO ACTIONS (BACK TO HOME)
    ===================================================== */
-
+ 
 .admin-hero-actions {
   margin-top: 12px;
 }
-
+ 
 .admin-home-btn {
   border-radius: 999px;
   padding: 10px 22px;
@@ -362,58 +362,60 @@ SEARCH.admin-filter-bar {
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
+ 
 .admin-home-btn:hover {
   background: rgba(37, 99, 235, 0.08);
   transform: translateY(-1px);
 }
-
+ 
 /* =====================================================
    RIGHT HEADER ACTIONS (SWITCH + LOGOUT)
    ===================================================== */
-
+ 
 .admin-header-actions {
   display: flex;
   gap: 12px;
   align-items: center;
   margin-top: 6px;
 }
-
-
+ 
+ 
 .admin-logout-btn {
   border-radius: 14px;
   padding: 9px 18px;
   font-weight: 700;
-
+ 
   background: rgba(220, 38, 38, 0.08);
   border: 1.8px solid #dc2626;
   color: #dc2626;
-
+ 
   cursor: pointer;
   transition: all 0.25s ease;
 }
-
-
-
+ 
+ 
+ 
 .admin-logout-btn:hover {
   background: #dc2626;
   color: #ffffff;
   transform: translateY(-1px);
   box-shadow: 0 10px 22px rgba(220, 38, 38, 0.35);
 }
-
-
+ 
+ 
 /* =====================================================
    RESPONSIVE
    ===================================================== */
-
+ 
 @media (max-width: 900px) {
   .admin-header-row {
     flex-direction: column;
     gap: 16px;
   }
-
+ 
   .admin-header-actions {
     align-self: flex-start;
   }
 }
+ 
+ 

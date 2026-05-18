@@ -1,7 +1,7 @@
 /* =====================================================
    SAAS BUTTON SYSTEM (STAFF DASHBOARD)
    ===================================================== */
-
+ 
 /* Base button reset */
 .staff-card button {
   border-radius: 12px;
@@ -15,19 +15,19 @@
   justify-content: center;
   gap: 6px;
 }
-
+ 
 /* ✅ PRIMARY ACTION (List, Find, Approve, Add) */
 .staff-card button:not(.danger):not(.secondary) {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: #ffffff;
   box-shadow: 0 10px 22px rgba(37, 99, 235, 0.35);
 }
-
+ 
 .staff-card button:not(.danger):not(.secondary):hover {
   transform: translateY(-2px);
   box-shadow: 0 16px 32px rgba(37, 99, 235, 0.45);
 }
-
+ 
 /* ✅ SECONDARY ACTION (Find by ID, List Doctors types) */
 .staff-card .secondary {
   background: transparent;
@@ -35,24 +35,24 @@
   border: 1.6px solid #2563eb;
   box-shadow: none;
 }
-
+ 
 .staff-card .secondary:hover {
   background: rgba(37, 99, 235, 0.08);
 }
-
+ 
 /* ✅ DANGER ACTION (Delete, Unmap, Remove) */
 .staff-card .danger {
   background: rgba(220, 38, 38, 0.08);
   color: #dc2626;
   border: 1.6px solid #dc2626;
 }
-
+ 
 .staff-card .danger:hover {
   background: #dc2626;
   color: #ffffff;
   box-shadow: 0 12px 26px rgba(220, 38, 38, 0.4);
 }
-
+ 
 /* Disabled state */
 .staff-card button:disabled {
   opacity: 0.5;
@@ -60,7 +60,7 @@
   box-shadow: none;
   transform: none;
 }
-
+ 
 .staff-kicker {
   font-size: 0.72rem;
   letter-spacing: 0.12em;
@@ -68,14 +68,14 @@
   text-transform: uppercase;
   color: #2563eb;
 }
-
+ 
 .staff-title {
   font-size: 2.3rem;
   font-weight: 800;
   color: #0f172a;
   margin-top: 6px;
 }
-
+ 
 .staff-header p {
   margin-top: 8px;
   color: #475569;
@@ -92,7 +92,7 @@
   white-space: nowrap;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
-
+ 
 /* ✅ Green – Active / Completed / Booked */
 .staff-badge.success {
   background-color: #e7f7ef;
@@ -110,43 +110,43 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   transition: transform 0.15s ease;
 }
-
+ 
 /* ✅ Green – Active / Completed / Booked */
 .staff-badge.success {
   background-color: #e7f7ef;
   color: #0f9d58;
   border: 1px solid #b7e4c7;
 }
-
+ 
 /* 🟡 Yellow – Pending */
 .staff-badge.warning {
   background-color: #fff8e1;
   color: #b26a00;
   border: 1px solid #ffe082;
 }
-
+ 
 /* 🔴 Red – Cancelled / Failed */
 .staff-badge.danger {
   background-color: #fdecea;
   color: #d93025;
   border: 1px solid #f4c7c3;
 }
-
+ 
 /* Optional hover polish */
 .staff-badge:hover {
   transform: translateY(-1px);
 }
-
-
+ 
+ 
 /* =====================================================
    FIX: SPACE BETWEEN GO TO HOME & OVERVIEW CARDS
    ===================================================== */
-
+ 
 .staff-hero-actions {
   margin-top: 20px;
-  margin-bottom: 56px; 
+  margin-bottom: 56px;
 }
-
+ 
 .staff-home-btn {
   padding: 10px 22px;
   border-radius: 999px;
@@ -157,17 +157,17 @@
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
+ 
 .staff-home-btn:hover {
   background: rgba(37, 99, 235, 0.08);
   transform: translateY(-1px);
 }
-
+ 
 .staff-header-actions {
   display: flex;
   align-items: center;
 }
-
+ 
 .staff-logout-btn {
   padding: 8px 18px;
   border-radius: 14px;
@@ -178,13 +178,13 @@
   cursor: pointer;
   transition: 0.25s ease;
 }
-
+ 
 .staff-logout-btn:hover {
   background: #dc2626;
   color: white;
   box-shadow: 0 10px 22px rgba(220, 38, 38, 0.35);
 }
-
+ 
 /* =====================================================
    OVERVIEW CARDS
    ===================================================== */
@@ -194,14 +194,14 @@
   gap: 18px;
   margin-bottom: 36px; /* ✅ clear separation */
 }
-
+ 
 .staff-overview-card {
   background: #ffffff;
   border-radius: 18px;
   padding: 22px;
   box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
 }
-
+ 
 .staff-overview-card span {
   font-size: 0.72rem;
   text-transform: uppercase;
@@ -209,14 +209,14 @@
   font-weight: 700;
   color: #2563eb;
 }
-
+ 
 .staff-overview-card p {
   margin-top: 6px;
   font-size: 1.6rem;
   font-weight: 800;
   color: #0f172a;
 }
-
+ 
 /* =====================================================
    NAV TABS
    ===================================================== */
@@ -226,7 +226,7 @@
   margin-bottom: 32px;
   flex-wrap: wrap;
 }
-
+ 
 .staff-tabs button {
   padding: 10px 18px;
   border-radius: 999px;
@@ -236,17 +236,17 @@
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
+ 
 .staff-tabs button:hover {
   background: #f1f5f9;
 }
-
+ 
 .staff-tabs button.active {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: white;
   border-color: transparent;
 }
-
+ 
 /* =====================================================
    CARD
    ===================================================== */
@@ -257,13 +257,13 @@
   margin-bottom: 36px;
   box-shadow: 0 18px 38px rgba(15, 23, 42, 0.12);
 }
-
+ 
 .staff-card-header h4 {
   color: #2563eb;
   font-weight: 700;
   margin-bottom: 18px;
 }
-
+ 
 /* =====================================================
    ACTION ROWS
    ===================================================== */
@@ -273,7 +273,7 @@
   flex-wrap: wrap;
   margin-bottom: 20px; /* ✅ more spacing */
 }
-
+ 
 .staff-actions input,
 .staff-actions select {
   padding: 10px 12px;
@@ -282,31 +282,31 @@
   min-width: 200px;
   font-weight: 600;
 }
-
+ 
 .staff-actions input:focus,
 .staff-actions select:focus {
   outline: none;
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
-
+ 
 /* =====================================================
    TABLE
    ===================================================== */
 .staff-table-wrap {
   overflow-x: auto;
 }
-
+ 
 .staff-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 12px;
 }
-
+ 
 .staff-table thead {
   background: #f1f5f9;
 }
-
+ 
 .staff-table th {
   padding: 12px;
   font-size: 0.78rem;
@@ -314,22 +314,22 @@
   text-transform: uppercase;
   color: #334155;
 }
-
+ 
 .staff-table td {
   padding: 12px;
   font-size: 0.95rem;
   color: #0f172a;
   border-bottom: 1px solid #e2e8f0;
 }
-
+ 
 .staff-table tr:nth-child(even) {
   background: #f8fafc;
 }
-
+ 
 .staff-table tr:hover {
   background: #eef6ff;
 }
-
+ 
 /* =====================================================
    EMPTY / LOADING STATES
    ===================================================== */
@@ -339,24 +339,24 @@
   color: #64748b;
   font-weight: 600;
 }
-
+ 
 .staff-empty {
   text-align: center;
   padding: 36px 0;
 }
-
+ 
 .staff-empty p {
   font-size: 1.05rem;
   font-weight: 700;
   color: #0f172a;
   margin-bottom: 6px;
 }
-
+ 
 .staff-empty span {
   font-size: 0.9rem;
   color: #64748b;
 }
-
+ 
 /* =====================================================
    RESPONSIVE
    ===================================================== */
@@ -365,24 +365,24 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
-
+ 
 @media (max-width: 900px) {
   .staff-header-row {
     flex-direction: column;
     gap: 18px;
   }
-
+ 
   .staff-actions {
     flex-direction: column;
     align-items: stretch;
   }
-
+ 
   .staff-actions input,
   .staff-actions select {
     width: 100%;
   }
 }
-
+ 
 @media (max-width: 640px) {
   .staff-overview {
     grid-template-columns: 1fr;
@@ -393,7 +393,7 @@
   min-height: 100vh;
   font-family: "Segoe UI", Arial, sans-serif;
 }
-
+ 
 /* =====================================================
    HEADER
    ===================================================== */
@@ -407,7 +407,7 @@
 .staff-container {
   animation: pageEnter 0.4s ease-out;
 }
-
+ 
 @keyframes pageEnter {
   from {
     opacity: 0;
@@ -418,3 +418,4 @@
     transform: translateY(0);
   }
 }
+ 

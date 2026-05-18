@@ -1,33 +1,33 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-
+ 
 /* PUBLIC */
 import LandingPage from "./pages/Landing/LandingPage";
 import RegisterPage from "./pages/Register/RegisterPage";
-
+ 
 /* LOGIN */
 import AdminLogin from "./pages/Login/AdminLogin";
 import DoctorLogin from "./pages/Login/DoctorLogin";
 import PatientLogin from "./pages/Login/PatientLogin";
 import OthersLogin from "./pages/Login/OthersLogin";
-
+ 
 /* DASHBOARDS */
 import PatientDashboard from "./pages/Dashboard/Patient/PatientDashboard";
 import DoctorDashboard from "./pages/Dashboard/Doctor/DoctorDashboard";
 import AdminDashboard from "./pages/Dashboard/Admin/AdminDashboard";
 import StaffDashboard from "./pages/Dashboard/Staff/StaffDashboard";
-
+ 
 /* FEATURES */
 import BookAppointment from "./pages/Dashboard/Patient/BookAppointment";
 import MyAppointments from "./pages/Dashboard/Patient/MyAppointments";
 import AddPrescription from "./pages/Dashboard/Doctor/AddPrescription";
 import ViewPrescription from "./pages/Dashboard/Patient/ViewPrescription";
-
+ 
 /* ROUTE GUARD */
 import ProtectedRoute from "./routes/ProtectedRoute";
-
+ 
 /* ✅ CHATBOT */
 import ChatbotWidget from "./Chatbot/ChatbotWidget";
-
+ 
 export default function App() {
   return (
     <>
@@ -35,14 +35,31 @@ export default function App() {
         {/* ========== PUBLIC ========== */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/register" element={<RegisterPage />} />
-
+ 
         {/* ========== LOGIN ========== */}
-        <Route path="/login" element={<OthersLogin />} />
+ 
+        {/* ✅ GENERIC LOGIN */}
+        <Route
+          path="/login"
+          element={<OthersLogin title="Login to ClinicCare" />}
+        />
+ 
+        {/* ✅ ROLE-SPECIFIC LOGIN */}
         <Route path="/login/admin" element={<AdminLogin />} />
         <Route path="/login/doctor" element={<DoctorLogin />} />
         <Route path="/login/patient" element={<PatientLogin />} />
-        <Route path="/login/staff" element={<OthersLogin />} />
-
+ 
+        {/* ✅ FIXED STAFF LOGIN */}
+        <Route
+          path="/login/staff"
+          element={
+            <OthersLogin
+              title="Staff Login"
+              expectedRole="STAFF"
+            />
+          }
+        />
+ 
         {/* ========== PATIENT ========== */}
         <Route
           path="/dashboard/patient"
@@ -52,7 +69,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
+ 
         <Route
           path="/dashboard/patient/book"
           element={
@@ -61,7 +78,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
+ 
         <Route
           path="/dashboard/patient/appointments"
           element={
@@ -70,12 +87,12 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
+ 
         <Route
           path="/patient/prescription/:appointmentId"
           element={<ViewPrescription />}
         />
-
+ 
         {/* ========== DOCTOR ========== */}
         <Route
           path="/dashboard/doctor"
@@ -85,7 +102,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
+ 
         <Route
           path="/doctor/prescription/:appointmentId"
           element={
@@ -94,7 +111,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
+ 
         {/* ========== ADMIN ========== */}
         <Route
           path="/dashboard/admin"
@@ -104,7 +121,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
+ 
         {/* ========== STAFF ========== */}
         <Route
           path="/dashboard/staff"
@@ -114,11 +131,11 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
+ 
         {/* ========== FALLBACK ========== */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-
+ 
       {/* ✅ CHATBOT ON ALL PAGES */}
       <ChatbotWidget
         agent={{
@@ -130,3 +147,4 @@ export default function App() {
     </>
   );
 }
+ 

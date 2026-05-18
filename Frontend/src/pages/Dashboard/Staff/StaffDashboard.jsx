@@ -134,7 +134,7 @@ export default function StaffDashboard() {
         setAllTestsCount(0);
       }
     } catch {
-      // overview failure silently ignore; page still works
+      // ignore overview failure
     }
   };
 
@@ -146,21 +146,13 @@ export default function StaffDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
-    useEffect(() => {
+  useEffect(() => {
     window.history.pushState(null, "", window.location.href);
-
-    const blockBack = () => {
-      window.history.pushState(null, "", window.location.href);
-    };
-
+    const blockBack = () => window.history.pushState(null, "", window.location.href);
     window.addEventListener("popstate", blockBack);
-
-    return () => {
-      window.removeEventListener("popstate", blockBack);
-    };
+    return () => window.removeEventListener("popstate", blockBack);
   }, []);
-  
+
   // ---------------- PATIENT APIs ----------------
   const loadAllPatients = async () => {
     setLoading(true);
@@ -483,16 +475,31 @@ export default function StaffDashboard() {
     </div>
   );
 
+  // ✅ ✅ ✅ UPDATED: removes createdAt/updatedAt columns
   const renderTable = () => {
     if (loading) return <div className="staff-hint">Loading…</div>;
     if (!rows || rows.length === 0) {
-      return renderEmpty(
-        "No data available",
-        "Results for this section will appear here."
-      );
+      return renderEmpty("No data available", "Results for this section will appear here.");
     }
 
-    const cols = Object.keys(rows[0] || {});
+    const removeCols = new Set([
+      "createdat",
+      "updatedat",
+      "created_at",
+      "updated_at",
+      "createddate",
+      "updateddate",
+      "temppassword",   
+      "temp_password",  
+      "tempPassword"    
+
+    ]);
+
+    const cols = Object.keys(rows[0] || {}).filter((c) => {
+      const key = String(c).toLowerCase();
+      return !removeCols.has(key);
+    });
+
     return (
       <div className="staff-table-wrap">
         <table className="staff-table">
@@ -503,6 +510,7 @@ export default function StaffDashboard() {
               ))}
             </tr>
           </thead>
+
           <tbody>
             {rows.map((r, idx) => (
               <tr key={idx}>
@@ -540,10 +548,7 @@ export default function StaffDashboard() {
   const renderPendingAppointmentsTable = () => {
     if (loading) return <div className="staff-hint">Loading…</div>;
     if (!rows || rows.length === 0) {
-      return renderEmpty(
-        "No pending appointments",
-        "Pending approvals will appear here."
-      );
+      return renderEmpty("No pending appointments", "Pending approvals will appear here.");
     }
 
     return (
@@ -616,7 +621,6 @@ export default function StaffDashboard() {
 
   return (
     <div className="staff-container">
-
       {/* HEADER */}
       <div className="staff-header-row">
         <div className="staff-header">
@@ -827,67 +831,27 @@ export default function StaffDashboard() {
           </div>
 
           <div className="staff-actions">
-            <input
-              value={testName}
-              onChange={(e) => setTestName(e.target.value)}
-              placeholder="Test Name"
-            />
-            <input
-              value={testCost}
-              onChange={(e) => setTestCost(e.target.value)}
-              placeholder="Cost"
-            />
-            <input
-              value={testDesc}
-              onChange={(e) => setTestDesc(e.target.value)}
-              placeholder="Description"
-            />
-            <button onClick={addNewTest} disabled={!testName || !testCost}>
-              Add Test
-            </button>
+            <input value={testName} onChange={(e) => setTestName(e.target.value)} placeholder="Test Name" />
+            <input value={testCost} onChange={(e) => setTestCost(e.target.value)} placeholder="Cost" />
+            <input value={testDesc} onChange={(e) => setTestDesc(e.target.value)} placeholder="Description" />
+            <button onClick={addNewTest} disabled={!testName || !testCost}>Add Test</button>
           </div>
 
           <div className="staff-actions">
-            <input
-              value={deleteTestId}
-              onChange={(e) => setDeleteTestId(e.target.value)}
-              placeholder="Test ID to delete"
-            />
-            <button className="danger" onClick={deleteTest} disabled={!deleteTestId}>
-              Delete Test
-            </button>
+            <input value={deleteTestId} onChange={(e) => setDeleteTestId(e.target.value)} placeholder="Test ID to delete" />
+            <button className="danger" onClick={deleteTest} disabled={!deleteTestId}>Delete Test</button>
           </div>
 
           <div className="staff-actions">
-            <input
-              value={assignPatientId}
-              onChange={(e) => setAssignPatientId(e.target.value)}
-              placeholder="Patient ID"
-            />
-            <input
-              value={assignTestId}
-              onChange={(e) => setAssignTestId(e.target.value)}
-              placeholder="Test ID"
-            />
-            <input
-              type="date"
-              value={assignDate}
-              onChange={(e) => setAssignDate(e.target.value)}
-            />
-            <button onClick={assignTestToPatient} disabled={!assignPatientId || !assignTestId || !assignDate}>
-              Assign Test
-            </button>
+            <input value={assignPatientId} onChange={(e) => setAssignPatientId(e.target.value)} placeholder="Patient ID" />
+            <input value={assignTestId} onChange={(e) => setAssignTestId(e.target.value)} placeholder="Test ID" />
+            <input type="date" value={assignDate} onChange={(e) => setAssignDate(e.target.value)} />
+            <button onClick={assignTestToPatient} disabled={!assignPatientId || !assignTestId || !assignDate}>Assign Test</button>
           </div>
 
           <div className="staff-actions">
-            <input
-              value={listPatientTestsId}
-              onChange={(e) => setListPatientTestsId(e.target.value)}
-              placeholder="Patient ID to list tests"
-            />
-            <button onClick={listTestsForPatient} disabled={!listPatientTestsId}>
-              List Patient Tests
-            </button>
+            <input value={listPatientTestsId} onChange={(e) => setListPatientTestsId(e.target.value)} placeholder="Patient ID to list tests" />
+            <button onClick={listTestsForPatient} disabled={!listPatientTestsId}>List Patient Tests</button>
           </div>
 
           {renderTable()}
