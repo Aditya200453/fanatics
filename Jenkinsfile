@@ -63,6 +63,7 @@ pipeline {
                         'MYSQL_USER=root',
                         'MYSQL_PASSWORD=root',
                         'JWT_SECRET=VGhpc0lzQVN1cGVyU2VjdXJlS2V5Rm9ySldUU2lnbmluZzEyMw==',
+                        'JWT_EXPIRY_MS=3600000',
                         'INTERNAL_SECRET=CHANGE_ME_INTERNAL',
                         'SPRING_PROFILES_ACTIVE=docker'
                     ]) {
