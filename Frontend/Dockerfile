@@ -1,5 +1,5 @@
-# ✅ Use latest stable node (important)
-FROM node:20-alpine AS build
+# ✅ Use stable node (avoid alpine issues)
+FROM node:20 AS build
 
 WORKDIR /app
 
@@ -8,12 +8,9 @@ RUN npm install
 
 COPY . .
 
-# ✅ FIX for CustomEvent error
-ENV NODE_OPTIONS=--experimental-global-webcrypto
-
 RUN npm run build
 
-# Stage 2: Nginx
+# ✅ Serve using nginx
 FROM nginx:alpine
 
 COPY --from=build /app/dist /usr/share/nginx/html
