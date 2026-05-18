@@ -87,4 +87,8 @@ public class SpecialityServiceImpl implements SpecialityService {
 
         return doctorRepository.findAllById(doctorIds);
     }
+    @Override
+    public void deleteSpeciality(Integer id) {
+        specialityRepository.deleteById(id);
+    }
 }

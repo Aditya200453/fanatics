@@ -11,6 +11,7 @@ public interface SpecialityService {
     Speciality addSpeciality(Speciality speciality);
     List<Speciality> getAllSpecialities();
     Speciality getSpeciality(Integer id);
+    void deleteSpeciality(Integer id);
 
     SpecialityDoctorMap mapDoctorToSpeciality(Integer specialityId, Integer doctorId);
     void removeDoctorFromSpeciality(Integer specialityId, Integer doctorId);

@@ -10,6 +10,7 @@ public class BookAppointmentRequest {
     private Integer doctorId;
     private LocalDate appointmentDate;
 
+
     // ✅ time picker sends "HH:mm"
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime appointmentTime;

@@ -109,4 +109,17 @@ public class SpecialityController {
         specialityService.removeDoctorFromSpeciality(specialityId, doctorId);
         return ResponseEntity.ok().build();
     }
+    // ✅ DELETE SPECIALITY (ADMIN ONLY)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteSpeciality(
+            @RequestHeader("X-User-Role") String role,
+            @PathVariable Integer id) {
+
+        if (!"ADMIN".equalsIgnoreCase(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        specialityService.deleteSpeciality(id);
+        return ResponseEntity.ok().build();
+    }
 }
