@@ -230,6 +230,16 @@ services:
       prescription-service: { condition: service_started }
     networks: [cms-net]
 
+  
+  frontend:
+      build:
+        context: ../Frontend
+      ports:
+        - "5173:80"
+      depends_on:
+        - api-gateway
+
+
 networks:
   cms-net:
     driver: bridge
