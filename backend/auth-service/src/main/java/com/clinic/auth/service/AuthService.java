@@ -72,6 +72,7 @@ public class AuthService {
                 token,
                 user.getRole().name()
         );
+
     }
 
     // ✅ SIGNUP (PATIENT default, STAFF -> PENDING approval)

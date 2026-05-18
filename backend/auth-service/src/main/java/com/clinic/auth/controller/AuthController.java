@@ -4,7 +4,9 @@ import com.clinic.auth.dto.LoginRequest;
 import com.clinic.auth.dto.LoginResponse;
 import com.clinic.auth.dto.PendingUser;
 import com.clinic.auth.dto.SignupRequest;
+
 import com.clinic.auth.service.AuthService;
+
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +21,13 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // ✅ Inject AuthService only (controller should not access DB directly)
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
 
     // ✅ PUBLIC: Register PATIENT or STAFF
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
+    public ResponseEntity<String> signup(@RequestBody SignupRequest request) {
         return ResponseEntity.ok(authService.signup(request));
     }
 
@@ -47,21 +48,6 @@ public class AuthController {
     }
 
     // ✅ ADMIN: Get all pending staff (DTO used to avoid exposing password)
-//    @GetMapping("/admin/staff/pending")
-//    public ResponseEntity<List<PendingUser>> pendingStaff() {
-//
-//        List<PendingUser> list = authService.getPendingStaff().stream()
-//                .map(u -> new PendingUser(
-//                        u.getId(),
-//                        u.getEmail(),
-//                        u.getRole().name(),
-//                        u.getStatus().name()
-//                ))
-//                .toList();
-//
-//        return ResponseEntity.ok(list);
-//    }
-
     @GetMapping("/admin/staff/pending")
     public ResponseEntity<List<PendingUser>> pendingStaff(
             @RequestHeader("X-User-Role") String role

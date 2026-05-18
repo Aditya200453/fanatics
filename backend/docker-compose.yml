@@ -3,6 +3,8 @@ services:
   # DATABASE (single MariaDB)
   # ======================
   db:
+    env_file:
+    - .env
     image: mariadb:11.8
     container_name: cms-db
     restart: unless-stopped
@@ -27,6 +29,8 @@ services:
   # EUREKA SERVER (Phase 2)
   # ======================
   eureka-server:
+    env_file:
+    - .env
     build:
       context: ./eureka-server
       dockerfile: Dockerfile
@@ -53,6 +57,8 @@ services:
   # AUTH SERVICE (Phase 3) - scaffold (we'll finalize next)
   # ======================
   auth-service:
+    env_file:
+    - .env
     build:
       context: ./auth-service
       dockerfile: Dockerfile
@@ -87,6 +93,8 @@ services:
   # Each will use cms DB
   # ======================
   patient-service:
+    env_file:
+    - .env
     build: { context: ./patient, dockerfile: Dockerfile }
     container_name: patient-service
     restart: unless-stopped
@@ -107,6 +115,8 @@ services:
     networks: [cms-net]
 
   doctor-service:
+    env_file:
+    - .env
     build: { context: ./doctor, dockerfile: Dockerfile }
     container_name: doctor-service
     restart: unless-stopped
@@ -127,6 +137,8 @@ services:
     networks: [cms-net]
 
   diagnostic-service:
+    env_file:
+    - .env
     build: { context: ./diagnostic, dockerfile: Dockerfile }
     container_name: diagnostic-service
     restart: unless-stopped
@@ -147,6 +159,8 @@ services:
     networks: [cms-net]
 
   appointment-service:
+    env_file:
+    - .env
     build: { context: ./appointment, dockerfile: Dockerfile }
     container_name: appointment-service
     restart: unless-stopped
@@ -167,6 +181,8 @@ services:
     networks: [cms-net]
 
   prescription-service:
+    env_file:
+    - .env
     build: { context: ./prescription, dockerfile: Dockerfile }
     container_name: prescription-service
     restart: unless-stopped
@@ -190,6 +206,8 @@ services:
   # API GATEWAY (Phase 5) - scaffold
   # ======================
   api-gateway:
+    env_file:
+    - .env
     build: { context: ./api-gateway, dockerfile: Dockerfile }
     container_name: api-gateway
     restart: unless-stopped
