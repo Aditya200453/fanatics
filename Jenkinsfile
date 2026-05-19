@@ -42,8 +42,7 @@ pipeline {
 
                     for (s in services) {
                         dir("Backend/${s}") {
-                            // bat 'mvn clean package -DskipTests'
-                            bat 'mvn clean package'
+                            bat 'mvn clean package -DskipTests'
                         }
                     }
                 }

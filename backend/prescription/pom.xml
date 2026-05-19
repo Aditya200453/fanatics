@@ -24,7 +24,7 @@
 		<spring-cloud.version>2025.1.1</spring-cloud.version>
 	</properties>
 
-	<!-- Spring Cloud Alignment -->
+	<!-- ✅ IMPORTANT: This aligns Eureka + other Spring Cloud libs with Boot 4.x -->
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -38,61 +38,38 @@
 	</dependencyManagement>
 
 	<dependencies>
-
-		<!-- Core -->
+		<!-- JPA -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
+		<!-- Web (recommended) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- Database -->
+		<!-- MariaDB driver -->
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Eureka -->
+		<!-- Eureka Client (version comes from the BOM) -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
 
-		<!-- Testing -->
+		<!-- Testing (recommended single starter) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-		<!-- MockMvc -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webmvc-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Security Testing -->
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Servlet API -->
-		<dependency>
-			<groupId>jakarta.servlet</groupId>
-			<artifactId>jakarta.servlet-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
 	</dependencies>
-
 
 	<build>
 		<plugins>
