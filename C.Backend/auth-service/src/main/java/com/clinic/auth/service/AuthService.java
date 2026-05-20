@@ -34,7 +34,7 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
-    // ✅ LOGIN (block if not ACTIVE)
+    //  LOGIN (block if not ACTIVE)
     public LoginResponse login(LoginRequest request) {
         String email = normalizeEmail(request.getEmail());
         User user = userRepository.findByEmail(email)
@@ -42,7 +42,7 @@ public class AuthService {
                         HttpStatus.UNAUTHORIZED, "Invalid credentials"
                 ));
 
-        // ✅ PENDING / DISABLED handling
+        //  PENDING / DISABLED handling
         if (AccountStatus.PENDING.equals(user.getStatus())) {
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED,
@@ -74,7 +74,7 @@ public class AuthService {
         );
     }
 
-    // ✅ SIGNUP (PATIENT default, STAFF -> PENDING approval)
+    //  SIGNUP (PATIENT default, STAFF -> PENDING approval)
     public String signup(SignupRequest request) {
         String email = normalizeEmail(request.getEmail());
 
@@ -87,7 +87,7 @@ public class AuthService {
 
         Role roleToCreate = parseRoleOrDefault(request.getRole(), Role.PATIENT);
 
-        // ✅ Secure: do NOT allow public creation of ADMIN / DOCTOR
+        //  Secure: do NOT allow public creation of ADMIN / DOCTOR
         if (roleToCreate == Role.ADMIN || roleToCreate == Role.DOCTOR) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
@@ -100,7 +100,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(roleToCreate);
 
-        // ✅ STAFF requires approval
+        //  STAFF requires approval
         if (roleToCreate == Role.STAFF) {
             user.setStatus(AccountStatus.PENDING);
         } else {
@@ -115,7 +115,7 @@ public class AuthService {
         return "Signup successful";
     }
 
-    // ✅ DOCTOR REGISTRATION (internal/admin flow)
+    // DOCTOR REGISTRATION (internal/admin flow)
     public void registerDoctor(String internalKey, SignupRequest request) {
         if (internalKey == null || !internalKey.equals(appInternalKey)) {
             throw new ResponseStatusException(
@@ -140,12 +140,12 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    // ✅ ADMIN: list pending STAFF
+    // ADMIN: list pending STAFF
     public List<User> getPendingStaff() {
         return userRepository.findAllByRoleAndStatus(Role.STAFF, AccountStatus.PENDING);
     }
 
-    // ✅ ADMIN: approve STAFF
+    //  ADMIN: approve STAFF
     public String approveStaff(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -159,7 +159,7 @@ public class AuthService {
         return "Staff approved";
     }
 
-    // ✅ ADMIN: reject/disable STAFF
+    //  ADMIN: reject/disable STAFF
     public String rejectStaff(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));

@@ -21,6 +21,5 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
 
-# ✅ ✅ ADD THIS BLOCK (MANDATORY)
 app:
   internal-key: "CLINIC_INTERNAL_SECRET"

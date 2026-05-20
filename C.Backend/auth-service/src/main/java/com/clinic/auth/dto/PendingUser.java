@@ -1,7 +1,7 @@
 package com.clinic.auth.dto;
 
 
-// ✅ DTO to avoid leaking password in response
+// DTO to avoid leaking password in response
 public class PendingUser {
     private Integer id;
     private String email;

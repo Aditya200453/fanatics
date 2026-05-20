@@ -23,7 +23,7 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                // ✅ Add JWT parsing filter
+                // Add JWT parsing filter
 //                .addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         //public
@@ -32,7 +32,7 @@ public class SecurityConfig {
                         // internal (server-to-server)
                         .requestMatchers("/auth/internal/**").permitAll()
 
-                        // ✅ admin only
+                        //  admin only
                                 .requestMatchers("/auth/admin/**").permitAll()
 
 //                        .requestMatchers("/auth/admin/**").hasRole("ADMIN")

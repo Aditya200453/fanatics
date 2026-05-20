@@ -29,11 +29,6 @@ public class User {
     @Column(nullable = false, length = 20)
     private AccountStatus status = AccountStatus.ACTIVE;
 
-//    OPTIONAL IF YOU DONT WANT TO SET THE DEFAULT STATUS AS ACTIVE
-//    @Enumerated(EnumType.STRING)
-//    @Column(nullable = false, length = 20)
-//    private AccountStatus status;   // remove "= AccountStatus.ACTIVE"
-
     public Integer getId() {
         return id;
     }

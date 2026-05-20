@@ -22,7 +22,7 @@ public class JwtUtil {
     ) {
         byte[] keyBytes = Decoders.BASE64.decode(secretBase64);
 
-        // ✅ HS256 requires >= 32 bytes (256 bits)
+        //  HS256 requires >= 32 bytes (256 bits)
         if (keyBytes.length < 32) {
             throw new IllegalArgumentException(
                     "jwt.secret is too short. Use a Base64-encoded key of at least 32 bytes (256 bits)."
@@ -33,7 +33,7 @@ public class JwtUtil {
         this.expiryMs = expiryMs;
     }
 
-    // ✅ Generate JWT (JJWT 0.12.x style)
+    //  Generate JWT (JJWT 0.12.x style)
     public String generateToken(String email, String role) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expiryMs);
@@ -47,7 +47,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    // ✅ Parse + Validate JWT (JJWT 0.12.x style)
+    //  Parse + Validate JWT (JJWT 0.12.x style)
     public Claims parseAndValidate(String token) {
         return Jwts.parser()
                 .verifyWith(key)

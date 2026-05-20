@@ -17,7 +17,7 @@ public class Prescription {
     @Column(name = "appointment_id", nullable = false)
     private Integer appointmentId;
 
-    // ✅ ensures JSON "yyyy-MM-dd" parses correctly
+    // ensures JSON "yyyy-MM-dd" parses correctly
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Column(name = "prescription_date", nullable = false)
     private LocalDate prescriptionDate;

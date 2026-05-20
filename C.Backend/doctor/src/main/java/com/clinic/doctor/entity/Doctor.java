@@ -36,7 +36,7 @@ public class Doctor {
     private String status = "PENDING";
 
     /**
-     * ✅ TEMP password only until approval.
+     * TEMP password only until approval.
      * After approval, we will set it to null.
      */
     @Column(name = "temp_password", length = 255)

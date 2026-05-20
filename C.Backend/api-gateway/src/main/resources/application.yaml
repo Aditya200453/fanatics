@@ -11,7 +11,7 @@ spring:
   cloud:
     gateway:
       server:
-        webflux:   # ✅ REQUIRED FOR SPRING BOOT 3.x
+        webflux:   # REQUIRED FOR SPRING BOOT 3.x
 
           globalcors:
             add-to-simple-url-handler-mapping: true
@@ -63,7 +63,7 @@ spring:
               predicates:
                 - Path=/speciality/**
 
-            # ================= DIAGNOSTIC ✅ FIX =================
+            # ================= DIAGNOSTIC FIX =================
             - id: diagnostic
               uri: lb://diagnostic
               predicates:

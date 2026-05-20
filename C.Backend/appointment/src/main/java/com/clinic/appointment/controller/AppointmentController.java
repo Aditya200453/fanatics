@@ -21,7 +21,7 @@ public class AppointmentController {
         this.service = service;
     }
 
-    // ✅ PATIENT: Book -> PENDING
+    //  PATIENT: Book -> PENDING
     @PostMapping("/book")
     public ResponseEntity<Appointment> book(
             @RequestHeader("X-User-Email") String email,
@@ -29,21 +29,21 @@ public class AppointmentController {
         return ResponseEntity.ok(service.bookForLoggedInPatient(email, req));
     }
 
-    // ✅ PATIENT: My appointments (all statuses)
+    //  PATIENT: My appointments (all statuses)
     @GetMapping("/my")
     public ResponseEntity<List<Appointment>> my(
             @RequestHeader("X-User-Email") String email) {
         return ResponseEntity.ok(service.myAppointments(email));
     }
 
-    // ✅ DOCTOR: My appointments (BOOKED only)
+    //  DOCTOR: My appointments (BOOKED only)
     @GetMapping("/doctor/my")
     public ResponseEntity<List<Appointment>> doctorMy(
             @RequestHeader("X-User-Email") String email) {
         return ResponseEntity.ok(service.doctorAppointments(email));
     }
 
-    // ✅ DOCTOR: add checkup notes/discussion (remarks)
+    // DOCTOR: add checkup notes/discussion (remarks)
     @PutMapping("/doctor/remarks/{appointmentId}")
     public ResponseEntity<Appointment> updateRemarks(
             @RequestHeader("X-User-Email") String doctorEmail,
@@ -53,7 +53,7 @@ public class AppointmentController {
         return ResponseEntity.ok(service.updateRemarksByDoctor(appointmentId, remarks, doctorEmail));
     }
 
-    // ✅ STAFF/ADMIN: Pending appointments queue
+    //  STAFF/ADMIN: Pending appointments queue
     @GetMapping("/staff/pending")
     public ResponseEntity<List<Appointment>> pending(
             @RequestHeader("X-User-Role") String role) {
@@ -64,7 +64,7 @@ public class AppointmentController {
         return ResponseEntity.ok(service.pendingAppointments());
     }
 
-    // ✅ STAFF/ADMIN: Approve appointment (PENDING -> BOOKED)
+    //  STAFF/ADMIN: Approve appointment (PENDING -> BOOKED)
     @PutMapping("/staff/{appointmentId}/approve")
     public ResponseEntity<Appointment> approve(
             @RequestHeader("X-User-Role") String role,
@@ -76,7 +76,7 @@ public class AppointmentController {
         return ResponseEntity.ok(service.approveAppointment(appointmentId));
     }
 
-    // ✅ STAFF/ADMIN: appointments by patientId
+    //  STAFF/ADMIN: appointments by patientId
     @GetMapping("/patient/{patientId}")
     public ResponseEntity<List<Appointment>> appointmentsByPatientId(
             @RequestHeader("X-User-Role") String role,
@@ -88,7 +88,7 @@ public class AppointmentController {
         return ResponseEntity.ok(service.appointmentsByPatientId(patientId));
     }
 
-    // ✅ STAFF/ADMIN: doctor schedule by date
+    //  STAFF/ADMIN: doctor schedule by date
     @GetMapping("/doctor/{doctorId}")
     public ResponseEntity<List<Appointment>> appointmentsByDoctorAndDate(
             @RequestHeader("X-User-Role") String role,

@@ -56,7 +56,6 @@ public class Patient {
 
     public Patient() {}
 
-    // (Optional) keep constructor minimal; prefer setters/DTOs in production
     public Patient(Integer patientId, String name, Integer age, LocalDate dob, String gender,
                    String phone, String email, String address, String status) {
         this.patientId = patientId;

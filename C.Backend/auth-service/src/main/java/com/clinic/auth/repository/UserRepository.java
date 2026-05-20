@@ -13,7 +13,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     boolean existsByEmail(String email);
 
 
-// ✅ NEW
+//  NEW
     List<User> findAllByRoleAndStatus(Role role, AccountStatus status);
 
 }

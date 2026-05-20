@@ -14,7 +14,7 @@ public class JwtUtil {
 
     private final SecretKey key;
 
-    // ✅ jwt.secret is Base64 -> must decode into bytes
+    // jwt.secret is Base64 -> must decode into bytes
     public JwtUtil(@Value("${jwt.secret}") String secretBase64) {
         byte[] keyBytes = Decoders.BASE64.decode(secretBase64);
         this.key = Keys.hmacShaKeyFor(keyBytes);

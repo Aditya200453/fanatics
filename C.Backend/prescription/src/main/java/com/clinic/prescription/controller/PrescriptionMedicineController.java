@@ -18,7 +18,6 @@ public class PrescriptionMedicineController {
         this.medicineService = medicineService;
     }
 
-    // ✅ no trailing slash
     @PostMapping("/{prescriptionId}/medicine")
     public ResponseEntity<PrescriptionMedicine> addMedicine(
             @PathVariable Integer prescriptionId,

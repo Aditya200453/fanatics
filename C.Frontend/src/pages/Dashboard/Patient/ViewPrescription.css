@@ -1,0 +1,104 @@
+/* ================= ROOT ================= */
+.vp-root {
+  min-height: 100vh;
+  padding: 48px 0 80px;
+  background: transparent;
+}
+ 
+/* ================= HERO ================= */
+.vp-hero {
+  text-align: center;
+  margin-bottom: 36px;
+}
+ 
+.vp-hero h2 {
+  font-size: clamp(2.4rem, 4vw, 3rem);
+  font-weight: 800;
+}
+ 
+.vp-hero p {
+  color: #475569;
+  margin-top: 6px;
+}
+ 
+/* HERO ACTIONS */
+.vp-hero-actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+ 
+.vp-back-btn {
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-weight: 700;
+}
+ 
+.vp-print-btn {
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-weight: 700;
+  background: #2563eb;
+  color: white;
+  border: none;
+}
+ 
+/* ================= SUMMARY ================= */
+.vp-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  margin-bottom: 32px;
+}
+ 
+.vp-summary-card {
+  background: white;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 14px 30px rgba(15,23,42,0.14);
+}
+ 
+.vp-summary-card span {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+}
+ 
+.vp-summary-card p {
+  margin-top: 6px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+ 
+/* ================= MEDICINES ================= */
+.vp-meds-card {
+  border-radius: 22px;
+  box-shadow: 0 20px 40px rgba(15,23,42,0.18);
+}
+ 
+.vp-meds-card h5 {
+  font-weight: 700;
+}
+ 
+/* TABLE */
+.vp-table th {
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+ 
+.vp-table td {
+  padding: 14px;
+}
+ 
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .vp-summary {
+    grid-template-columns: 1fr;
+  }
+}
+ 

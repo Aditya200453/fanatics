@@ -28,7 +28,6 @@ public class PrescriptionController {
         return ResponseEntity.ok(prescriptionService.getPrescription(id));
     }
 
-    // ✅ IMPORTANT: no trailing slash
     @PostMapping
     public ResponseEntity<Prescription> create(@RequestBody Prescription prescription) {
         return ResponseEntity.ok(prescriptionService.createPrescription(prescription));

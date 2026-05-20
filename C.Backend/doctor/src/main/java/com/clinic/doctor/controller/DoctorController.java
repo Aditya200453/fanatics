@@ -35,7 +35,7 @@ public class DoctorController {
         this.restTemplate = restTemplate;
     }
 
-    // ✅ DOCTOR SIGNUP (stores temp password until admin approves)
+    // DOCTOR SIGNUP (stores temp password until admin approves)
     @PostMapping("/signup")
     public ResponseEntity<ResponseMessage> signupDoctor(@RequestBody DoctorSignupRequest request) {
 
@@ -59,7 +59,7 @@ public class DoctorController {
         doctor.setQualification(request.getQualification());
 
         doctor.setStatus("PENDING");
-        doctor.setTempPassword(request.getPassword()); // ✅ store temporarily
+        doctor.setTempPassword(request.getPassword()); // store temporarily
 
         doctorService.saveDoctor(doctor);
 
@@ -68,13 +68,13 @@ public class DoctorController {
         );
     }
 
-    // ✅ ADMIN → list doctors for UI
+    //  ADMIN → list doctors for UI
     @GetMapping("/admin/doctors")
     public ResponseEntity<List<Doctor>> getAllDoctors(HttpServletRequest request) {
 
         String role = request.getHeader("X-User-Role");
 
-        // ✅ ONLY ADMIN + STAFF
+        // ONLY ADMIN + STAFF
         if (role == null || !(role.equalsIgnoreCase("ADMIN") || role.equalsIgnoreCase("STAFF"))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -97,7 +97,7 @@ public class DoctorController {
     }
 
 
-    // ✅ ADMIN → approve doctor: creates auth user as DOCTOR using stored temp password
+    // ADMIN → approve doctor: creates auth user as DOCTOR using stored temp password
     @PostMapping("/admin/approve/{id}")
     public ResponseEntity<ResponseMessage> approveDoctor(@PathVariable Integer id) {
 
@@ -114,7 +114,7 @@ public class DoctorController {
 
         AuthRegisterRequest authRequest = new AuthRegisterRequest(
                 doctor.getEmail(),
-                doctor.getTempPassword() // ✅ use actual password doctor entered
+                doctor.getTempPassword() // use actual password doctor entered
         );
 
         HttpHeaders headers = new HttpHeaders();
@@ -124,7 +124,7 @@ public class DoctorController {
         HttpEntity<AuthRegisterRequest> entity = new HttpEntity<>(authRequest, headers);
 
         try {
-            // ✅ Use internal endpoint so role becomes DOCTOR (not PATIENT)
+            // Use internal endpoint so role becomes DOCTOR (not PATIENT)
             // This matches the intended “Admin approves → auth user created with DOCTOR role” flow. [1](https://insightgloballlc-my.sharepoint.com/personal/pantham_jashwanth_insightglobal_com/Documents/Microsoft%20Teams%20Chat%20Files/signups%20and%20logins.pdf?web=1)
             restTemplate.postForEntity(
                     "http://auth-service/auth/internal/doctor",
@@ -138,9 +138,9 @@ public class DoctorController {
             System.out.println("Auth-service error while creating doctor auth: " + body);
         }
 
-        // ✅ Activate doctor and clear temp password
+        //  Activate doctor and clear temp password
         doctor.setStatus("ACTIVE");
-        doctor.setTempPassword(null); // ✅ do not keep plaintext password
+        doctor.setTempPassword(null); //  do not keep plaintext password
         doctorService.updateDoctor(doctor);
 
         return ResponseEntity.ok(
@@ -148,7 +148,7 @@ public class DoctorController {
         );
     }
 
-    // ✅ doctor profile
+    // doctor profile
     @GetMapping("/me")
     public ResponseEntity<Doctor> getMyProfile(HttpServletRequest request) {
         String email = request.getHeader("X-User-Email");
@@ -162,7 +162,7 @@ public class DoctorController {
         return ResponseEntity.ok(doctor);
     }
 
-    // ✅ INTERNAL: doctorId by email (used by appointment-service)
+    // INTERNAL: doctorId by email (used by appointment-service)
     @GetMapping("/internal/id")
     public ResponseEntity<Integer> getDoctorIdByEmail(
             @RequestHeader("X-INTERNAL-KEY") String key,
@@ -178,7 +178,7 @@ public class DoctorController {
         return ResponseEntity.ok(doctor.getDoctorId());
     }
 
-    // ✅ PUBLIC: active doctors
+    // PUBLIC: active doctors
     @GetMapping("/public/active")
     public ResponseEntity<List<Doctor>> getActiveDoctors() {
         return ResponseEntity.ok(doctorRepository.findByStatus("ACTIVE"));

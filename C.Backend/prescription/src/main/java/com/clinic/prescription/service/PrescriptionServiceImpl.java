@@ -41,7 +41,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
             throw new PrescriptionConflictException("prescriptionDate is required");
         }
 
-        // Business rule (optional): only one prescription per appointment
+        // Business rule: only one prescription per appointment
         if (prescriptionRepository.existsByAppointmentId(prescription.getAppointmentId())) {
             throw new PrescriptionConflictException(
                     "Prescription already exists for appointmentId " + prescription.getAppointmentId());

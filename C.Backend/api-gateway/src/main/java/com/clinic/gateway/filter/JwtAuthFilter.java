@@ -27,17 +27,17 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         final String path = exchange.getRequest().getURI().getPath();
         final HttpMethod method = exchange.getRequest().getMethod();
 
-        // ✅ Allow CORS preflight
+        // Allow CORS preflight
         if (HttpMethod.OPTIONS.equals(method)) {
             return chain.filter(exchange);
         }
 
-        // ✅ Public endpoints (no JWT required)
+        // Public endpoints (no JWT required)
         if (isPublic(path)) {
             return chain.filter(exchange);
         }
 
-        // ✅ Require Bearer token
+        //  Require Bearer token
         final String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ") || authHeader.length() <= 7) {
             return unauthorized(exchange);
@@ -60,36 +60,36 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
             final String role = roleRaw.toUpperCase();
 
-            // ==========================================================
-            // ✅ ROLE-BASED ACCESS RULES
-            // ==========================================================
 
-            // ✅ PATIENT SERVICE: ADMIN / PATIENT / STAFF
+            // ROLE-BASED ACCESS RULES
+
+
+            //  PATIENT SERVICE: ADMIN / PATIENT / STAFF
             if (isPath(path, "/patient") &&
                     !(role.equals("ADMIN") || role.equals("PATIENT") || role.equals("STAFF"))) {
                 return forbidden(exchange);
             }
 
-            // ✅ DOCTOR SERVICE: ADMIN / DOCTOR / STAFF
+            //  DOCTOR SERVICE: ADMIN / DOCTOR / STAFF
             if (isPath(path, "/doctor") &&
                     !(role.equals("ADMIN") || role.equals("DOCTOR") || role.equals("STAFF"))) {
                 return forbidden(exchange);
             }
 
-            // ✅ SPECIALITY: ADMIN / STAFF / PATIENT
+            // SPECIALITY: ADMIN / STAFF / PATIENT
             // (needed for patient booking page to load specialities + doctors)
             if (isPath(path, "/speciality") &&
                     !(role.equals("ADMIN") || role.equals("STAFF") || role.equals("PATIENT"))) {
                 return forbidden(exchange);
             }
 
-            // ✅ APPOINTMENT: ADMIN / DOCTOR / PATIENT / STAFF
+            //  APPOINTMENT: ADMIN / DOCTOR / PATIENT / STAFF
             if (isPath(path, "/appointment") &&
                     !(role.equals("ADMIN") || role.equals("DOCTOR") || role.equals("PATIENT") || role.equals("STAFF"))) {
                 return forbidden(exchange);
             }
 
-            // ✅ DIAGNOSTIC: ADMIN / STAFF / DOCTOR (optional) / PATIENT (optional)
+            //  DIAGNOSTIC: ADMIN / STAFF / DOCTOR (optional) / PATIENT (optional)
             // If you want PATIENT to view tests, include PATIENT here.
             // If you want ONLY STAFF to manage tests, keep PATIENT out.
             if (isPath(path, "/diagnostic") &&
@@ -97,13 +97,13 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
                 return forbidden(exchange);
             }
 
-            // ✅ AUTH ADMIN endpoints: ADMIN only
+            //  AUTH ADMIN endpoints: ADMIN only
             if (isPath(path, "/auth/admin") && !role.equals("ADMIN")) {
                 return forbidden(exchange);
             }
 
             // ==========================================================
-            // ✅ Forward identity headers to microservices (prevent spoofing)
+            // Forward identity headers to microservices (prevent spoofing)
             // ==========================================================
             ServerWebExchange mutated = exchange.mutate()
                     .request(r -> r.headers(headers -> {
@@ -123,16 +123,16 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     private boolean isPublic(String path) {
         return
-                // ✅ Auth public
+                //  Auth public
                 path.equals("/auth/login")
                         || path.equals("/auth/signup")
                         || path.startsWith("/auth/internal/")
 
-                        // ✅ Signup endpoints public
+                        //  Signup endpoints public
                         || path.equals("/patient/signup")
                         || path.equals("/doctor/signup")
 
-                        // ✅ Optional doctor public endpoints
+                        // Optional doctor public endpoints
                         || path.equals("/doctor/public/active")
                         || path.startsWith("/doctor/public/");
     }

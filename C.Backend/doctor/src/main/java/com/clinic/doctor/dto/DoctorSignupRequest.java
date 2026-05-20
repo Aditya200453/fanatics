@@ -8,7 +8,7 @@ public class DoctorSignupRequest {
     private Integer experience;
     private String qualification;
 
-    // ✅ NEW FIELD
+    //  NEW FIELD
     private String password;
 
     // getters & setters

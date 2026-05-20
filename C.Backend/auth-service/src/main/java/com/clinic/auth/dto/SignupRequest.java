@@ -4,7 +4,7 @@ public class SignupRequest {
 
     private String email;
     private String password;
-    private String role;   // ✅ ADD THIS
+    private String role;   // ADD THIS
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }

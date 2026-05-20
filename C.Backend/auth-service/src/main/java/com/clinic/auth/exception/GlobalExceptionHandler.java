@@ -14,7 +14,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // ✅ Preserve status codes thrown by your service
+    //  Preserve status codes thrown by your service
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, Object>> handleResponseStatus(ResponseStatusException ex) {
         Map<String, Object> body = new HashMap<>();
@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ex.getStatusCode()).body(body);
     }
 
-    // ✅ Validation errors -> 400
+    // Validation errors -> 400
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
         Map<String, String> fieldErrors = new HashMap<>();
@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
-    // ✅ Fallback -> 500 (keep message useful in dev)
+    // Fallback -> 500 (keep message useful in dev)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleAny(Exception ex) {
         Map<String, Object> body = new HashMap<>();

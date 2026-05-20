@@ -22,7 +22,7 @@ public class SpecialityController {
     }
 
     // =====================================================
-    // ✅ ADMIN ONLY – CREATE SPECIALITY (MASTER DATA)
+    //  ADMIN ONLY – CREATE SPECIALITY (MASTER DATA)
     // =====================================================
     @PostMapping("/")
     public ResponseEntity<Speciality> addSpeciality(
@@ -37,7 +37,7 @@ public class SpecialityController {
     }
 
     // =====================================================
-    // ✅ READ‑ONLY – ADMIN + STAFF + PATIENT
+    //  READ‑ONLY – ADMIN + STAFF + PATIENT
     // Used by: patient booking, staff/admin dashboards
     // =====================================================
     @GetMapping("/")
@@ -55,7 +55,7 @@ public class SpecialityController {
     }
 
     // =====================================================
-    // ✅ READ‑ONLY – ADMIN + STAFF + PATIENT
+    // READ‑ONLY – ADMIN + STAFF + PATIENT
     // Used by: appointment booking doctor selection
     // =====================================================
     @GetMapping("/{id}/doctors")
@@ -74,7 +74,7 @@ public class SpecialityController {
     }
 
     // =====================================================
-    // ✅ ADMIN + STAFF – MAP DOCTOR → SPECIALITY
+    // ADMIN + STAFF – MAP DOCTOR → SPECIALITY
     // =====================================================
     @PostMapping("/map")
     public ResponseEntity<SpecialityDoctorMap> mapDoctor(
@@ -94,7 +94,7 @@ public class SpecialityController {
     }
 
     // =====================================================
-    // ✅ ADMIN + STAFF – REMOVE DOCTOR FROM SPECIALITY
+    // ADMIN + STAFF – REMOVE DOCTOR FROM SPECIALITY
     // =====================================================
     @DeleteMapping("/map")
     public ResponseEntity<Void> unmapDoctor(
@@ -109,7 +109,7 @@ public class SpecialityController {
         specialityService.removeDoctorFromSpeciality(specialityId, doctorId);
         return ResponseEntity.ok().build();
     }
-    // ✅ DELETE SPECIALITY (ADMIN ONLY)
+    // DELETE SPECIALITY (ADMIN ONLY)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSpeciality(
             @RequestHeader("X-User-Role") String role,

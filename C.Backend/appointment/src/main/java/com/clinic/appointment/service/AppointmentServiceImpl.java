@@ -26,7 +26,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         this.restTemplate = restTemplate;
     }
 
-    // ✅ Patient books -> ALWAYS PENDING
+    // Patient books -> ALWAYS PENDING
     @Override
     public Appointment bookForLoggedInPatient(String patientEmail, BookAppointmentRequest req) {
 
@@ -38,7 +38,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setAppointmentDate(req.getAppointmentDate());
         appointment.setAppointmentTime(req.getAppointmentTime());
 
-        // ✅ PENDING until staff/admin approves
+        // PENDING until staff/admin approves
         appointment.setStatus(AppointmentStatus.PENDING);
 
         appointment.setSymptoms(req.getSymptoms());
@@ -47,27 +47,27 @@ public class AppointmentServiceImpl implements AppointmentService {
         return repo.save(appointment);
     }
 
-    // ✅ Patient sees all statuses
+    //  Patient sees all statuses
     @Override
     public List<Appointment> myAppointments(String patientEmail) {
         Integer patientId = getPatientId(patientEmail);
         return repo.findByPatientIdOrderByAppointmentDateDesc(patientId);
     }
 
-    // ✅ Doctor sees ONLY BOOKED
+    //  Doctor sees ONLY BOOKED
     @Override
     public List<Appointment> doctorAppointments(String doctorEmail) {
         Integer doctorId = getDoctorId(doctorEmail);
         return repo.findByDoctorIdAndStatusOrderByAppointmentDateDesc(doctorId, AppointmentStatus.BOOKED);
     }
 
-    // ✅ Staff/Admin: pending queue
+    //  Staff/Admin: pending queue
     @Override
     public List<Appointment> pendingAppointments() {
         return repo.findByStatusOrderByAppointmentDateAscAppointmentTimeAsc(AppointmentStatus.PENDING);
     }
 
-    // ✅ Staff approves: PENDING -> BOOKED
+    //  Staff approves: PENDING -> BOOKED
     @Override
     public Appointment approveAppointment(Integer appointmentId) {
         Appointment appt = repo.findById(appointmentId)
@@ -81,13 +81,13 @@ public class AppointmentServiceImpl implements AppointmentService {
         return repo.save(appt);
     }
 
-    // ✅ Staff/Admin: appointments by patientId
+    //  Staff/Admin: appointments by patientId
     @Override
     public List<Appointment> appointmentsByPatientId(Integer patientId) {
         return repo.findByPatientIdOrderByAppointmentDateDesc(patientId);
     }
 
-    // ✅ Staff/Admin: doctor schedule by date (BOOKED only)
+    //  Staff/Admin: doctor schedule by date (BOOKED only)
     @Override
     public List<Appointment> appointmentsByDoctorIdAndDate(Integer doctorId, LocalDate date) {
         return repo.findByDoctorIdAndAppointmentDateAndStatusOrderByAppointmentTimeAsc(
@@ -95,7 +95,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         );
     }
 
-    // ✅ Doctor adds notes/checkup discussion (remarks)
+    // Doctor adds notes/checkup discussion (remarks)
     @Override
     public Appointment updateRemarksByDoctor(Integer appointmentId, String remarks, String doctorEmail) {
 
@@ -104,15 +104,15 @@ public class AppointmentServiceImpl implements AppointmentService {
         Appointment appt = repo.findById(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Appointment not found: " + appointmentId));
 
-        // ✅ Security check
+        //  Security check
         if (!appt.getDoctorId().equals(doctorId)) {
             throw new RuntimeException("You cannot update this appointment");
         }
 
-        // ✅ Save remarks
+        // Save remarks
         appt.setRemarks(remarks);
 
-        // ✅ ✅ ADD THIS LINE HERE 🔥
+        //  ADD THIS LINE HERE 🔥
         appt.setStatus(AppointmentStatus.COMPLETED);
 
         return repo.save(appt);

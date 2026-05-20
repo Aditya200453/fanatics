@@ -1,0 +1,218 @@
+/* ===================== GLOBAL RESET ===================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html, body, #root {
+  background: transparent !important;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+.container-fluid {
+  background: transparent !important;
+}
+ 
+/* ===================== FONT SYSTEM ===================== */
+:root {
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-heading: "Manrope", system-ui, sans-serif;
+ 
+  /* Medical color system */
+  --text-dark: #0f172a;
+  --text-muted: #475569;
+  --brand-blue: #2563eb;
+}
+ 
+/* ===================== BODY ===================== */
+body {
+  background: none;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  letter-spacing: 0.18px;
+  color: var(--text-dark);
+  -webkit-font-smoothing: antialiased;
+}
+ 
+/* ===================== ROOT ===================== */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+}
+ 
+/* ===================== GLOBAL APP BACKGROUND ===================== *//* ===================== SVG WATERMARK ===================== */
+.app-root {
+  background:
+    url("/medical-watermark.svg") repeat,
+    radial-gradient(circle at 20% 20%, rgba(59,130,246,0.22), transparent 45%),
+    radial-gradient(circle at 80% 30%, rgba(16,185,129,0.18), transparent 40%),
+    radial-gradient(circle at 70% 85%, rgba(14,165,233,0.22), transparent 45%),
+    linear-gradient(
+      135deg,
+      #dbeafe 0%,   /* ⬅️ darker than before */
+      #eef6ff 50%,
+      #def7f2 100%
+    );
+ 
+  background-size:
+    220px 220px,
+    auto,
+    auto,
+    auto,
+    auto;
+}
+ 
+ 
+/* ===================== TYPOGRAPHY ===================== */
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.04em;
+  color: var(--text-dark);
+}
+ 
+p {
+  margin: 0;
+  color: var(--text-muted);
+}
+ 
+/* ===================== DASHBOARD HERO ===================== */
+.pd-header {
+  padding: 32px 0 48px;
+  margin-bottom: 48px;
+}
+ 
+.pd-header h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.6rem, 4vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1.1;
+}
+ 
+.pd-header p {
+  margin-top: 8px;
+  font-size: 1rem;
+}
+ 
+/* ===================== GLASS / WHITE CARDS ===================== */
+.pd-card,
+.pd-cta,
+.dashboard-info-card {
+  background: #ffffff;
+  border-radius: 18px;
+  border: none;
+  padding: 22px;
+ 
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.12);
+}
+ 
+/* ===================== CARD CONTENT ===================== */
+.pd-card h6 {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand-blue);
+  margin-bottom: 6px;
+}
+ 
+.pd-card p {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+ 
+.pd-card small {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+ 
+/* ===================== BUTTONS ===================== */
+.btn {
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 11px 18px;
+}
+ 
+.btn-primary {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+}
+ 
+.btn-outline-primary {
+  background-color: #e0ecff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+ 
+/* ===================== TABLE ===================== */
+.pd-table thead th {
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #334155;
+}
+ 
+.pd-table tbody td {
+  font-size: 0.95rem;
+  color: var(--text-dark);
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* ===================== FINAL BACKGROUND SAFETY OVERRIDES ===================== */
+ 
+/* Ensure body never shows white beyond content */
+body {
+  background:
+    url("/medical-watermark.svg") repeat,
+    radial-gradient(circle at 20% 20%, rgba(59,130,246,0.22), transparent 45%),
+    radial-gradient(circle at 80% 30%, rgba(16,185,129,0.18), transparent 40%),
+    radial-gradient(circle at 70% 85%, rgba(14,165,233,0.22), transparent 45%),
+    linear-gradient(
+      135deg,
+      #dbeafe 0%,
+      #eef6ff 50%,
+      #def7f2 100%
+    );
+   
+  background-size:
+    220px 220px,
+    auto,
+    auto,
+    auto,
+    auto;
+ 
+  background-attachment: fixed; /*  kills white gap on scroll */
+}
+ 
+/* Make sure app wrapper stretches full viewport */
+.app-root {
+  min-height: 100vh;
+}
+ 
+/* Safety-net: even if content is short */
+#root {
+  min-height: 100vh;
+}
+ 

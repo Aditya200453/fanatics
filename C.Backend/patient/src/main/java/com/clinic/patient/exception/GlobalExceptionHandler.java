@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new ResponseMessage(ex.getMessage()), HttpStatus.CONFLICT);
     }
 
-    // ✅ New: handle database unique constraint errors gracefully
+    //  handle database unique constraint errors gracefully
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ResponseMessage> handleDataIntegrity(DataIntegrityViolationException ex) {
         return new ResponseEntity<>(

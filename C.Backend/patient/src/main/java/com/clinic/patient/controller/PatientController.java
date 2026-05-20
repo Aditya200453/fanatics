@@ -24,7 +24,7 @@ public class PatientController {
     private final PatientRepository patientRepository;
     private final RestTemplate restTemplate;
 
-    // ✅ IMPORTANT FOR INTERNAL CALLS
+
     @Value("${app.internal-key}")
     private String internalKeyFromYaml;
 
@@ -36,7 +36,7 @@ public class PatientController {
         this.restTemplate = restTemplate;
     }
 
-    // ✅ ✅ PATIENT SIGNUP
+    //  PATIENT SIGNUP
     @PostMapping("/signup")
     public ResponseEntity<ResponseMessage> signupPatient(@RequestBody PatientSignupRequest request) {
 
@@ -53,7 +53,7 @@ public class PatientController {
                     .body(new ResponseMessage("Phone already exists"));
         }
 
-        // ✅ create user in auth-service
+        //  create user in auth-service
         AuthRegisterRequest authRequest =
                 new AuthRegisterRequest(email, request.getPassword());
 
@@ -69,7 +69,7 @@ public class PatientController {
                 String.class
         );
 
-        // ✅ save patient
+        // save patient
         Patient patient = new Patient();
         patient.setName(request.getName());
         patient.setAge(request.getAge());
@@ -87,7 +87,7 @@ public class PatientController {
         );
     }
 
-    // ✅ ✅ GET LOGGED-IN PROFILE
+    // GET LOGGED-IN PROFILE
     @GetMapping("/me")
     public ResponseEntity<Patient> getMyProfile(HttpServletRequest request) {
 
@@ -102,7 +102,7 @@ public class PatientController {
         return ResponseEntity.ok(patient);
     }
 
-    // ✅ ✅ INTERNAL API (used by appointment-service)
+    //  INTERNAL API (used by appointment-service)
     @GetMapping("/internal/id")
     public ResponseEntity<Integer> getPatientIdByEmail(
             @RequestHeader("X-INTERNAL-KEY") String key,
@@ -118,7 +118,7 @@ public class PatientController {
         return ResponseEntity.ok(p.getPatientId());
     }
 
-    // ✅ ✅ GET ALL PATIENTS
+    //  GET ALL PATIENTS
     @GetMapping("/all")public ResponseEntity<List<Patient>> getAllPatientsForStaff(HttpServletRequest request) {
         String role = request.getHeader("X-User-Role");
 
@@ -130,7 +130,7 @@ public class PatientController {
     }
 
 
-    // ✅ ✅ GET ONE PATIENT
+    // GET ONE PATIENT
     @GetMapping("/{id}")
     public ResponseEntity<Patient> getPatient(@PathVariable Integer id) {
         return ResponseEntity.ok(patientService.getOnePatient(id));

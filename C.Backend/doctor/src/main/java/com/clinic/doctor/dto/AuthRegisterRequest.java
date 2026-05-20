@@ -4,7 +4,7 @@ public class AuthRegisterRequest {
     private String email;
     private String password;
 
-    public AuthRegisterRequest() {} // ✅ ADD THIS
+    public AuthRegisterRequest() {} //  ADD THIS
 
     public AuthRegisterRequest(String email, String password) {
         this.email = email;

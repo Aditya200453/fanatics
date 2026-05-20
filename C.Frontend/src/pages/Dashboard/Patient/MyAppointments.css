@@ -1,0 +1,212 @@
+/* ROOT */
+.ma-root{
+  background: #f4f9fd;
+  min-height: 100vh;
+ 
+  padding-top: 40px;
+  padding-bottom: 80px;
+ 
+}
+/* PAGE HEADER */
+.ma-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+ 
+.ma-page-title {
+  font-size: 2.2rem;       /* ⬅ BIGGER */
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+ 
+/* CARD */
+.ma-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+ 
+  /* spacing so it can float */
+  margin-top: 40px;
+  margin-bottom: 40px;
+  max-width: 1600px;
+  margin-left: auto;
+  margin-right: auto;
+ 
+  /* REAL floating shadow */
+  box-shadow:
+    0 30px 60px rgba(15, 23, 42, 0.25),
+    0 10px 24px rgba(15, 23, 42, 0.12);
+ 
+  position: relative;
+  z-index: 2;
+}
+ 
+/* HEADER */
+.ma-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+ 
+.ma-title{
+  font-weight: 800;
+  margin: 0;
+}
+ 
+/* REFRESH BUTTON */
+.ma-refresh-btn{
+  border-radius: 12px;
+  font-weight: 700;
+  padding: 8px 16px;
+}
+ 
+/* TABLE WRAPPER */
+.ma-table-wrapper{
+  overflow-x: auto;
+}
+ 
+/* TABLE */
+.ma-table {
+  border-collapse: separate;
+  border-spacing: 0 6px;
+}
+ 
+.ma-table tbody tr {
+  border-radius: 12px;
+}
+ 
+.ma-table tbody td:first-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+ 
+.ma-table tbody td:last-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+ 
+ 
+.ma-table thead{
+  background: #1f2933;
+}
+ 
+.ma-table thead th{
+  color: #e5e7eb;
+  font-weight: 700;
+  border: none;
+}
+ 
+.ma-table tbody tr{
+  background: #111827;
+}
+ 
+.ma-table tbody td{
+  color: #e5e7eb;
+  vertical-align: middle;
+  border-color: rgba(255,255,255,0.08);
+}
+ 
+/* STATUS BADGES */
+.ma-status{
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: inline-block;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+}
+ 
+.ma-status.pending{
+  background: #fef3c7;
+  color: #92400e;
+}
+ 
+.ma-status.booked{
+  background: #dcfce7;
+  color: #166534;
+}
+ 
+.ma-status.completed{
+  background: #e0f2fe;
+  color: #075985;
+}
+ 
+/* VIEW BUTTON */
+.ma-view-btn{
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 6px 14px;
+  background: #2563eb;
+  border: none;
+}
+ 
+.ma-view-btn:hover{
+  background: #1d4ed8;
+}
+ 
+/* ========== FORCE VISIBILITY FIX ========== */
+ 
+.ma-table thead {
+  background: #f1f5f9 !important;
+}
+ 
+.ma-table thead th {
+  color: #0f172a !important;
+  font-weight: 700;
+  border-bottom: 1px solid #e5e7eb;
+}
+ 
+.ma-table tbody tr {
+  background: #ffffff !important;
+}
+ 
+.ma-table tbody td {
+  color: #0f172a !important;
+  border-bottom: 1px solid #e5e7eb;
+}
+ 
+/* Hover */
+.ma-table tbody tr:hover {
+  background: #f8fafc !important;
+}
+.ma-root {
+  background: transparent;
+}
+.ba-slotBtn:disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+/* ================= HERO HEADER (MY APPOINTMENTS) ================= */
+ 
+.ma-hero {
+  position: relative;
+  text-align: center;
+  margin-bottom: 36px;
+  padding: 20px 0 10px;
+}
+ 
+.ma-hero h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 4vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--text-dark);
+  margin: 0;
+}
+ 
+.ma-hero p {
+  margin-top: 8px;
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+ 
+/* Refresh button styled like action in hero */
+.ma-hero .ma-refresh-btn {
+  margin-top: 16px;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-weight: 700;
+}

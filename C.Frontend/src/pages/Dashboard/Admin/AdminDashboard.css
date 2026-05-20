@@ -1,0 +1,421 @@
+/* ===================== ROOT ===================== */
+.admin-container {
+  padding: 32px;
+  min-height: 100vh;
+}
+ 
+/* ===================== HEADER ===================== */
+.admin-header {
+  margin-bottom: 32px;
+}
+ 
+.admin-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+ 
+.admin-header-row h2 {
+  font-size: clamp(2.2rem, 3vw, 2.6rem);
+  font-weight: 800;
+  color: var(--text-dark);
+}
+ 
+/* Header description */
+.admin-header p {
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+ 
+/* ===================== BUTTON (HEADER) ===================== */
+.pd-header-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+ 
+  background: #ffffff;
+  padding: 8px 16px;
+  border-radius: 999px;
+ 
+  border: 1px solid #e2e8f0;
+  font-weight: 600;
+ 
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+ 
+.pd-header-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.1);
+}
+ 
+/* small status dot */
+.pd-chip-dot {
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+}
+ 
+/* ===================== MESSAGE ===================== */
+.admin-msg {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  border-radius: 10px;
+ 
+  background: #e0ecff;
+  color: #1d4ed8;
+  font-weight: 500;
+}
+ 
+/* ===================== CARD ===================== */
+.card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 22px;
+  margin-bottom: 30px;
+ 
+  box-shadow:
+    0 18px 38px rgba(15, 23, 42, 0.12);
+ 
+  transition: 0.3s ease;
+}
+ 
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow:
+    0 28px 50px rgba(15, 23, 42, 0.16);
+}
+ 
+.card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: var(--text-dark);
+}
+ 
+/* ===================== TABLE ===================== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+}
+ 
+/* --- HEADER --- */
+thead {
+  background: #f1f5f9;
+}
+ 
+th {
+  padding: 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+ 
+  color: #334155;
+}
+ 
+/* --- BODY --- */
+td {
+  padding: 12px;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+}
+ 
+/* zebra rows */
+tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+ 
+tbody tr:hover {
+  background: #eef6ff;
+  transition: 0.2s;
+}
+ 
+/* subtle border */
+tbody td {
+  border-bottom: 1px solid #e2e8f0;
+}
+ 
+/* ===================== STATUS ===================== */
+.status-active {
+  color: #22c55e;
+  font-weight: 600;
+}
+ 
+.status-pending {
+  color: #f59e0b;
+  font-weight: 600;
+}
+ 
+/* ===================== BUTTONS ===================== */
+.btn {
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+ 
+/* ✅ APPROVE */
+.btn-success {
+  background: linear-gradient(135deg, #22c55e, #4ade80);
+  color: white;
+}
+ 
+.btn-success:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+}
+ 
+/* ✅ REJECT */
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444, #f87171);
+  color: white;
+}
+ 
+.btn-danger:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+ 
+/* spacing */
+.me-2 {
+  margin-right: 10px;
+}
+ 
+/* ===================== SELECT ===================== */
+select {
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid #cbd5f5;
+  background: white;
+  font-size: 13px;
+}
+ 
+select:focus {
+  outline: none;
+  border-color: var(--brand-blue);
+}
+ 
+/* ===================== LOADING TEXT ===================== */
+h4 {
+  color: #64748b;
+}
+ 
+/* ===================== ANIMATION ===================== */
+.card {
+  animation: fadeUp 0.4s ease;
+}
+ 
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+ 
+SEARCH.admin-filter-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+ 
+.admin-filter-bar input,
+.admin-filter-bar select {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-weight: 600;
+  min-width: 220px;
+}
+ 
+.admin-filter-bar input:focus,
+.admin-filter-bar select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+ 
+/* =====================================================
+   ADMIN HEADER – SP  margin-bottom: 40px;           /* space before cards */  
+.admin-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+}
+ 
+/* LEFT */
+ 
+.admin-header-left p {
+  margin-top: 6px;
+  margin-bottom: 18px;           /* space before Home button */
+  color: #475569;
+}
+ 
+/* ================= HERO ACTIONS ================= */
+ 
+.admin-hero-actions {
+  margin-top: 12px;
+}
+ 
+.admin-home-btn {
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-weight: 700;
+  background: transparent;
+  border: 1.8px solid #2563eb;
+  color: #2563eb;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+ 
+.admin-home-btn:hover {
+  background: rgba(37, 99, 235, 0.08);
+  transform: translateY(-1px);
+}
+ 
+/* ================= RIGHT ACTIONS ================= */
+ 
+.admin-header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 6px;
+}
+ 
+.admin-logout-btn {
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-weight: 700;
+  border: 1.5px solid #dc2626;
+  background: transparent;
+  color: #dc2626;
+  cursor: pointer;
+}
+ 
+.admin-logout-btn:hover {
+  background: rgba(220, 38, 38, 0.08);
+}
+ 
+/* ================= RESPONSIVE ================= */
+ 
+@media (max-width: 900px) {
+  .admin-header-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+ 
+  .admin-header-actions {
+    align-self: flex-start;
+  }
+}
+ 
+/* =====================================================/* ================================================= HEADER – SPACING & ACTIONS
+   ===================================================== */
+ 
+.admin-header {
+  margin-bottom: 40px; /* space before cards */
+}
+ 
+.admin-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+}
+ 
+/* =====================================================
+   LEFT SECTION
+   ===================================================== */
+ 
+.admin-header-left p {
+  margin-top: 6px;
+  margin-bottom: 18px; /* space before Home button */
+  color: #475569;
+}
+ 
+/* =====================================================
+   HERO ACTIONS (BACK TO HOME)
+   ===================================================== */
+ 
+.admin-hero-actions {
+  margin-top: 12px;
+}
+ 
+.admin-home-btn {
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-weight: 700;
+  background: transparent;
+  border: 1.8px solid #2563eb;
+  color: #2563eb;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+ 
+.admin-home-btn:hover {
+  background: rgba(37, 99, 235, 0.08);
+  transform: translateY(-1px);
+}
+ 
+/* =====================================================
+   RIGHT HEADER ACTIONS (SWITCH + LOGOUT)
+   ===================================================== */
+ 
+.admin-header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 6px;
+}
+ 
+ 
+.admin-logout-btn {
+  border-radius: 14px;
+  padding: 9px 18px;
+  font-weight: 700;
+ 
+  background: rgba(220, 38, 38, 0.08);
+  border: 1.8px solid #dc2626;
+  color: #dc2626;
+ 
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+ 
+ 
+ 
+.admin-logout-btn:hover {
+  background: #dc2626;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(220, 38, 38, 0.35);
+}
+ 
+ 
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+ 
+@media (max-width: 900px) {
+  .admin-header-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+ 
+  .admin-header-actions {
+    align-self: flex-start;
+  }
+}
+ 
+ 
